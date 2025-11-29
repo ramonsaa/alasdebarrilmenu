@@ -234,8 +234,11 @@
         function createTableCard(t) {
             const ords = ordersData.filter(o => o.tableId === t.id && o.status !== 'cancelled');
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
+            
+            // Si tiene depósito (anticipo), restarlo del total visual
             const deposit = t.deposit || 0;
             const remaining = total - deposit;
+
             let cardBg = 'bg-white', borderColor = 'border-stone-300', badge = '';
             
             // CLIENTE DISTINGUIDO STYLING
@@ -515,25 +518,10 @@
             switchTab('orders');
         }
 
-        window.openNewTableModal = () => { document.getElementById('modal-content').innerHTML = `
-            <div class="p-6 bg-[#fffbeb]">
-                <h3 class="font-black text-xl mb-4 text-amber-900">ABRIR NUEVA MESA</h3>
-                <input type="number" id="ntn" placeholder="Número de Mesa" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-3 text-lg font-bold outline-none focus:border-amber-500">
-                <input type="text" id="ntnm" placeholder="Apodo / Referencia" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-4 outline-none focus:border-amber-500">
-                <label class="flex items-center gap-2 mb-6 p-2 border border-pink-200 bg-pink-50 rounded-lg cursor-pointer">
-                    <input type="checkbox" id="ntvip" class="w-5 h-5 accent-pink-500"> 
-                    <span class="font-bold text-pink-700"><i class="fa-solid fa-crown"></i> Cliente Distinguido (VIP)</span>
-                </label>
-                <div class="flex gap-3">
-                    <button onclick="closeModal()" class="flex-1 bg-stone-200 py-3 rounded-lg font-bold text-stone-600 hover:bg-stone-300">CANCELAR</button>
-                    <button onclick="subNT()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition">ABRIR</button>
-                </div>
-            </div>`; document.getElementById('modal-overlay').classList.remove('hidden'); }
-        
+        window.openNewTableModal = () => { document.getElementById('modal-content').innerHTML = `<div class="p-6 bg-[#fffbeb]"><h3 class="font-black text-xl mb-4 text-amber-900">ABRIR NUEVA MESA</h3><input type="number" id="ntn" placeholder="Número de Mesa" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-3 text-lg font-bold outline-none focus:border-amber-500"><input type="text" id="ntnm" placeholder="Apodo / Referencia" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-4 outline-none focus:border-amber-500"><div class="flex gap-3"><button onclick="closeModal()" class="flex-1 bg-stone-200 py-3 rounded-lg font-bold text-stone-600 hover:bg-stone-300">CANCELAR</button><button onclick="subNT()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition">ABRIR</button></div></div>`; document.getElementById('modal-overlay').classList.remove('hidden'); }
         window.subNT = async () => {
             const num = document.getElementById('ntn').value;
             const nick = document.getElementById('ntnm').value || 'Cliente';
-            const isVip = document.getElementById('ntvip').checked;
             if(!num) return;
             try {
                 await runTransaction(db, async (transaction) => {
@@ -543,14 +531,7 @@
                     if (counterDoc.exists()) newId = counterDoc.data().current + 1;
                     transaction.set(counterRef, { current: newId });
                     const newTableRef = doc(collection(db, 'tables'));
-                    transaction.set(newTableRef, { 
-                        number: num, 
-                        nickname: nick, 
-                        status: 'open', 
-                        openedAt: serverTimestamp(), 
-                        uniqueId: newId,
-                        isVip: isVip // Guardamos el estado VIP
-                    });
+                    transaction.set(newTableRef, { number: num, nickname: nick, status: 'open', openedAt: serverTimestamp(), uniqueId: newId });
                 });
                 closeModal();
             } catch (e) { alert("Error al crear mesa."); console.error(e); }
@@ -595,8 +576,14 @@
             else if(s==='preparing') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } 
             else { btnText="Entregar"; btnClass="bg-blue-600 hover:bg-blue-700"; }
             let nextSt = s==='ordered' ? (o.category==='bar'?'ready':'preparing') : (s==='preparing'?'ready':'delivered');
-            return `<div class="bg-stone-50 p-4 rounded-lg shadow border border-stone-200">
-                <div class="flex justify-between font-bold text-lg mb-2"><span class="bg-stone-800 text-white px-2 py-0.5 rounded text-sm">MESA ${t?t.number:'?'}</span><span class="text-xs font-normal text-stone-500 bg-white border px-2 py-1 rounded flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div>
+            
+            // VIP Logic in Kanban Cards
+            const isVip = t?.isVip;
+            const cardBg = isVip ? "bg-pink-50 border-pink-300" : "bg-stone-50 border-stone-200";
+            const vipBadge = isVip ? '<span class="bg-pink-500 text-white text-[10px] px-1 py-0.5 rounded ml-1"><i class="fa-solid fa-crown"></i></span>' : '';
+            
+            return `<div class="${cardBg} p-4 rounded-lg shadow border">
+                <div class="flex justify-between font-bold text-lg mb-2"><span class="bg-stone-800 text-white px-2 py-0.5 rounded text-sm flex items-center">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-normal text-stone-500 bg-white border px-2 py-1 rounded flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div>
                 <div class="text-xl leading-tight text-stone-800 mb-2"><span class="font-black bg-amber-200 px-2 rounded-md mr-1">${o.quantity}</span> ${o.itemName}</div>
                 ${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-700 font-bold bg-red-50 p-2 rounded border border-red-100 mb-2 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}
                 <button onclick="upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 mt-1 rounded-lg font-bold shadow-md active:translate-y-0.5 transition uppercase tracking-wide">${btnText}</button></div>`;
@@ -687,4 +674,3 @@
         initApp();
     </script>
 </body>
-</html>
