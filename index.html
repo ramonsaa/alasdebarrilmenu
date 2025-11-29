@@ -12,13 +12,46 @@
     <!-- jsPDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+    <!-- Fuentes Retro de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+
     <style>
-        /* Tipografía y Fondo Rústico */
+        /* --- ESTILO RETRO GLOBAL --- */
+        :root {
+            --retro-cream: #f8f1e5;
+            --retro-dark: #2c1e16;
+            --retro-brown: #5c4033;
+            --retro-red: #a63e3e;
+            --retro-green: #557b55;
+            --retro-yellow: #d4a353;
+            --retro-blue: #4a6fa5;
+            --retro-gold: #cba135;
+            --retro-paper: #fffdf9;
+            --retro-shadow: 4px 4px 0px var(--retro-brown);
+            --retro-border: 3px double var(--retro-brown);
+        }
+
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #fffbeb; 
-            color: #451a03; 
+            font-family: 'Old Standard TT', serif; /* Fuente principal con serifa */
+            background-color: var(--retro-cream);
+            color: var(--retro-dark);
             user-select: none; 
+            /* Textura de papel sutil */
+            background-image: 
+                linear-gradient(to right, rgba(92, 64, 51, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(92, 64, 51, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .font-bold {
+            font-family: 'Abril Fatface', cursive; /* Fuente para títulos */
+            letter-spacing: 0.05em;
+        }
+
+        .font-mono {
+            font-family: 'Special Elite', cursive !important; /* Fuente estilo máquina de escribir */
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -31,67 +64,129 @@
             @page { margin: 0; size: auto; }
         }
         
-        /* ESTILOS PERSONALIZADOS */
-        .option-btn { @apply border-2 rounded-lg p-2 text-center cursor-pointer transition-all font-bold text-stone-600 bg-white border-stone-300 text-sm; }
-        .option-btn.clara.selected { background-color: #fef9c3; border-color: #facc15; color: #854d0e; }
-        .option-btn.oscura.selected { background-color: #451a03; border-color: #78350f; color: #fef3c7; }
+        /* --- ESTILOS PERSONALIZADOS RETRO --- */
+        .option-btn { 
+            @apply border-2 rounded-sm p-2 text-center cursor-pointer transition-all font-bold text-[#5c4033] bg-[#fffdf9] border-[#a89f91] text-sm; 
+            box-shadow: 2px 2px 0 #a89f91;
+        }
+        .option-btn:active { box-shadow: 1px 1px 0 #a89f91; transform: translate(1px, 1px); }
+        .option-btn.clara.selected { background-color: var(--retro-yellow); border-color: var(--retro-brown); color: var(--retro-dark); box-shadow: 2px 2px 0 var(--retro-brown); }
+        .option-btn.oscura.selected { background-color: var(--retro-brown); border-color: var(--retro-dark); color: var(--retro-cream); box-shadow: 2px 2px 0 var(--retro-dark); }
         
-        .prep-radio { @apply border-2 rounded-lg p-2 text-center cursor-pointer transition-all font-medium text-stone-500 bg-white border-stone-300 text-xs; }
-        .prep-radio.selected { background-color: #e0f2fe; border-color: #0284c7; color: #0c4a6e; font-weight: 800; }
+        .prep-radio { 
+            @apply border-2 rounded-sm p-2 text-center cursor-pointer transition-all font-medium text-[#5c4033] bg-[#fffdf9] border-[#a89f91] text-xs;
+            box-shadow: 2px 2px 0 #a89f91;
+        }
+        .prep-radio:active { box-shadow: 1px 1px 0 #a89f91; transform: translate(1px, 1px); }
+        .prep-radio.selected { background-color: var(--retro-blue); border-color: var(--retro-brown); color: var(--retro-cream); font-weight: 800; box-shadow: 2px 2px 0 var(--retro-brown); }
 
-        .mod-btn { transition: all 0.2s; border-width: 1px; font-weight: 600; }
-        .mod-btn.btn-red { color: #991b1b; background-color: #fef2f2; border-color: #fca5a5; }
-        .mod-btn.btn-red.selected { background-color: #b91c1c; color: white; border-color: #7f1d1d; }
-        .mod-btn.btn-green { color: #166534; background-color: #f0fdf4; border-color: #86efac; }
-        .mod-btn.btn-green.selected { background-color: #15803d; color: white; border-color: #14532d; }
-        .mod-btn.btn-neutral { color: #57534e; background-color: white; border-color: #d6d3d1; }
-        .mod-btn.btn-neutral.selected { background-color: #a8a29e; color: white; border-color: #57534e; }
+        .mod-btn { transition: all 0.1s; border-width: 2px; font-weight: 600; box-shadow: 2px 2px 0 var(--retro-brown); border-style: solid; }
+        .mod-btn:active { box-shadow: 1px 1px 0 var(--retro-brown); transform: translate(1px, 1px); }
+        .mod-btn.btn-red { color: var(--retro-red); background-color: #fce8e8; border-color: var(--retro-red); }
+        .mod-btn.btn-red.selected { background-color: var(--retro-red); color: var(--retro-cream); border-color: var(--retro-brown); }
+        .mod-btn.btn-green { color: var(--retro-green); background-color: #e8fce8; border-color: var(--retro-green); }
+        .mod-btn.btn-green.selected { background-color: var(--retro-green); color: var(--retro-cream); border-color: var(--retro-brown); }
+        .mod-btn.btn-neutral { color: var(--retro-brown); background-color: var(--retro-paper); border-color: var(--retro-brown); }
+        .mod-btn.btn-neutral.selected { background-color: var(--retro-brown); color: var(--retro-cream); border-color: var(--retro-dark); }
         
-        .cat-header { font-size: 0.85rem; font-weight: 900; text-transform: uppercase; color: #78350f; margin-top: 1.5rem; margin-bottom: 0.5rem; letter-spacing: 0.05em; border-bottom: 2px solid #d6d3d1; padding-bottom: 2px; }
-        .wood-shadow { box-shadow: 2px 4px 6px rgba(69, 26, 3, 0.15); }
+        .cat-header { 
+            font-size: 1rem; 
+            font-family: 'Abril Fatface', cursive; 
+            text-transform: uppercase; 
+            color: var(--retro-brown); 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.8rem; 
+            letter-spacing: 0.1em; 
+            border-bottom: 3px double var(--retro-brown); 
+            padding-bottom: 4px; 
+            text-align: center;
+        }
+        
+        .wood-shadow { box-shadow: var(--retro-shadow); }
 
         /* Estilo para secciones de paquete */
-        .pkg-section { @apply mb-4 border border-stone-300 rounded-lg p-3 bg-white; }
-        .pkg-title { @apply font-bold text-amber-900 mb-2 border-b border-stone-200 pb-1 text-sm uppercase; }
+        .pkg-section { @apply mb-4 border-2 border-[#a89f91] rounded-sm p-3 bg-[#fffdf9]; box-shadow: 2px 2px 0 #a89f91; }
+        .pkg-title { @apply font-bold text-[#5c4033] mb-2 border-b-2 border-[#a89f91] pb-1 text-sm uppercase; font-family: 'Abril Fatface', cursive; }
+
+        /* Estilos para Inputs y Botones Retro */
+        input[type="number"], input[type="text"], select {
+            @apply border-2 border-[#a89f91] p-3 rounded-sm text-lg font-bold outline-none bg-[#fffdf9] text-[#5c4033];
+            box-shadow: inset 2px 2px 4px rgba(92, 64, 51, 0.1);
+            font-family: 'Special Elite', cursive;
+        }
+        input:focus, select:focus { @apply border-[#5c4033]; }
+
+        .btn-retro {
+            @apply py-3 rounded-sm font-bold text-white shadow-md uppercase tracking-wide border-2 border-[#2c1e16] transition-all;
+            box-shadow: 3px 3px 0 #2c1e16;
+            font-family: 'Abril Fatface', cursive;
+        }
+        .btn-retro:active { box-shadow: 1px 1px 0 #2c1e16; transform: translate(2px, 2px); }
+        .btn-retro-green { background-color: var(--retro-green); }
+        .btn-retro-blue { background-color: var(--retro-blue); }
+        .btn-retro-red { background-color: var(--retro-red); }
+        .btn-retro-yellow { background-color: var(--retro-yellow); color: var(--retro-dark); }
+        .btn-retro-dark { background-color: var(--retro-brown); color: var(--retro-cream); }
+        .btn-retro-neutral { background-color: #dcdcdc; color: var(--retro-dark); border-color: #999; box-shadow: 3px 3px 0 #999; }
+        .btn-retro-neutral:active { box-shadow: 1px 1px 0 #999; }
+
+        .card-retro {
+            @apply rounded-sm shadow-sm p-3 border-2 border-[#5c4033] relative cursor-pointer transition bg-[#fffdf9];
+            box-shadow: 4px 4px 0 rgba(92, 64, 51, 0.3);
+        }
+        .card-retro:active { box-shadow: 2px 2px 0 rgba(92, 64, 51, 0.3); transform: translate(2px, 2px); }
+        .card-retro-vip { background-color: #fff0e6; border-color: var(--retro-gold); } /* Fondo crema rojizo para VIP */
+
+        .badge-retro {
+            @apply text-[10px] font-bold px-2 py-0.5 rounded-sm border-2;
+            font-family: 'Special Elite', cursive;
+            box-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+        }
+        
+        .modal-retro {
+            @apply bg-[#fffdf9] rounded-sm shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col border-4 border-double border-[#5c4033];
+            box-shadow: 8px 8px 0 rgba(44, 30, 22, 0.4);
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="app" class="h-screen w-full flex flex-col overflow-hidden relative">
-        <!-- Header Rústico (Madera Oscura) -->
-        <header id="main-header" class="bg-amber-950 text-amber-50 p-3 shadow-md flex justify-between items-center z-10 shrink-0 relative border-b-4 border-amber-700">
+    <div id="app" class="h-screen w-full flex flex-col overflow-hidden relative font-serif">
+        <!-- Header Rústico Retro -->
+        <header id="main-header" class="bg-[#2c1e16] text-[#f8f1e5] p-3 shadow-md flex justify-between items-center z-10 shrink-0 relative border-b-[6px] border-double border-[#5c4033]" style="box-shadow: 0 4px 0 rgba(92, 64, 51, 0.5);">
             <div class="flex items-center gap-3">
-                <!-- LOGO EN HEADER -->
-                <div class="bg-white p-1 rounded-full border-2 border-amber-600 overflow-hidden w-12 h-12 flex items-center justify-center shadow-sm">
-                    <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100?text=AB'">
+                <!-- LOGO EN HEADER CON ESTILO DE SELLO -->
+                <div class="bg-[#f8f1e5] p-1 rounded-full border-4 border-double border-[#cba135] overflow-hidden w-14 h-14 flex items-center justify-center shadow-sm" style="box-shadow: 2px 2px 0 #cba135;">
+                    <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain sepia" onerror="this.src='https://placehold.co/100x100?text=AB'">
                 </div>
-                <h1 class="font-bold text-xl tracking-wide" id="header-title" style="font-family: 'Courier New', Courier, monospace;">A-LAS DE BARRIL</h1>
+                <h1 class="font-bold text-2xl tracking-widest" id="header-title" style="font-family: 'Abril Fatface', cursive; text-shadow: 2px 2px 0 #000;">A-LAS DE BARRIL</h1>
             </div>
             
-            <div id="status-indicator" class="hidden absolute left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-sm border text-xs font-bold shadow-lg flex items-center gap-2 top-14 md:top-auto">
+            <div id="status-indicator" class="hidden absolute left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-sm border-2 border-double text-xs font-bold shadow-[2px_2px_0_#000] flex items-center gap-2 top-14 md:top-auto font-mono">
                 <span id="status-text"></span>
             </div>
 
-            <button onclick="logoutToHome()" class="text-xs bg-amber-900 border border-amber-700 px-3 py-1.5 rounded hover:bg-amber-800 transition uppercase font-bold tracking-wider text-amber-100">
+            <button onclick="logoutToHome()" class="text-xs bg-[#5c4033] border-2 border-[#f8f1e5] px-3 py-1.5 rounded-sm hover:bg-[#4a3328] transition uppercase font-bold tracking-wider text-[#f8f1e5]" style="box-shadow: 2px 2px 0 #f8f1e5; font-family: 'Abril Fatface', cursive;">
                 <i class="fa-solid fa-right-from-bracket"></i> Salir
             </button>
         </header>
 
-        <!-- Contenido (Fondo Crema) -->
-        <main id="content-area" class="flex-1 overflow-y-auto bg-amber-50 relative flex flex-col p-1">
-            <div class="flex flex-col justify-center items-center h-full text-amber-800 opacity-50 gap-4">
+        <!-- Contenido (Fondo Crema Texturizado) -->
+        <main id="content-area" class="flex-1 overflow-y-auto bg-[#f8f1e5] relative flex flex-col p-2" style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%235c4033\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z\'/%3E%3C/g%3E%3C/svg%3E');">
+            <div class="flex flex-col justify-center items-center h-full text-[#5c4033] opacity-50 gap-4 font-mono">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl"></i>
                 <p class="text-sm font-bold animate-pulse">Cargando sistema...</p>
             </div>
         </main>
 
         <!-- Área Ticket (Oculto para impresión nativa) -->
-        <div id="receipt-area" class="hidden bg-white p-4 text-xs w-[300px] mx-auto font-mono"></div>
+        <div id="receipt-area" class="hidden bg-[#fffdf9] p-4 text-xs w-[300px] mx-auto font-mono border-4 double border-[#5c4033] text-[#2c1e16]"></div>
     </div>
 
-    <!-- Modales -->
-    <div id="modal-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-70 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm">
-        <div id="modal-content" class="bg-[#fffbeb] rounded-xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col border-4 border-amber-900/10"></div>
+    <!-- Modales Retro -->
+    <div id="modal-overlay" class="fixed inset-0 bg-[#2c1e16] bg-opacity-80 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm">
+        <div id="modal-content" class="modal-retro"></div>
     </div>
 
     <script type="module">
@@ -118,7 +213,7 @@
             const ind = document.getElementById('status-indicator');
             const txt = document.getElementById('status-text');
             if (!navigator.onLine) {
-                ind.className = "absolute left-1/2 transform -translate-x-1/2 bg-red-700 px-4 py-1 rounded-sm border border-red-900 text-xs font-bold shadow-lg animate-pulse flex items-center gap-2 text-white top-14 md:top-auto";
+                ind.className = "absolute left-1/2 transform -translate-x-1/2 bg-[#a63e3e] px-4 py-1 rounded-sm border-2 border-double border-[#2c1e16] text-xs font-bold shadow-[2px_2px_0_#2c1e16] animate-pulse flex items-center gap-2 text-[#f8f1e5] top-14 md:top-auto font-mono";
                 ind.classList.remove('hidden'); txt.innerHTML = '<i class="fa-solid fa-wifi"></i> MODO OFFLINE';
             } else { ind.classList.add('hidden'); }
         }
@@ -126,7 +221,7 @@
         window.addEventListener('offline', updateStatusDisplay);
         updateStatusDisplay();
 
-        function showError(title, details) { document.getElementById('content-area').innerHTML = `<div class="flex flex-col justify-center items-center h-full p-6 text-center"><h2 class="font-bold">${title}</h2><p>${details}</p><button onclick="location.reload()" class="mt-4 bg-amber-700 text-white px-4 py-2 rounded">Reintentar</button></div>`; }
+        function showError(title, details) { document.getElementById('content-area').innerHTML = `<div class="flex flex-col justify-center items-center h-full p-6 text-center"><h2 class="font-bold text-2xl text-[#a63e3e]" style="font-family: 'Abril Fatface', cursive;">${title}</h2><p class="text-[#5c4033] font-mono mt-2">${details}</p><button onclick="location.reload()" class="mt-6 btn-retro btn-retro-dark px-6 py-2">Reintentar</button></div>`; }
 
         let currentUser = null, ordersData = [], tablesData = [];
         let currentRole = null, currentTableId = null, showingDebts = false;
@@ -192,11 +287,13 @@
             document.getElementById('header-title').innerText = 'A-LAS DE BARRIL';
             document.getElementById('content-area').innerHTML = `
                 <div class="p-6 flex flex-col gap-6 h-full justify-center items-center max-w-md mx-auto">
-                    <img src="https://www.dropbox.com/scl/fi/jymn0kvgyx9ioqjojwbfw/Picture2.png?rlkey=u4k3ppl3f7vohb07au7bt8tw4&raw=1" class="w-48 mb-2 rounded-xl shadow-lg border-4 border-amber-900/10" alt="Logo" onerror="this.src='https://placehold.co/200x200?text=LOGO'">
-                    <h2 class="text-2xl font-bold text-amber-900 mb-2 border-b-4 border-amber-500 pb-2">SELECCIONA PERFIL</h2>
-                    <button onclick="setRole('waiter')" class="w-full bg-yellow-700 hover:bg-yellow-800 text-white p-6 rounded-xl text-xl font-bold flex gap-4 items-center wood-shadow transition transform active:scale-95 border-2 border-yellow-900"><div class="bg-yellow-900 p-3 rounded-full text-yellow-100"><i class="fa-solid fa-mobile-screen"></i></div><span>Mesero</span></button>
-                    <button onclick="setRole('bar')" class="w-full bg-amber-800 hover:bg-amber-900 text-white p-6 rounded-xl text-xl font-bold flex gap-4 items-center wood-shadow transition transform active:scale-95 border-2 border-amber-950"><div class="bg-amber-950 p-3 rounded-full text-amber-100"><i class="fa-solid fa-beer-mug-empty"></i></div><span>Barra</span></button>
-                    <button onclick="setRole('kitchen')" class="w-full bg-orange-800 hover:bg-orange-900 text-white p-6 rounded-xl text-xl font-bold flex gap-4 items-center wood-shadow transition transform active:scale-95 border-2 border-orange-950"><div class="bg-orange-950 p-3 rounded-full text-orange-100"><i class="fa-solid fa-fire-burner"></i></div><span>Cocina</span></button>
+                    <div class="p-2 bg-[#fffdf9] border-4 border-double border-[#cba135] rounded-full shadow-[4px_4px_0_#5c4033]">
+                        <img src="https://www.dropbox.com/scl/fi/jymn0kvgyx9ioqjojwbfw/Picture2.png?rlkey=u4k3ppl3f7vohb07au7bt8tw4&raw=1" class="w-48 rounded-full sepia" alt="Logo" onerror="this.src='https://placehold.co/200x200?text=LOGO'">
+                    </div>
+                    <h2 class="text-3xl font-bold text-[#5c4033] mb-4 pb-2 border-b-[3px] double border-[#cba135] uppercase tracking-widest" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #f8f1e5;">Selecciona Perfil</h2>
+                    <button onclick="setRole('waiter')" class="w-full btn-retro btn-retro-yellow p-6 text-2xl flex gap-4 items-center"><div class="bg-[#5c4033] p-3 rounded-full text-[#f8f1e5] border-2 border-[#f8f1e5]"><i class="fa-solid fa-mobile-screen"></i></div><span>Mesero</span></button>
+                    <button onclick="setRole('bar')" class="w-full btn-retro btn-retro-dark p-6 text-2xl flex gap-4 items-center"><div class="bg-[#cba135] p-3 rounded-full text-[#2c1e16] border-2 border-[#2c1e16]"><i class="fa-solid fa-beer-mug-empty"></i></div><span>Barra</span></button>
+                    <button onclick="setRole('kitchen')" class="w-full btn-retro btn-retro-red p-6 text-2xl flex gap-4 items-center"><div class="bg-[#2c1e16] p-3 rounded-full text-[#f8f1e5] border-2 border-[#f8f1e5]"><i class="fa-solid fa-fire-burner"></i></div><span>Cocina</span></button>
                 </div>`;
         }
         window.setRole = (r) => { currentRole = r; refreshCurrentView(); }
@@ -213,27 +310,29 @@
                 const closedDate = t.closedAt?.seconds * 1000 || 0;
                 return (now - closedDate) < eightDaysMs;
             }).sort((a,b) => (b.closedAt?.seconds||0) - (a.closedAt?.seconds||0));
-            const btnClass = showingDebts ? 'bg-amber-700 text-amber-50' : 'bg-stone-600 text-stone-200';
+            
+            const btnClass = showingDebts ? 'btn-retro-red' : 'btn-retro-dark';
+            const sectionTitle = showingDebts ? 'Deudas Pendientes' : 'Mesas Abiertas';
 
             let html = `
                 <div class="p-4 flex flex-col gap-6 pb-24">
-                    <div class="flex gap-2 bg-white p-2 rounded-lg shadow-sm border border-amber-200">
-                        <input type="number" id="search-ticket-id" placeholder="Buscar Ticket #" class="flex-1 p-2 rounded bg-transparent outline-none text-stone-700 placeholder-stone-400 font-mono font-bold">
-                        <button onclick="searchTicket()" class="bg-stone-700 text-white px-4 rounded hover:bg-stone-800"><i class="fa-solid fa-search"></i></button>
+                    <div class="flex gap-2 bg-[#fffdf9] p-2 rounded-sm shadow-[2px_2px_0_#5c4033] border-2 border-[#5c4033]">
+                        <input type="number" id="search-ticket-id" placeholder="Buscar Ticket #" class="flex-1 border-0 p-2 bg-transparent outline-none text-[#5c4033] placeholder-[#a89f91] font-mono font-bold" style="box-shadow: none;">
+                        <button onclick="searchTicket()" class="bg-[#5c4033] text-[#f8f1e5] px-4 rounded-sm hover:bg-[#4a3328] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-search"></i></button>
                     </div>
-                    <div class="flex gap-3"><button onclick="toggleDebtView()" class="flex-1 ${btnClass} py-3 rounded-lg font-bold shadow-md border-b-4 border-black/20 text-sm">${showingDebts ? '⬅ Ver Mesas Activas' : '📂 Ver Deudas / Fiado'}</button></div>
+                    <div class="flex gap-3"><button onclick="toggleDebtView()" class="flex-1 btn-retro ${btnClass} py-3 text-sm">${showingDebts ? '⬅ Ver Mesas Activas' : '📂 Ver Deudas / Fiado'}</button></div>
                     <div>
-                        <div class="flex justify-between items-end mb-3 border-b-2 border-amber-200 pb-1">
-                            <h3 class="font-black text-amber-900 text-lg uppercase tracking-wider">${showingDebts ? 'Deudas Pendientes' : 'Mesas Abiertas'}</h3>
-                            ${!showingDebts ? `<button onclick="openNewTableModal()" class="bg-green-700 hover:bg-green-800 text-white text-xs font-bold px-3 py-1.5 rounded shadow flex items-center gap-1 border border-green-900"><i class="fa-solid fa-plus"></i> NUEVA</button>` : ''}
+                        <div class="flex justify-between items-end mb-3 border-b-[3px] double border-[#5c4033] pb-1">
+                            <h3 class="font-black text-[#5c4033] text-xl uppercase tracking-wider" style="font-family: 'Abril Fatface', cursive;">${sectionTitle}</h3>
+                            ${!showingDebts ? `<button onclick="openNewTableModal()" class="btn-retro btn-retro-green text-xs px-3 py-2 flex items-center gap-1"><i class="fa-solid fa-plus"></i> NUEVA</button>` : ''}
                         </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            ${!showingDebts && openTables.length === 0 ? '<p class="col-span-2 text-stone-400 text-sm text-center italic py-4 bg-stone-100 rounded border border-dashed border-stone-300">No hay mesas abiertas</p>' : ''}
-                            ${showingDebts && debtTables.length === 0 ? '<p class="col-span-2 text-stone-400 text-sm text-center italic py-4 bg-stone-100 rounded border border-dashed border-stone-300">No hay deudas</p>' : ''}
+                        <div class="grid grid-cols-2 gap-4">
+                            ${!showingDebts && openTables.length === 0 ? '<p class="col-span-2 text-[#a89f91] text-sm text-center italic py-4 bg-[#fffdf9] rounded-sm border-2 border-dashed border-[#a89f91] font-mono">No hay mesas abiertas</p>' : ''}
+                            ${showingDebts && debtTables.length === 0 ? '<p class="col-span-2 text-[#a89f91] text-sm text-center italic py-4 bg-[#fffdf9] rounded-sm border-2 border-dashed border-[#a89f91] font-mono">No hay deudas</p>' : ''}
                             ${!showingDebts ? openTables.map(t => createTableCard(t)).join('') : debtTables.map(t => createTableCard(t)).join('')}
                         </div>
                     </div>
-                    ${!showingDebts ? `<div class="mt-4 opacity-75"><h3 class="font-bold text-stone-500 text-sm uppercase mb-2 border-b border-stone-300 pb-1">Cerradas (8 días)</h3><div class="grid grid-cols-2 gap-3">${closedTables.length ? closedTables.map(t => createTableCard(t)).join('') : '<p class="col-span-2 text-stone-400 text-xs text-center">Historial vacío</p>'}</div></div>` : ''}
+                    ${!showingDebts ? `<div class="mt-6 opacity-80"><h3 class="font-bold text-[#5c4033] text-lg uppercase mb-3 border-b-[3px] double border-[#5c4033] pb-1" style="font-family: 'Abril Fatface', cursive;">Cerradas (8 días)</h3><div class="grid grid-cols-2 gap-4">${closedTables.length ? closedTables.map(t => createTableCard(t)).join('') : '<p class="col-span-2 text-[#a89f91] text-xs text-center font-mono">Historial vacío</p>'}</div></div>` : ''}
                 </div>`;
             document.getElementById('content-area').innerHTML = html;
         }
@@ -241,47 +340,51 @@
         function createTableCard(t) {
             const ords = ordersData.filter(o => o.tableId === t.id && o.status !== 'cancelled');
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
-            
-            // Si tiene depósito (anticipo), restarlo del total visual
             const deposit = t.deposit || 0;
             const remaining = total - deposit;
 
-            let cardBg = 'bg-white', borderColor = 'border-stone-300', badge = '';
+            let cardBgClass = '', borderColor = 'border-[#5c4033]', badge = '', statusIconColor = 'text-[#5c4033]';
             
-            // CLIENTE DISTINGUIDO STYLING
+            // ESTILOS RETRO PARA ESTADOS
             if (t.isVip) {
-                cardBg = 'bg-pink-50'; // Slight pink tint
-            } else if (t.status === 'open') {
-                cardBg = 'bg-[#fffef0]';
+                cardBgClass = 'card-retro-vip'; // Fondo crema rojizo
+                borderColor = 'border-[#cba135]'; // Borde dorado
             }
 
             if (t.status === 'open') {
                 const pending = ords.some(o => o.status !== 'delivered');
-                borderColor = pending ? 'border-yellow-500' : 'border-green-600';
-                badge = pending ? '<i class="fa-solid fa-clock text-yellow-600 animate-pulse"></i>' : '<i class="fa-solid fa-check text-green-600"></i>';
-            } else if (t.status === 'debt') { borderColor = 'border-red-500'; cardBg = 'bg-red-50'; badge = '<i class="fa-solid fa-file-invoice-dollar text-red-600"></i>';
-            } else { cardBg = 'bg-stone-200'; badge = '<i class="fa-solid fa-lock text-stone-400"></i>'; }
+                borderColor = pending ? 'border-[#d4a353]' : 'border-[#557b55]'; // Amarillo / Verde retro
+                statusIconColor = pending ? 'text-[#d4a353]' : 'text-[#557b55]';
+                badge = pending ? `<i class="fa-solid fa-clock animate-pulse ${statusIconColor}"></i>` : `<i class="fa-solid fa-check ${statusIconColor}"></i>`;
+            } else if (t.status === 'debt') { 
+                borderColor = 'border-[#a63e3e]'; cardBgClass = 'bg-[#fce8e8]'; // Rojo retro
+                statusIconColor = 'text-[#a63e3e]';
+                badge = `<i class="fa-solid fa-file-invoice-dollar ${statusIconColor}"></i>`;
+            } else { 
+                cardBgClass = 'bg-[#e0d8c8]'; // Grisáceo retro
+                statusIconColor = 'text-[#a89f91]';
+                badge = `<i class="fa-solid fa-lock ${statusIconColor}"></i>`; 
+            }
             
-            // Add VIP badge if applicable
-            let vipBadge = t.isVip ? '<span class="absolute -top-2 -left-2 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm border border-white"><i class="fa-solid fa-crown"></i> VIP</span>' : '';
+            // VIP BADGE RETRO
+            let vipBadge = t.isVip ? `<span class="absolute -top-3 -left-3 bg-[#cba135] text-[#2c1e16] text-[10px] px-3 py-1 rounded-sm font-bold shadow-[2px_2px_0_#2c1e16] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
             
-            let priceDisplay = `$${total}`; if (deposit > 0) priceDisplay = `<span class="text-xs text-stone-400 line-through mr-1">$${total}</span> $${remaining}`;
+            let priceDisplay = `$${total}`; if (deposit > 0) priceDisplay = `<span class="text-xs text-[#a63e3e] line-through mr-1 font-mono">$${total}</span> $${remaining}`;
             
-            // DATE FORMATTING
             const dateStr = t.openedAt ? new Date(t.openedAt.seconds * 1000).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') : '';
 
-            return `<div onclick="renderTableDetail('${t.id}')" class="${cardBg} rounded-lg shadow-sm p-3 border-b-4 ${borderColor} relative cursor-pointer active:scale-95 transition border-l border-r border-t">
+            return `<div onclick="renderTableDetail('${t.id}')" class="card-retro ${cardBgClass} ${borderColor}">
                     ${vipBadge}
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-[10px] font-mono font-bold text-stone-400 bg-stone-100 px-1 rounded border border-stone-200">#${t.uniqueId || '---'}</span>
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-[11px] font-mono font-bold text-[#5c4033] bg-[#e0d8c8] px-2 py-0.5 rounded-sm border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91]">#${t.uniqueId || '---'}</span>
                         <div class="flex flex-col items-end">
-                             <span class="text-[10px] text-stone-400 font-mono mb-0.5">${dateStr}</span>
-                             ${badge}
+                             <span class="text-[10px] text-[#5c4033] font-mono mb-0.5 font-bold">${dateStr}</span>
+                             <div class="bg-[#fffdf9] border-2 border-[#a89f91] rounded-full p-1 shadow-[1px_1px_0_#a89f91]">${badge}</div>
                         </div>
                     </div>
-                    <div class="text-2xl font-black text-stone-800 leading-none mb-1">${t.number}</div>
-                    <div class="text-xs text-stone-500 truncate font-semibold mb-2 uppercase tracking-wide">${t.nickname}</div>
-                    <div class="text-lg font-bold text-amber-800 text-right border-t border-dashed border-stone-300 pt-1">${priceDisplay}</div>
+                    <div class="text-3xl font-black text-[#2c1e16] leading-none mb-1 text-center" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">${t.number}</div>
+                    <div class="text-xs text-[#5c4033] truncate font-semibold mb-3 uppercase tracking-wider text-center font-mono border-b-2 border-dashed border-[#a89f91] pb-1">${t.nickname}</div>
+                    <div class="text-xl font-bold text-[#2c1e16] text-right pt-1" style="font-family: 'Special Elite', cursive;">${priceDisplay}</div>
                 </div>`;
         }
 
@@ -300,64 +403,68 @@
 
             const isClosed = t.status === 'closed';
             let closeBtnText = t.status === 'debt' ? "Liquidar Deuda" : "Cerrar Cuenta";
-            let closeBtnColor = t.status === 'debt' ? "bg-blue-700" : "bg-green-700";
-            let totalDisplay = `<span>Total</span><span>$${total}</span>`;
-            if (deposit > 0) totalDisplay = `<div class="flex justify-between text-xs text-stone-500"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-xs text-red-500"><span>A cuenta</span><span>-$${deposit}</span></div><div class="flex justify-between font-black text-xl text-amber-900 border-t border-stone-300 pt-1 mt-1"><span>Restante</span><span>$${remaining}</span></div>`;
-            else totalDisplay = `<div class="flex justify-between mb-3 font-black text-xl text-amber-900 px-2"><span>Total</span><span>$${total}</span></div>`;
+            let closeBtnColorClass = t.status === 'debt' ? "btn-retro-blue" : "btn-retro-green";
             
-            // --- MODIFICACIÓN PARA MESA CERRADA ---
-            // Ahora mostramos botones de impresión incluso si la mesa está cerrada
+            let totalDisplay = `<div class="flex justify-between mb-3 font-black text-2xl text-[#2c1e16] px-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Total</span><span>$${total}</span></div>`;
+            
+            if (deposit > 0) {
+                 totalDisplay = `<div class="flex justify-between text-sm text-[#5c4033] font-mono"><span>Subtotal</span><span>$${total}</span></div>
+                                 <div class="flex justify-between text-sm text-[#a63e3e] font-mono"><span>A cuenta</span><span>-$${deposit}</span></div>
+                                 <div class="flex justify-between font-black text-2xl text-[#2c1e16] border-t-4 double border-[#5c4033] pt-2 mt-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Restante</span><span>$${remaining}</span></div>`;
+            }
+            
             let footerHtml = '';
             
             if (isClosed) {
-                // Footer para mesas cerradas: Solo botones de impresión y total final
                  footerHtml = `
-                <div id="order-footer" class="fixed bottom-0 w-full bg-stone-100 p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-30 border-t border-stone-300">
-                     <div class="flex justify-between mb-2 font-bold text-xl text-stone-700 px-2"><span>Total Final</span><span>$${total}</span></div>
-                     <div class="flex gap-2">
-                        <button onclick="printR('${tid}')" class="flex-1 bg-stone-700 text-white py-3 rounded-lg font-bold shadow-md hover:bg-stone-800"><i class="fa-solid fa-print"></i> Ticket</button>
-                        <button onclick="downloadPDF('${tid}')" class="flex-1 bg-red-700 text-white py-3 rounded-lg font-bold shadow-md hover:bg-red-800"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                <div id="order-footer" class="fixed bottom-0 w-full bg-[#e0d8c8] p-4 shadow-[0_-4px_0_rgba(92,64,51,0.8)] z-30 border-t-[3px] double border-[#5c4033]">
+                     <div class="flex justify-between mb-3 font-bold text-2xl text-[#2c1e16] px-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Total Final</span><span>$${total}</span></div>
+                     <div class="flex gap-3">
+                        <button onclick="printR('${tid}')" class="flex-1 btn-retro btn-retro-dark py-3"><i class="fa-solid fa-print"></i> Ticket</button>
+                        <button onclick="downloadPDF('${tid}')" class="flex-1 btn-retro btn-retro-red py-3"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                      </div>
-                     <div class="text-center text-[10px] text-stone-400 mt-2 font-bold uppercase tracking-widest">MESA CERRADA</div>
+                     <div class="text-center text-xs text-[#a63e3e] mt-3 font-bold uppercase tracking-[0.2em] font-mono border-t-2 border-dashed border-[#a63e3e] pt-2">MESA CERRADA - ARCHIVO</div>
                 </div>`;
             } else {
-                // Footer para mesas abiertas (normal)
-                footerHtml = `<div id="order-footer" class="fixed bottom-0 w-full bg-[#fffbeb] p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-30 border-t border-amber-200">${totalDisplay}<button onclick="openCloseAccountModal('${tid}', ${total})" class="w-full ${closeBtnColor} text-white py-3.5 rounded-lg font-bold shadow-lg border-b-4 border-black/20 active:border-b-0 active:translate-y-1 transition uppercase tracking-wide">${closeBtnText}</button></div>`;
+                footerHtml = `<div id="order-footer" class="fixed bottom-0 w-full bg-[#fffdf9] p-4 shadow-[0_-4px_0_rgba(92,64,51,0.3)] z-30 border-t-[3px] double border-[#cba135]">${totalDisplay}<button onclick="openCloseAccountModal('${tid}', ${total})" class="w-full btn-retro ${closeBtnColorClass} py-4 text-lg mt-2">${closeBtnText}</button></div>`;
             }
             
-            const pageBg = t.isVip ? 'bg-pink-50' : 'bg-white';
-            const vipHeader = t.isVip ? '<span class="ml-2 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded font-bold shadow"><i class="fa-solid fa-crown"></i> VIP</span>' : '';
+            const pageBgClass = t.isVip ? 'bg-[#fff0e6]' : 'bg-[#fffdf9]';
+            const vipHeader = t.isVip ? `<span class="ml-3 bg-[#cba135] text-[#2c1e16] text-[11px] px-3 py-1 rounded-sm font-bold shadow-[2px_2px_0_#2c1e16] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
 
-            let html = `<div class="flex flex-col h-full ${pageBg}">
-                <div class="bg-amber-900 text-white p-3 flex items-center justify-between shadow-md shrink-0">
-                    <button onclick="renderWaiterDashboard()" class="text-amber-100 font-bold text-sm flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Volver</button>
-                    <div class="text-center"><div class="font-black text-lg leading-none flex items-center justify-center">MESA ${t.number} ${vipHeader}</div><div class="text-[10px] font-mono text-amber-300 opacity-80">Ticket ${uniqueDisplay}</div></div><div class="w-10"></div>
+            let html = `<div class="flex flex-col h-full ${pageBgClass}">
+                <div class="bg-[#2c1e16] text-[#f8f1e5] p-3 flex items-center justify-between shadow-[0_4px_0_rgba(92,64,51,0.5)] shrink-0 border-b-[4px] double border-[#cba135]">
+                    <button onclick="renderWaiterDashboard()" class="text-[#f8f1e5] font-bold text-sm flex items-center gap-2 hover:text-[#cba135] transition" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-chevron-left"></i> Volver</button>
+                    <div class="text-center"><div class="font-black text-xl leading-none flex items-center justify-center tracking-wider" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">MESA ${t.number} ${vipHeader}</div><div class="text-[11px] font-mono text-[#cba135] opacity-90 mt-1 font-bold">Ticket ${uniqueDisplay}</div></div><div class="w-14"></div>
                 </div>
-                <div class="bg-white shadow-sm flex border-b border-stone-200 shrink-0">
-                    <button onclick="switchTab('menu')" id="tab-btn-menu" class="flex-1 py-3 text-amber-800 border-b-4 border-amber-600 bg-amber-50 font-bold">MENÚ</button>
-                    <button onclick="switchTab('orders')" id="tab-btn-orders" class="flex-1 py-3 text-stone-400 font-bold hover:bg-stone-50 transition">CUENTA</button>
+                <div class="bg-[#fffdf9] shadow-[0_2px_0_#a89f91] flex border-b-2 border-[#a89f91] shrink-0">
+                    <button onclick="switchTab('menu')" id="tab-btn-menu" class="flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide" style="font-family: 'Abril Fatface', cursive;">MENÚ</button>
+                    <button onclick="switchTab('orders')" id="tab-btn-orders" class="flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide" style="font-family: 'Abril Fatface', cursive;">CUENTA</button>
                 </div>
-                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-24 ${isClosed ? 'hidden' : ''} bg-stone-50">
-                    <h3 class="cat-header">Cocina</h3><div class="grid gap-3 mb-6">${renderMenuSection('kitchen')}</div>
+                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-32 ${isClosed ? 'hidden' : ''} bg-[#f8f1e5]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%235c4033\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z\'/%3E%3C/g%3E%3C/svg%3E');">
+                    <h3 class="cat-header">Cocina</h3><div class="grid gap-3 mb-8">${renderMenuSection('kitchen')}</div>
                     <h3 class="cat-header">Barra</h3><div class="grid gap-3">${renderMenuSection('bar')}</div>
                 </div>
-                <div id="tab-orders" class="${isClosed ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-48 ${t.isVip ? 'bg-pink-50' : 'bg-stone-100'}">
-                    ${ords.length === 0 ? '<div class="text-center py-10 text-stone-400 italic">Mesa vacía</div>' : ''}
+                <div id="tab-orders" class="${isClosed ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-52 ${t.isVip ? 'bg-[#fff0e6]' : 'bg-[#fffdf9]'}" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23a89f91\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');">
+                    ${ords.length === 0 ? '<div class="text-center py-10 text-[#a89f91] italic font-mono border-2 border-dashed border-[#a89f91] p-4 rounded-sm m-4 bg-[#fffdf9]">Mesa vacía - Sin pedidos</div>' : ''}
                     ${ords.map(o => {
-                        let stClass = "bg-stone-200 text-stone-500", stIcon = "fa-clock";
-                        if(o.status === 'preparing') { stClass = "bg-yellow-100 text-yellow-700 border border-yellow-300"; stIcon = "fa-fire"; }
-                        if(o.status === 'ready') { stClass = "bg-green-100 text-green-700 border border-green-300"; stIcon = "fa-check"; }
-                        if(o.status === 'delivered') { stClass = "bg-blue-50 text-blue-700 border border-blue-200"; stIcon = "fa-thumbs-up"; }
+                        let stClass = "bg-[#e0d8c8] text-[#5c4033] border-[#a89f91]", stIcon = "fa-clock";
+                        if(o.status === 'preparing') { stClass = "bg-[#fff9c4] text-[#d4a353] border-[#d4a353]"; stIcon = "fa-fire animate-bounce"; }
+                        if(o.status === 'ready') { stClass = "bg-[#e8fce8] text-[#557b55] border-[#557b55]"; stIcon = "fa-bell animate-pulse"; }
+                        if(o.status === 'delivered') { stClass = "bg-[#d0e0ff] text-[#4a6fa5] border-[#4a6fa5]"; stIcon = "fa-thumbs-up"; }
                         
-                        // VIP items highlight slightly
-                        const itemBg = t.isVip ? 'bg-pink-100/50 border-pink-200' : 'bg-white border-stone-200';
+                        const itemBgClass = t.isVip ? 'bg-[#fff5ee] border-[#cba135]' : 'bg-[#fffdf9] border-[#a89f91]';
                         
-                        return `<div class="${itemBg} p-3 rounded-lg shadow-sm mb-3 border">
-                        <div class="flex justify-between items-start">
-                            <div><div class="font-bold text-stone-800 text-lg leading-tight">${o.quantity}x ${o.itemName}</div>
-                                ${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-600 font-semibold mt-1 bg-red-50 p-1 rounded inline-block border border-red-100"><i class="fa-solid fa-pen-to-square"></i> ${o.modifiers.join(', ')}</div>`:''}
-                                <div class="text-[10px] text-stone-400 mt-1 font-mono">${new Date(o.timestamp?.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>
-                            <div class="text-right"><div class="font-bold text-amber-800 text-lg">$${o.price*o.quantity}</div><span class="text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 justify-end ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span></div>
+                        return `<div class="${itemBgClass} p-3 rounded-sm shadow-[2px_2px_0_#a89f91] mb-3 border-2 relative overflow-hidden">
+                        ${t.isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-transparent border-r-[#cba135]/30"></div>' : ''}
+                        <div class="flex justify-between items-start relative z-10">
+                            <div><div class="font-bold text-[#2c1e16] text-xl leading-tight" style="font-family: 'Abril Fatface', cursive;"><span class="text-[#a63e3e] mr-1">${o.quantity}x</span> ${o.itemName}</div>
+                                ${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-[#a63e3e] font-bold mt-2 bg-[#fce8e8] p-1.5 rounded-sm inline-block border-2 border-[#a63e3e] font-mono shadow-[1px_1px_0_#a63e3e]"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}
+                                <div class="text-[10px] text-[#a89f91] mt-1 font-mono font-bold flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${new Date(o.timestamp?.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div>
+                            <div class="text-right flex flex-col items-end gap-2">
+                                <div class="font-black text-[#5c4033] text-xl" style="font-family: 'Special Elite', cursive;">$${o.price*o.quantity}</div>
+                                <span class="text-[10px] font-bold px-2 py-1 rounded-sm flex items-center gap-1 justify-end border-2 uppercase tracking-wider shadow-[1px_1px_0_rgba(0,0,0,0.2)] ${stClass}" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
+                            </div>
                         </div></div>`;
                     }).join('')}
                 </div>
@@ -367,12 +474,13 @@
 
         function renderMenuSection(cat) {
             return MENU.filter(i => i.category === cat).map(i => `
-                <button onclick="openCustomizeModal('${i.id}')" class="bg-white p-3 rounded-lg shadow-sm flex justify-between items-center text-left active:bg-amber-50 border border-stone-200 active:border-amber-300 transition group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-amber-700 group-active:scale-110 transition border border-amber-100"><i class="fa-solid ${i.icon}"></i></div>
-                        <div><div class="font-bold text-stone-700 group-active:text-amber-900">${i.name}</div><div class="text-xs text-stone-500 font-mono">$${i.price}</div></div>
+                <button onclick="openCustomizeModal('${i.id}')" class="bg-[#fffdf9] p-3 rounded-sm shadow-[2px_2px_0_#a89f91] flex justify-between items-center text-left active:bg-[#fff0e6] border-2 border-[#a89f91] active:border-[#cba135] transition group relative overflow-hidden active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0_#a89f91]">
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div class="w-12 h-12 bg-[#e0d8c8] rounded-full flex items-center justify-center text-[#5c4033] group-active:scale-110 transition border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91] text-xl"><i class="fa-solid ${i.icon}"></i></div>
+                        <div><div class="font-bold text-lg text-[#2c1e16] group-active:text-[#a63e3e]" style="font-family: 'Abril Fatface', cursive;">${i.name}</div><div class="text-sm text-[#5c4033] font-mono font-bold">$${i.price}</div></div>
                     </div>
-                    <div class="bg-amber-100 text-amber-700 w-8 h-8 rounded-full flex items-center justify-center font-bold shadow-sm group-active:bg-amber-500 group-active:text-white transition"><i class="fa-solid fa-plus"></i></div>
+                    <div class="bg-[#cba135] text-[#2c1e16] w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-[2px_2px_0_#2c1e16] group-active:bg-[#2c1e16] group-active:text-[#cba135] transition border-2 border-[#2c1e16] text-lg relative z-10"><i class="fa-solid fa-plus"></i></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#fff0e6]/50 opacity-0 group-active:opacity-100 transition"></div>
                 </button>`).join('');
         }
 
@@ -381,37 +489,35 @@
             if (item.isPackage) { openPackageModal(item); return; }
             const modal = document.getElementById('modal-content');
             
+            // Header y Footer del Modal (Común)
+            const modalHeader = `<div class="p-4 border-b-[3px] double border-[#cba135] bg-[#f8f1e5] flex justify-between items-center shadow-[0_2px_0_#a89f91]"><div><h3 class="font-black text-2xl text-[#2c1e16] uppercase tracking-wide" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">${item.name}</h3><p class="text-[#a63e3e] font-bold font-mono text-lg">$${item.price}</p></div><button onclick="closeModal()" class="text-[#5c4033] text-2xl hover:text-[#a63e3e] transition bg-[#fffdf9] rounded-full w-10 h-10 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033]"><i class="fa-solid fa-times"></i></button></div>`;
+            const modalFooter = (submitFunc) => `<div class="p-4 border-t-[3px] double border-[#cba135] bg-[#fffdf9] flex gap-4 shadow-[0_-2px_0_#a89f91]"><button onclick="closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4 text-[#5c4033]">CANCELAR</button><button onclick="${submitFunc}('${item.id}')" class="flex-1 btn-retro btn-retro-green py-4 text-lg">AGREGAR PEDIDO</button></div>`;
+
             if (item.isBeer && item.category === 'bar') {
                 const isGeneric = item.type === 'regular'; 
-                modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#fffbeb]">
-                        <div class="p-4 border-b border-amber-200 bg-amber-50 flex justify-between items-center"><div><h3 class="font-black text-xl text-amber-900 uppercase">${item.name}</h3><p class="text-stone-500 font-bold">$${item.price}</p></div><button onclick="closeModal()" class="text-stone-400 text-xl"><i class="fa-solid fa-times"></i></button></div>
-                        <div class="p-5 overflow-y-auto flex-1 space-y-5">
-                            <div class="flex justify-center items-center gap-6 bg-white p-3 rounded-xl shadow-inner border border-stone-200"><button onclick="adjQty(-1)" class="w-12 h-12 rounded-full bg-stone-200 text-stone-600 text-2xl font-bold">-</button><span id="modal-qty" class="text-4xl font-black text-amber-900">1</span><button onclick="adjQty(1)" class="w-12 h-12 rounded-full bg-amber-600 text-white text-2xl font-bold">+</button></div>
-                            ${isGeneric ? `<div><h4 class="text-xs font-bold text-stone-400 uppercase mb-2">Tipo</h4><div class="grid grid-cols-2 gap-3" id="beer-type-group"><div onclick="selectBeerType(this)" class="option-btn clara selected" data-val="Clara">CLARA</div><div onclick="selectBeerType(this)" class="option-btn oscura" data-val="Oscura">OSCURA</div></div></div>` : ''}
-                            <div><h4 class="text-xs font-bold text-stone-400 uppercase mb-2">Escarchado</h4><div class="grid grid-cols-1 gap-2" id="beer-prep-group"><div onclick="selectBeerPrep(this)" class="prep-radio" data-val="Escarchado Sal">Escarchado Sal</div><div onclick="selectBeerPrep(this)" class="prep-radio selected" data-val="Escarchado Chamoy">Escarchado Chamoy</div><div onclick="selectBeerPrep(this)" class="prep-radio" data-val="Sin Escarchar">Sin Escarchar</div></div></div>
-                            <div class="flex gap-2"><button onclick="toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-lg font-bold shadow-sm" id="btn-sin-limon">SIN LIMÓN</button><button onclick="toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-lg font-bold shadow-sm hidden" id="btn-sin-ajonjoli">SIN AJONJOLÍ</button></div>
-                            <div onclick="toggleMod(this)" class="mod-btn btn-green p-3 rounded-lg flex justify-between items-center cursor-pointer mt-2 shadow-sm border-2" id="btn-clamato"><span class="font-bold flex items-center gap-2"><i class="fa-solid fa-droplet"></i> EXTRA CLAMATO</span><span class="font-black bg-green-700 text-white px-2 py-0.5 rounded text-xs">+$5</span></div>
-                            <input type="text" id="manual-note" placeholder="Nota extra..." class="w-full border-2 border-stone-300 rounded-lg p-3 text-sm focus:border-amber-500 outline-none bg-white mt-2">
+                modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#f8f1e5]">${modalHeader}
+                        <div class="p-5 overflow-y-auto flex-1 space-y-6" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23a89f91\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');">
+                            <div class="flex justify-center items-center gap-8 bg-[#fffdf9] p-4 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-2 border-[#a89f91]"><button onclick="adjQty(-1)" class="w-14 h-14 rounded-full bg-[#e0d8c8] text-[#5c4033] text-3xl font-bold border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91] active:shadow-[1px_1px_0_#a89f91] active:translate-x-[1px] active:translate-y-[1px] transition">-</button><span id="modal-qty" class="text-5xl font-black text-[#2c1e16]" style="font-family: 'Special Elite', cursive;">1</span><button onclick="adjQty(1)" class="w-14 h-14 rounded-full bg-[#cba135] text-[#2c1e16] text-3xl font-bold border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] active:shadow-[1px_1px_0_#2c1e16] active:translate-x-[1px] active:translate-y-[1px] transition">+</button></div>
+                            ${isGeneric ? `<div><h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-mono tracking-wider border-b-2 border-dashed border-[#a89f91] pb-1">Tipo de Cerveza</h4><div class="grid grid-cols-2 gap-4" id="beer-type-group"><div onclick="selectBeerType(this)" class="option-btn clara selected" data-val="Clara" style="font-family: 'Abril Fatface', cursive;">CLARA</div><div onclick="selectBeerType(this)" class="option-btn oscura" data-val="Oscura" style="font-family: 'Abril Fatface', cursive;">OSCURA</div></div></div>` : ''}
+                            <div><h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-mono tracking-wider border-b-2 border-dashed border-[#a89f91] pb-1">Preparación</h4><div class="grid grid-cols-1 gap-3" id="beer-prep-group"><div onclick="selectBeerPrep(this)" class="prep-radio" data-val="Escarchado Sal">Escarchado Sal</div><div onclick="selectBeerPrep(this)" class="prep-radio selected" data-val="Escarchado Chamoy">Escarchado Chamoy</div><div onclick="selectBeerPrep(this)" class="prep-radio" data-val="Sin Escarchar">Sin Escarchar</div></div></div>
+                            <div class="flex gap-3"><button onclick="toggleMod(this)" class="mod-btn btn-red flex-1 py-4 rounded-sm font-bold shadow-sm text-sm tracking-wider uppercase" id="btn-sin-limon" style="font-family: 'Abril Fatface', cursive;">SIN LIMÓN</button><button onclick="toggleMod(this)" class="mod-btn btn-red flex-1 py-4 rounded-sm font-bold shadow-sm hidden text-sm tracking-wider uppercase" id="btn-sin-ajonjoli" style="font-family: 'Abril Fatface', cursive;">SIN AJONJOLÍ</button></div>
+                            <div onclick="toggleMod(this)" class="mod-btn btn-green p-4 rounded-sm flex justify-between items-center cursor-pointer mt-4 shadow-sm border-2" id="btn-clamato"><span class="font-bold flex items-center gap-2 uppercase tracking-wide" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-droplet animate-bounce"></i> EXTRA CLAMATO</span><span class="font-black bg-[#557b55] text-[#f8f1e5] px-3 py-1 rounded-sm text-sm border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] font-mono">+$5</span></div>
+                            <input type="text" id="manual-note" placeholder="Nota extra para barra..." class="w-full mt-4">
                         </div>
-                        <div class="p-4 border-t border-amber-200 bg-white flex gap-3"><button onclick="closeModal()" class="flex-1 py-3.5 rounded-lg border-2 border-stone-300 text-stone-500 font-bold hover:bg-stone-50">CANCELAR</button><button onclick="submitBeerOrder('${item.id}')" class="flex-1 py-3.5 rounded-lg bg-amber-600 text-white font-bold shadow-lg border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 transition">AGREGAR</button></div>
-                    </div>`;
+                        ${modalFooter('submitBeerOrder')}</div>`;
                 checkChamoy();
             } else {
-                // UI GENERAL Y PAQUETES
                 let mods = item.modGroup ? MODIFIERS[item.modGroup] : (MODIFIERS['general_' + item.category] || []);
-                modal.innerHTML = `
-                    <div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#fffbeb]">
-                        <div class="p-4 border-b border-amber-200 bg-amber-50 flex justify-between items-center"><div><h3 class="font-black text-xl text-amber-900 uppercase">${item.name}</h3><p class="text-stone-500 font-bold">$${item.price}</p></div><button onclick="closeModal()" class="text-stone-400 text-xl"><i class="fa-solid fa-times"></i></button></div>
-                        <div class="p-5 overflow-y-auto flex-1">
-                            <div class="flex justify-center items-center gap-6 mb-6 bg-white p-3 rounded-xl shadow-inner border border-stone-200"><button onclick="adjQty(-1)" class="w-12 h-12 rounded-full bg-stone-200 text-stone-600 text-2xl font-bold">-</button><span id="modal-qty" class="text-4xl font-black text-amber-900">1</span><button onclick="adjQty(1)" class="w-12 h-12 rounded-full bg-amber-600 text-white text-2xl font-bold">+</button></div>
-                            ${mods.length > 0 ? `<div class="flex flex-wrap gap-2 mb-4">${mods.map(m => {
+                modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#f8f1e5]">${modalHeader}
+                        <div class="p-5 overflow-y-auto flex-1" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23a89f91\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');">
+                            <div class="flex justify-center items-center gap-8 mb-8 bg-[#fffdf9] p-4 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-2 border-[#a89f91]"><button onclick="adjQty(-1)" class="w-14 h-14 rounded-full bg-[#e0d8c8] text-[#5c4033] text-3xl font-bold border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91] active:shadow-[1px_1px_0_#a89f91] active:translate-x-[1px] active:translate-y-[1px] transition">-</button><span id="modal-qty" class="text-5xl font-black text-[#2c1e16]" style="font-family: 'Special Elite', cursive;">1</span><button onclick="adjQty(1)" class="w-14 h-14 rounded-full bg-[#cba135] text-[#2c1e16] text-3xl font-bold border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] active:shadow-[1px_1px_0_#2c1e16] active:translate-x-[1px] active:translate-y-[1px] transition">+</button></div>
+                            ${mods.length > 0 ? `<h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-mono tracking-wider border-b-2 border-dashed border-[#a89f91] pb-1">Modificadores</h4><div class="flex flex-wrap gap-3 mb-6">${mods.map(m => {
                                 let cls = m.startsWith("Sin") ? "btn-red" : (m.startsWith("Con")||m.includes("+") ? "btn-green" : "btn-neutral");
-                                return `<button onclick="toggleMod(this)" class="mod-btn px-3 py-2 rounded-lg text-sm shadow-sm ${cls}">${m}</button>`;
+                                return `<button onclick="toggleMod(this)" class="mod-btn px-4 py-3 rounded-sm text-sm shadow-sm font-bold tracking-wide ${cls}" style="font-family: 'Abril Fatface', cursive;">${m}</button>`;
                             }).join('')}</div>` : ''}
-                            <input type="text" id="manual-note" placeholder="Nota..." class="w-full border-2 border-stone-300 rounded-lg p-3 text-sm focus:border-amber-500 outline-none bg-white">
+                            <input type="text" id="manual-note" placeholder="Nota especial para cocina..." class="w-full">
                         </div>
-                        <div class="p-4 border-t border-amber-200 bg-white flex gap-3"><button onclick="closeModal()" class="flex-1 py-3.5 rounded-lg border-2 border-stone-300 text-stone-500 font-bold hover:bg-stone-50">CANCELAR</button><button onclick="submitGeneralOrder('${item.id}')" class="flex-1 py-3.5 rounded-lg bg-amber-600 text-white font-bold shadow-lg border-b-4 border-amber-800 active:border-b-0 active:translate-y-1 transition">AGREGAR</button></div>
-                    </div>`;
+                        ${modalFooter('submitGeneralOrder')}</div>`;
             }
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
@@ -421,99 +527,49 @@
             const modal = document.getElementById('modal-content');
             let content = '';
             
-            const salsaSection = (title, name) => `
-                <div class="pkg-section">
-                    <h4 class="pkg-title">${title}</h4>
-                    <div class="grid grid-cols-3 gap-2">
-                        ${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-1 text-xs border p-2 rounded cursor-pointer hover:bg-stone-100"><input type="radio" name="${name}" value="${s}" class="accent-amber-600"> ${s}</label>`).join('')}
-                    </div>
-                </div>`;
-
-            const beerSection = (num) => `
-                <div class="pkg-section">
-                    <h4 class="pkg-title">Tarro ${num} (½ Litro)</h4>
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        <select id="p_beer_type_${num}" class="border p-2 rounded text-sm w-full"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select>
-                        <select id="p_beer_prep_${num}" class="border p-2 rounded text-sm w-full"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select>
-                    </div>
-                    <label class="flex items-center gap-2 text-sm"><input type="checkbox" id="p_beer_nolimon_${num}"> Sin Limón</label>
-                </div>`;
+            const salsaSection = (title, name) => `<div class="pkg-section"><h4 class="pkg-title">${title}</h4><div class="grid grid-cols-3 gap-3">${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-2 text-xs border-2 border-[#a89f91] p-3 rounded-sm cursor-pointer bg-[#fffdf9] hover:bg-[#e0d8c8] transition font-bold shadow-[2px_2px_0_#a89f91]"><input type="radio" name="${name}" value="${s}" class="accent-[#cba135] w-4 h-4"> ${s}</label>`).join('')}</div></div>`;
+            const beerSection = (num) => `<div class="pkg-section"><h4 class="pkg-title">Tarro ${num} (½ Litro)</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p_beer_type_${num}" class="w-full"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select><select id="p_beer_prep_${num}" class="w-full"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-[#5c4033] bg-[#e0d8c8] p-2 rounded-sm border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91] w-fit"><input type="checkbox" id="p_beer_nolimon_${num}" class="accent-[#a63e3e] w-4 h-4"> Sin Limón</label></div>`;
+            
+            const radioGroup = (name, options) => `<div class="flex gap-4 bg-[#e0d8c8] p-3 rounded-sm border-2 border-[#a89f91] shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]">${options.map((opt, i) => `<label class="flex items-center gap-2 font-bold text-[#5c4033]"><input type="radio" name="${name}" value="${opt}" ${i===0?'checked':''} class="accent-[#cba135] w-5 h-5"> ${opt}</label>`).join('')}</div>`;
+            const checkGroup = (cls, options) => `<div class="grid grid-cols-3 gap-2 bg-[#fffdf9] p-2 rounded-sm border-2 border-[#a89f91]">${options.map(m=>`<label class="text-xs font-bold flex items-center gap-1 text-[#5c4033] p-1 hover:bg-[#e0d8c8] rounded-sm transition"><input type="checkbox" class="${cls} accent-[#a63e3e] w-3.5 h-3.5" value="${m}"> ${m}</label>`).join('')}</div>`;
 
             if(item.id === 'p1') {
-                content = `
-                    ${salsaSection('Salsa Alitas', 'p1_salsa_alitas')}
-                    ${salsaSection('Salsa Boneless', 'p1_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4"><label><input type="radio" name="p1_side" value="Media Papas" checked> ½ Papas</label><label><input type="radio" name="p1_side" value="Media Aros"> ½ Aros</label></div></div>
-                    ${beerSection(1)} ${beerSection(2)}
-                `;
+                content = `${salsaSection('Salsa Alitas', 'p1_salsa_alitas')}${salsaSection('Salsa Boneless', 'p1_salsa_boneless')}<div class="pkg-section"><h4 class="pkg-title">Guarnición</h4>${radioGroup('p1_side', ['Media Papas', 'Media Aros'])}</div>${beerSection(1)} ${beerSection(2)}`;
             } else if(item.id === 'p2') {
-                content = `
-                    <div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4><div class="flex gap-4 mb-2"><label><input type="radio" name="p2_main" value="Alitas" checked> Alitas</label><label><input type="radio" name="p2_main" value="Boneless"> Boneless</label></div>${salsaSection('Salsa (Para elección)', 'p2_salsa_main').replace('<div class="pkg-section">','<div>')}</div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4><div class="grid grid-cols-3 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs"><input type="checkbox" class="p2_h1_mod" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4><div class="grid grid-cols-3 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs"><input type="checkbox" class="p2_h2_mod" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 mb-2"><label><input type="radio" name="p2_side" value="Media Papas" checked> ½ Papas</label><label><input type="radio" name="p2_side" value="Media Aros"> ½ Aros</label></div><div class="grid grid-cols-3 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs"><input type="checkbox" class="p2_side_mod" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    ${beerSection(1)} ${beerSection(2)}
-                `;
+                content = `<div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4>${radioGroup('p2_main', ['Alitas', 'Boneless'])}${salsaSection('Salsa (Para elección)', 'p2_salsa_main').replace('<div class="pkg-section">','<div class="mt-3">')}</div><div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4>${checkGroup('p2_h1_mod', MODIFIERS.burgers)}</div><div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4>${checkGroup('p2_h2_mod', MODIFIERS.burgers)}</div><div class="pkg-section"><h4 class="pkg-title">Guarnición</h4>${radioGroup('p2_side', ['Media Papas', 'Media Aros'])}<div class="mt-3">${checkGroup('p2_side_mod', MODIFIERS.snacks)}</div></div>${beerSection(1)} ${beerSection(2)}`;
             } else if(item.id === 'p3') {
-                content = `
-                    ${salsaSection('Salsa Alitas', 'p3_salsa_alitas')}
-                    ${salsaSection('Salsa Boneless', 'p3_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla (Orden Completa)</h4><div class="grid grid-cols-3 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs"><input type="checkbox" class="p3_aros_mod" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4><div class="grid grid-cols-3 gap-2">${MODIFIERS.hotdogs.map(m=>`<label class="text-xs"><input type="checkbox" class="p3_hd_mod" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">3 Tarros Pequeños (Iguales)</h4><div class="grid grid-cols-2 gap-2 mb-2"><select id="p3_beer_type" class="border p-2 w-full"><option>Clara</option><option>Oscura</option></select><select id="p3_beer_prep" class="border p-2 w-full"><option>Chamoy</option><option>Sal</option><option>Sin</option></select></div><label><input type="checkbox" id="p3_beer_nolimon"> Sin Limón</label></div>
-                `;
+                content = `${salsaSection('Salsa Alitas', 'p3_salsa_alitas')}${salsaSection('Salsa Boneless', 'p3_salsa_boneless')}<div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla (Orden Completa)</h4>${checkGroup('p3_aros_mod', MODIFIERS.snacks)}</div><div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4>${checkGroup('p3_hd_mod', MODIFIERS.hotdogs)}</div><div class="pkg-section"><h4 class="pkg-title">3 Tarros Pequeños (Iguales)</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p3_beer_type" class="w-full"><option>Clara</option><option>Oscura</option></select><select id="p3_beer_prep" class="w-full"><option>Chamoy</option><option>Sal</option><option>Sin</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-[#5c4033] bg-[#e0d8c8] p-2 rounded-sm border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91] w-fit"><input type="checkbox" id="p3_beer_nolimon" class="accent-[#a63e3e] w-4 h-4"> Sin Limón</label></div>`;
             }
 
-            modal.innerHTML = `
-                <div class="flex-1 flex flex-col h-full max-h-[90vh] bg-[#fffbeb]">
-                    <div class="p-4 border-b border-amber-200 bg-amber-50 flex justify-between items-center"><div><h3 class="font-black text-xl text-amber-900 uppercase">${item.name}</h3><p class="text-stone-500 font-bold">$${item.price}</p></div><button onclick="closeModal()" class="text-stone-400 text-xl"><i class="fa-solid fa-times"></i></button></div>
-                    <div class="p-4 overflow-y-auto flex-1">${content}</div>
-                    <div class="p-4 border-t border-amber-200 bg-white flex gap-3"><button onclick="closeModal()" class="flex-1 py-3.5 rounded-lg border-2 border-stone-300 font-bold">Cancelar</button><button onclick="submitPackageOrder('${item.id}')" class="flex-1 py-3.5 rounded-lg bg-amber-600 text-white font-bold shadow-lg">AGREGAR PAQUETE</button></div>
-                </div>`;
+            modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[90vh] bg-[#f8f1e5]">
+                <div class="p-4 border-b-[3px] double border-[#cba135] bg-[#f8f1e5] flex justify-between items-center shadow-[0_2px_0_#a89f91]"><div><h3 class="font-black text-2xl text-[#2c1e16] uppercase tracking-wide" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">${item.name}</h3><p class="text-[#a63e3e] font-bold font-mono text-lg">$${item.price}</p></div><button onclick="closeModal()" class="text-[#5c4033] text-2xl hover:text-[#a63e3e] transition bg-[#fffdf9] rounded-full w-10 h-10 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033]"><i class="fa-solid fa-times"></i></button></div>
+                <div class="p-5 overflow-y-auto flex-1 space-y-4" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23a89f91\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');">${content}</div>
+                <div class="p-4 border-t-[3px] double border-[#cba135] bg-[#fffdf9] flex gap-4 shadow-[0_-2px_0_#a89f91]"><button onclick="closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4 text-[#5c4033]">CANCELAR</button><button onclick="submitPackageOrder('${item.id}')" class="flex-1 btn-retro btn-retro-green py-4 text-lg">AGREGAR PAQUETE</button></div>
+            </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
 
         window.submitPackageOrder = async (itemId) => {
             const item = MENU.find(i => i.id === itemId);
-            let kitchenMods = [];
-            let barMods = [];
-
+            let kitchenMods = [], barMods = [];
             const getRadio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || 'Sin elección';
             const getChecks = (cls) => Array.from(document.querySelectorAll(`.${cls}:checked`)).map(c => c.value).join(', ');
             const getBeer = (n) => `T${n}: ${document.getElementById(`p_beer_type_${n}`).value}, ${document.getElementById(`p_beer_prep_${n}`).value}` + (document.getElementById(`p_beer_nolimon_${n}`).checked ? ' (Sin Limón)' : '');
 
             if(itemId === 'p1') {
-                kitchenMods.push(`Alitas: ${getRadio('p1_salsa_alitas')}`);
-                kitchenMods.push(`Boneless: ${getRadio('p1_salsa_boneless')}`);
-                kitchenMods.push(`Guarnición: ${getRadio('p1_side')}`);
-                barMods.push(getBeer(1));
-                barMods.push(getBeer(2));
+                kitchenMods.push(`Alitas: ${getRadio('p1_salsa_alitas')}`); kitchenMods.push(`Boneless: ${getRadio('p1_salsa_boneless')}`); kitchenMods.push(`Guarnición: ${getRadio('p1_side')}`);
+                barMods.push(getBeer(1)); barMods.push(getBeer(2));
             } else if(itemId === 'p2') {
-                kitchenMods.push(`Principal: ${getRadio('p2_main')} (${getRadio('p2_salsa_main')})`);
-                kitchenMods.push(`Burg 1: ${getChecks('p2_h1_mod') || 'Sencilla'}`);
-                kitchenMods.push(`Burg 2: ${getChecks('p2_h2_mod') || 'Sencilla'}`);
-                kitchenMods.push(`Guarnición: ${getRadio('p2_side')} (${getChecks('p2_side_mod')})`);
-                barMods.push(getBeer(1));
-                barMods.push(getBeer(2));
+                kitchenMods.push(`Principal: ${getRadio('p2_main')} (${getRadio('p2_salsa_main')})`); kitchenMods.push(`Burg 1: ${getChecks('p2_h1_mod') || 'Sencilla'}`); kitchenMods.push(`Burg 2: ${getChecks('p2_h2_mod') || 'Sencilla'}`); kitchenMods.push(`Guarnición: ${getRadio('p2_side')} (${getChecks('p2_side_mod')})`);
+                barMods.push(getBeer(1)); barMods.push(getBeer(2));
             } else if(itemId === 'p3') {
-                kitchenMods.push(`Alitas: ${getRadio('p3_salsa_alitas')}`);
-                kitchenMods.push(`Boneless: ${getRadio('p3_salsa_boneless')}`);
-                kitchenMods.push(`Aros: ${getChecks('p3_aros_mod')}`);
-                kitchenMods.push(`3 HotDogs: ${getChecks('p3_hd_mod')}`);
+                kitchenMods.push(`Alitas: ${getRadio('p3_salsa_alitas')}`); kitchenMods.push(`Boneless: ${getRadio('p3_salsa_boneless')}`); kitchenMods.push(`Aros: ${getChecks('p3_aros_mod')}`); kitchenMods.push(`3 HotDogs: ${getChecks('p3_hd_mod')}`);
                 barMods.push(`3 Tarros: ${document.getElementById('p3_beer_type').value}, ${document.getElementById('p3_beer_prep').value}` + (document.getElementById('p3_beer_nolimon').checked ? ' (Sin Limón)' : ''));
             }
 
-            await addDoc(collection(db, 'orders'), {
-                tableId: currentTableId, itemId: item.id, itemName: `${item.name} (Cocina)`, category: 'kitchen',
-                price: item.price, quantity: 1, modifiers: kitchenMods, status: 'ordered', timestamp: serverTimestamp()
-            });
-            await addDoc(collection(db, 'orders'), {
-                tableId: currentTableId, itemId: item.id, itemName: `${item.name} (Barra)`, category: 'bar',
-                price: 0, quantity: 1, modifiers: barMods, status: 'ordered', timestamp: serverTimestamp()
-            });
-
-            closeModal();
-            switchTab('orders');
+            await addDoc(collection(db, 'orders'), { tableId: currentTableId, itemId: item.id, itemName: `${item.name} (Cocina)`, category: 'kitchen', price: item.price, quantity: 1, modifiers: kitchenMods, status: 'ordered', timestamp: serverTimestamp() });
+            await addDoc(collection(db, 'orders'), { tableId: currentTableId, itemId: item.id, itemName: `${item.name} (Barra)`, category: 'bar', price: 0, quantity: 1, modifiers: barMods, status: 'ordered', timestamp: serverTimestamp() });
+            closeModal(); switchTab('orders');
         }
 
         window.selectRadio = (el, groupId) => { const group = document.getElementById(groupId); if(group) { group.querySelectorAll('.beer-radio, .prep-radio').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); } }
@@ -553,7 +609,7 @@
             switchTab('orders');
         }
 
-        window.openNewTableModal = () => { document.getElementById('modal-content').innerHTML = `<div class="p-6 bg-[#fffbeb]"><h3 class="font-black text-xl mb-4 text-amber-900">ABRIR NUEVA MESA</h3><input type="number" id="ntn" placeholder="Número de Mesa" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-3 text-lg font-bold outline-none focus:border-amber-500"><input type="text" id="ntnm" placeholder="Apodo / Referencia" class="w-full border-2 border-stone-300 p-3 rounded-lg mb-4 outline-none focus:border-amber-500"><label class="flex items-center gap-2 mb-6 p-2 border border-pink-200 bg-pink-50 rounded-lg cursor-pointer"><input type="checkbox" id="ntvip" class="w-5 h-5 accent-pink-500"> <span class="font-bold text-pink-700"><i class="fa-solid fa-crown"></i> Cliente Distinguido (VIP)</span></label><div class="flex gap-3"><button onclick="closeModal()" class="flex-1 bg-stone-200 py-3 rounded-lg font-bold text-stone-600 hover:bg-stone-300">CANCELAR</button><button onclick="subNT()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition">ABRIR</button></div></div>`; document.getElementById('modal-overlay').classList.remove('hidden'); }
+        window.openNewTableModal = () => { document.getElementById('modal-content').innerHTML = `<div class="p-6 bg-[#f8f1e5] modal-retro border-0 shadow-none"><h3 class="font-black text-2xl mb-6 text-[#2c1e16] border-b-[3px] double border-[#cba135] pb-2 uppercase tracking-widest" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">ABRIR NUEVA MESA</h3><input type="number" id="ntn" placeholder="Número de Mesa" class="w-full mb-4"><input type="text" id="ntnm" placeholder="Apodo / Referencia" class="w-full mb-6"><label class="flex items-center gap-3 mb-8 p-4 border-2 border-[#cba135] bg-[#fff0e6] rounded-sm cursor-pointer shadow-[3px_3px_0_#cba135] hover:bg-[#ffe8d6] transition w-fit mx-auto"><input type="checkbox" id="ntvip" class="w-6 h-6 accent-[#cba135] border-2 border-[#2c1e16]"> <span class="font-bold text-[#2c1e16] text-lg" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown text-[#cba135] mr-2 drop-shadow-[1px_1px_0_#2c1e16]"></i> Cliente Distinguido (VIP)</span></label><div class="flex gap-4"><button onclick="closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4 text-[#5c4033]">CANCELAR</button><button onclick="subNT()" class="flex-1 btn-retro btn-retro-green py-4 text-lg">ABRIR MESA</button></div></div>`; document.getElementById('modal-overlay').classList.remove('hidden'); }
         window.subNT = async () => {
             const num = document.getElementById('ntn').value;
             const nick = document.getElementById('ntnm').value || 'Cliente';
@@ -578,12 +634,12 @@
         window.switchTab = (t) => {
             if(t==='menu'){ 
                 document.getElementById('tab-menu').classList.remove('hidden'); document.getElementById('tab-orders').classList.add('hidden'); document.getElementById('order-footer').classList.add('hidden'); 
-                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-amber-800 border-b-4 border-amber-600 bg-amber-50 font-bold";
-                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-stone-400 font-bold hover:bg-stone-50 transition";
+                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide";
+                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide";
             } else { 
                 document.getElementById('tab-menu').classList.add('hidden'); document.getElementById('tab-orders').classList.remove('hidden'); document.getElementById('order-footer').classList.remove('hidden');
-                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-amber-800 border-b-4 border-amber-600 bg-amber-50 font-bold";
-                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-stone-400 font-bold hover:bg-stone-50 transition";
+                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide";
+                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide";
             }
         }
         window.closeModal = () => document.getElementById('modal-overlay').classList.add('hidden');
@@ -597,58 +653,69 @@
                 return ta - tb; 
             });
             const ready = ordersData.filter(o => o.category === cat && o.status === 'ready');
-            let html = `<div class="flex h-full p-2 gap-3 overflow-x-auto bg-stone-200">`;
-            html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-red-500"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div> PENDIENTES (${active.filter(o=>o.status==='ordered').length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${active.filter(o=>o.status==='ordered').map(o=>card(o,'ordered')).join('')}</div></div>`;
-            if(cat==='kitchen') html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-yellow-400"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-400"></div> COCINANDO (${active.filter(o=>o.status==='preparing').length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${active.filter(o=>o.status==='preparing').map(o=>card(o,'preparing')).join('')}</div></div>`;
-            html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-green-600"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-600"></div> LISTOS (${ready.length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${ready.map(o=>card(o,'ready')).join('')}</div></div>`;
+            
+            const colStyle = (borderCol, titleCol, icon) => `flex-1 min-w-[320px] bg-[#fffdf9] rounded-sm shadow-[4px_4px_0_#5c4033] p-4 flex flex-col border-4 double border-[${borderCol}] relative overflow-hidden`;
+            const titleStyle = (textCol) => `font-black text-[${textCol}] mb-4 text-xl flex items-center gap-3 border-b-2 border-dashed border-[${textCol}] pb-2 tracking-wider`;
+
+            let html = `<div class="flex h-full p-4 gap-6 overflow-x-auto bg-[#f8f1e5]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%235c4033\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z\'/%3E%3C/g%3E%3C/svg%3E');">`;
+            
+            html += `<div class="${colStyle('#a63e3e', '#a63e3e')}"><div class="absolute top-0 right-0 opacity-10"><i class="fa-solid fa-clipboard-list text-6xl text-[#a63e3e]"></i></div><h3 class="${titleStyle('#a63e3e')}"><i class="fa-solid fa-inbox animate-bounce"></i> PENDIENTES (${active.filter(o=>o.status==='ordered').length})</h3><div class="flex-1 overflow-y-auto space-y-4 p-1">${active.filter(o=>o.status==='ordered').map(o=>card(o,'ordered')).join('')}</div></div>`;
+            if(cat==='kitchen') html += `<div class="${colStyle('#d4a353', '#d4a353')}"><div class="absolute top-0 right-0 opacity-10"><i class="fa-solid fa-fire-burner text-6xl text-[#d4a353]"></i></div><h3 class="${titleStyle('#d4a353')}"><i class="fa-solid fa-fire animate-pulse"></i> COCINANDO (${active.filter(o=>o.status==='preparing').length})</h3><div class="flex-1 overflow-y-auto space-y-4 p-1">${active.filter(o=>o.status==='preparing').map(o=>card(o,'preparing')).join('')}</div></div>`;
+            html += `<div class="${colStyle('#557b55', '#557b55')}"><div class="absolute top-0 right-0 opacity-10"><i class="fa-solid fa-bell-concierge text-6xl text-[#557b55]"></i></div><h3 class="${titleStyle('#557b55')}"><i class="fa-solid fa-check-double"></i> LISTOS (${ready.length})</h3><div class="flex-1 overflow-y-auto space-y-4 p-1">${ready.map(o=>card(o,'ready')).join('')}</div></div>`;
             document.getElementById('content-area').innerHTML = html + `</div>`;
         }
         
         function card(o,s) {
             const t = tablesData.find(x=>x.id===o.tableId);
             const timeAgo = Math.floor((new Date()-new Date(o.timestamp?.seconds*1000))/60000);
-            let btnClass = "bg-stone-500", btnText = "Acción";
-            if(s==='ordered') { if(o.category==='bar') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } else { btnText="Cocinar"; btnClass="bg-yellow-600 hover:bg-yellow-700"; } }
-            else if(s==='preparing') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } 
-            else { btnText="Entregar"; btnClass="bg-blue-600 hover:bg-blue-700"; }
+            let btnClass = "btn-retro-neutral", btnText = "Acción", btnIcon = "fa-arrow-right";
+            if(s==='ordered') { if(o.category==='bar') { btnText="Terminar"; btnClass="btn-retro-green"; btnIcon="fa-check"; } else { btnText="Cocinar"; btnClass="btn-retro-yellow"; btnIcon="fa-fire"; } }
+            else if(s==='preparing') { btnText="Terminar"; btnClass="btn-retro-green"; btnIcon="fa-check"; } 
+            else { btnText="Entregar"; btnClass="btn-retro-blue"; btnIcon="fa-thumbs-up"; }
             let nextSt = s==='ordered' ? (o.category==='bar'?'ready':'preparing') : (s==='preparing'?'ready':'delivered');
             
             const isVip = t?.isVip;
-            const cardBg = isVip ? "bg-pink-50 border-pink-300" : "bg-stone-50 border-stone-200";
-            const vipBadge = isVip ? '<span class="bg-pink-500 text-white text-[10px] px-1 py-0.5 rounded ml-1"><i class="fa-solid fa-crown"></i></span>' : '';
+            const cardBg = isVip ? "bg-[#fff0e6] border-[#cba135]" : "bg-[#fffdf9] border-[#a89f91]";
+            const vipBadge = isVip ? `<span class="bg-[#cba135] text-[#2c1e16] text-[10px] px-2 py-0.5 rounded-sm ml-2 border border-[#2c1e16] shadow-[1px_1px_0_#2c1e16] font-bold" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
             
-            return `<div class="${cardBg} p-4 rounded-lg shadow border"><div class="flex justify-between font-bold text-lg mb-2"><span class="bg-stone-800 text-white px-2 py-0.5 rounded text-sm flex items-center">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-normal text-stone-500 bg-white border px-2 py-1 rounded flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div><div class="text-xl leading-tight text-stone-800 mb-2"><span class="font-black bg-amber-200 px-2 rounded-md mr-1">${o.quantity}</span> ${o.itemName}</div>${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-700 font-bold bg-red-50 p-2 rounded border border-red-100 mb-2 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}<button onclick="upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 mt-1 rounded-lg font-bold shadow-md active:translate-y-0.5 transition uppercase tracking-wide">${btnText}</button></div>`;
+            return `<div class="${cardBg} p-4 rounded-sm shadow-[3px_3px_0_rgba(92,64,51,0.3)] border-2 relative overflow-hidden">
+                ${isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[40px] border-r-[40px] border-t-transparent border-r-[#cba135]/40 z-0"></div>' : ''}
+                <div class="relative z-10">
+                <div class="flex justify-between font-bold text-xl mb-3 pb-2 border-b-2 border-dashed border-[#a89f91]"><span class="bg-[#2c1e16] text-[#f8f1e5] px-3 py-1 rounded-sm text-base flex items-center shadow-[2px_2px_0_#a89f91]" style="font-family: 'Abril Fatface', cursive;">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-normal text-[#5c4033] bg-[#e0d8c8] border-2 border-[#a89f91] px-2 py-1 rounded-sm flex items-center gap-2 font-mono font-bold shadow-[1px_1px_0_#a89f91]"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div>
+                <div class="text-2xl leading-tight text-[#2c1e16] mb-3" style="font-family: 'Abril Fatface', cursive;"><span class="font-black text-[#a63e3e] mr-2 text-3xl">${o.quantity}x</span> ${o.itemName}</div>
+                ${o.modifiers&&o.modifiers.length?`<div class="text-xs text-[#a63e3e] font-bold bg-[#fce8e8] p-3 rounded-sm border-2 border-[#a63e3e] mb-4 flex flex-col gap-1 items-start font-mono shadow-[2px_2px_0_rgba(166,62,62,0.3)]"><i class="fa-solid fa-clipboard-check mb-1 text-base"></i> <span>${o.modifiers.join(', ')}</span></div>`:''}
+                <button onclick="upd('${o.id}','${nextSt}')" class="w-full btn-retro ${btnClass} py-4 text-lg flex justify-center items-center gap-3"><i class="fa-solid ${btnIcon}"></i> ${btnText}</button></div></div>`;
         }
         window.upd = async(id,s) => await updateDoc(doc(db,'orders',id),{status:s});
 
         window.openCloseAccountModal = (tid, total) => {
             const t = tablesData.find(x => x.id === tid);
-            document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-[#fffbeb]">
-                    <h3 class="font-black text-2xl text-amber-900 mb-1">MESA ${t.number}</h3>
-                    <p class="text-stone-500 font-mono text-sm mb-4">Ticket #${t.uniqueId || '---'}</p>
+            document.getElementById('modal-content').innerHTML = `<div class="p-6 text-center bg-[#f8f1e5] modal-retro border-0 shadow-none">
+                    <h3 class="font-black text-4xl text-[#2c1e16] mb-2 uppercase tracking-widest" style="font-family: 'Abril Fatface', cursive; text-shadow: 2px 2px 0 #cba135;">MESA ${t.number}</h3>
+                    <p class="text-[#5c4033] font-mono text-lg mb-6 font-bold border-b-2 border-dashed border-[#a89f91] pb-4 inline-block px-6">Ticket #${t.uniqueId || '---'}</p>
                     
                     <!-- PAYMENT TOGGLE -->
-                    <label class="flex items-center justify-center gap-2 mb-4 cursor-pointer bg-white p-3 rounded-lg shadow-sm border border-stone-200 hover:bg-stone-50 transition">
-                        <input type="checkbox" id="close-card-check" onchange="calcCloseTotal(${total})" class="w-5 h-5 accent-blue-600">
-                        <span class="font-bold text-stone-700 flex items-center gap-2"><i class="fa-solid fa-credit-card text-blue-600"></i> Pago con Tarjeta (+4%)</span>
+                    <label class="flex items-center justify-center gap-4 mb-6 cursor-pointer bg-[#fffdf9] p-4 rounded-sm shadow-[3px_3px_0_#a89f91] border-2 border-[#a89f91] hover:bg-[#e0d8c8] transition w-fit mx-auto">
+                        <input type="checkbox" id="close-card-check" onchange="calcCloseTotal(${total})" class="w-6 h-6 accent-[#4a6fa5] border-2 border-[#2c1e16]">
+                        <span class="font-bold text-[#2c1e16] flex items-center gap-3 text-lg" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-credit-card text-[#4a6fa5] text-2xl drop-shadow-[1px_1px_0_#2c1e16]"></i> Pago con Tarjeta (+4%)</span>
                     </label>
 
-                    <div class="bg-white p-4 rounded-xl shadow-inner border border-stone-200 mb-6">
-                         <div id="close-breakdown" class="hidden text-sm mb-2 space-y-1 text-stone-500">
+                    <div class="bg-[#fffdf9] p-6 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-4 double border-[#5c4033] mb-8 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-repeat-x" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'10\' viewBox=\'0 0 20 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 10L10 0L20 10H0Z\' fill=\'%235c4033\'/%3E%3C/svg%3E');"></div>
+                         <div id="close-breakdown" class="hidden text-base mb-4 space-y-2 font-mono text-[#5c4033] border-b-2 border-dashed border-[#a89f91] pb-4">
                             <div class="flex justify-between"><span>Subtotal:</span><span>$${total}</span></div>
-                            <div class="flex justify-between text-red-600 font-bold"><span>Comisión (4%):</span><span id="close-comm-val">$0</span></div>
-                            <div class="border-t border-stone-200 my-2"></div>
+                            <div class="flex justify-between text-[#a63e3e] font-bold"><span>Comisión (4%):</span><span id="close-comm-val">$0</span></div>
                         </div>
-                        <span class="block text-stone-400 text-xs uppercase font-bold tracking-widest">Total a Pagar</span>
-                        <span class="block text-5xl font-black text-stone-800" id="close-total-val">$${total}</span>
+                        <span class="block text-[#a89f91] text-sm uppercase font-bold tracking-[0.3em] mb-2 font-mono">Total a Pagar</span>
+                        <span class="block text-7xl font-black text-[#2c1e16]" id="close-total-val" style="font-family: 'Special Elite', cursive; text-shadow: 2px 2px 0 rgba(92,64,51,0.2);">$${total}</span>
+                        <div class="absolute bottom-0 left-0 w-full h-2 bg-repeat-x transform rotate-180" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'10\' viewBox=\'0 0 20 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 10L10 0L20 10H0Z\' fill=\'%235c4033\'/%3E%3C/svg%3E');"></div>
                     </div>
                     
-                    <div class="flex flex-col gap-3">
-                        <button onclick="openDebtModal('${tid}')" class="bg-blue-600 text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-blue-700">Dejar en Deuda / Fiado</button>
-                        <div class="flex gap-2"><button onclick="printR('${tid}')" class="flex-1 bg-stone-700 text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-stone-800"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="downloadPDF('${tid}')" class="flex-1 bg-red-700 text-white py-3.5 rounded-lg font-bold shadow-md hover:bg-red-800"><i class="fa-solid fa-file-pdf"></i> PDF</button></div>
-                        <button onclick="closeFinal('${tid}')" class="bg-green-600 text-white py-3.5 rounded-lg font-bold shadow-lg border-b-4 border-green-800 active:border-b-0 active:translate-y-1 transition text-lg">COBRAR Y CERRAR</button>
-                        <button onclick="closeModal()" class="text-stone-400 font-bold py-3 hover:text-stone-600 uppercase text-sm mt-2">Volver</button>
+                    <div class="flex flex-col gap-4">
+                        <button onclick="openDebtModal('${tid}')" class="btn-retro btn-retro-blue py-4 text-lg">Dejar en Deuda / Fiado</button>
+                        <div class="flex gap-4"><button onclick="printR('${tid}')" class="flex-1 btn-retro btn-retro-dark py-4 text-lg"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="downloadPDF('${tid}')" class="flex-1 btn-retro btn-retro-red py-4 text-lg"><i class="fa-solid fa-file-pdf"></i> PDF</button></div>
+                        <button onclick="closeFinal('${tid}')" class="btn-retro btn-retro-green py-5 text-2xl shadow-[4px_4px_0_#2c1e16]">COBRAR Y CERRAR</button>
+                        <button onclick="closeModal()" class="text-[#a89f91] font-bold py-3 hover:text-[#5c4033] uppercase text-sm mt-2 font-mono tracking-widest border-b-2 border-transparent hover:border-[#5c4033] transition w-fit mx-auto">Volver</button>
                     </div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
@@ -673,28 +740,27 @@
         }
 
         window.openDebtModal = (tid) => {
-            document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-[#fffbeb]">
-                    <h3 class="font-black text-xl mb-4 text-amber-900">DEJAR EN DEUDA</h3>
-                    <p class="mb-2 text-stone-600 text-sm">¿Dejaron dinero a cuenta?</p>
+            document.getElementById('modal-content').innerHTML = `<div class="p-6 text-center bg-[#f8f1e5] modal-retro border-0 shadow-none">
+                    <h3 class="font-black text-3xl mb-4 text-[#a63e3e] uppercase tracking-widest" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #2c1e16;">DEJAR EN DEUDA</h3>
+                    <p class="mb-4 text-[#5c4033] font-bold text-lg font-mono">¿Cuánto dinero dejaron a cuenta?</p>
                     
-                    <input type="number" id="debt-deposit" value="0" oninput="calcDebtTotal()" class="w-full p-3 text-center text-2xl border-2 border-stone-300 rounded-lg font-bold mb-4 outline-none focus:border-blue-500 transition">
+                    <input type="number" id="debt-deposit" value="0" oninput="calcDebtTotal()" class="w-full p-4 text-center text-4xl border-4 double border-[#5c4033] rounded-sm font-black mb-6 outline-none focus:border-[#4a6fa5] transition bg-[#fffdf9] text-[#2c1e16] shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)]" style="font-family: 'Special Elite', cursive;">
                     
-                    <label class="flex items-center justify-center gap-2 mb-4 cursor-pointer bg-white p-2 rounded shadow-sm border border-stone-200">
-                        <input type="checkbox" id="debt-card-check" onchange="calcDebtTotal()" class="w-5 h-5 accent-blue-600">
-                        <span class="font-bold text-stone-600 text-sm">Pago con Tarjeta (+4%)</span>
+                    <label class="flex items-center justify-center gap-3 mb-6 cursor-pointer bg-[#fffdf9] p-3 rounded-sm shadow-[3px_3px_0_#a89f91] border-2 border-[#a89f91] hover:bg-[#e0d8c8] transition w-fit mx-auto">
+                        <input type="checkbox" id="debt-card-check" onchange="calcDebtTotal()" class="w-5 h-5 accent-[#4a6fa5] border-2 border-[#2c1e16]">
+                        <span class="font-bold text-[#2c1e16] text-base" style="font-family: 'Abril Fatface', cursive;">Pago con Tarjeta (+4%)</span>
                     </label>
 
-                    <div id="debt-breakdown" class="hidden bg-stone-100 p-3 rounded mb-4 text-sm">
-                        <div class="flex justify-between text-stone-500"><span>Monto a Cuenta:</span><span id="debt-base-val">$0</span></div>
-                        <div class="flex justify-between text-red-500"><span>Comisión (4%):</span><span id="debt-comm-val">$0</span></div>
-                        <div class="border-t border-stone-300 my-1"></div>
-                        <div class="flex justify-between font-bold text-lg text-stone-800"><span>Total a Cobrar:</span><span id="debt-total-val">$0</span></div>
+                    <div id="debt-breakdown" class="hidden bg-[#e0d8c8] p-4 rounded-sm mb-6 text-base font-mono border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91]">
+                        <div class="flex justify-between text-[#5c4033]"><span>Monto a Cuenta:</span><span id="debt-base-val">$0</span></div>
+                        <div class="flex justify-between text-[#a63e3e] font-bold"><span>Comisión (4%):</span><span id="debt-comm-val">$0</span></div>
+                        <div class="border-t-2 border-dashed border-[#a89f91] my-3"></div>
+                        <div class="flex justify-between font-black text-2xl text-[#2c1e16]" style="font-family: 'Special Elite', cursive;"><span>Total a Cobrar:</span><span id="debt-total-val">$0</span></div>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button onclick="openCloseAccountModal('${tid}', 0)" class="flex-1 py-3 text-stone-500 font-bold">Cancelar</button>
-                        <button onclick="confirmDebt('${tid}')" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold shadow">Confirmar</button>
+                    <div class="flex gap-4">
+                        <button onclick="openCloseAccountModal('${tid}', 0)" class="flex-1 btn-retro btn-retro-neutral py-4 text-[#5c4033]">Cancelar</button>
+                        <button onclick="confirmDebt('${tid}')" class="flex-1 btn-retro btn-retro-blue py-4 text-lg">Confirmar Deuda</button>
                     </div>
                 </div>`;
         }
@@ -723,7 +789,7 @@
             renderWaiterDashboard();
         }
 
-        window.closeFinal = async(id)=>{ if(confirm("¿Cerrar Mesa?")) { await updateDoc(doc(db,'tables',id),{status:'closed', closedAt:serverTimestamp()}); closeModal(); renderWaiterDashboard(); } }
+        window.closeFinal = async(id)=>{ if(confirm("¿Estás seguro de cerrar esta mesa?")) { await updateDoc(doc(db,'tables',id),{status:'closed', closedAt:serverTimestamp()}); closeModal(); renderWaiterDashboard(); } }
         
         window.printR = (tid) => {
             const t = tablesData.find(x=>x.id===tid);
@@ -781,3 +847,4 @@
         initApp();
     </script>
 </body>
+</html>
