@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GastroApp Pro - Alas de Barril</title>
+    <title>GastroApp Pro - A-LAS DE BARRIL</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -58,21 +58,26 @@
 <body>
 
     <div id="app" class="h-screen w-full flex flex-col overflow-hidden relative">
+        <!-- Header Rústico (Madera Oscura) -->
         <header id="main-header" class="bg-amber-950 text-amber-50 p-3 shadow-md flex justify-between items-center z-10 shrink-0 relative border-b-4 border-amber-700">
             <div class="flex items-center gap-3">
+                <!-- LOGO EN HEADER -->
                 <div class="bg-white p-1 rounded-full border-2 border-amber-600 overflow-hidden w-12 h-12 flex items-center justify-center shadow-sm">
                     <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100?text=AB'">
                 </div>
-                <h1 class="font-bold text-xl tracking-wide" id="header-title" style="font-family: 'Courier New', Courier, monospace;">ALAS DE BARRIL</h1>
+                <h1 class="font-bold text-xl tracking-wide" id="header-title" style="font-family: 'Courier New', Courier, monospace;">A-LAS DE BARRIL</h1>
             </div>
+            
             <div id="status-indicator" class="hidden absolute left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-sm border text-xs font-bold shadow-lg flex items-center gap-2 top-14 md:top-auto">
                 <span id="status-text"></span>
             </div>
+
             <button onclick="logoutToHome()" class="text-xs bg-amber-900 border border-amber-700 px-3 py-1.5 rounded hover:bg-amber-800 transition uppercase font-bold tracking-wider text-amber-100">
                 <i class="fa-solid fa-right-from-bracket"></i> Salir
             </button>
         </header>
 
+        <!-- Contenido (Fondo Crema) -->
         <main id="content-area" class="flex-1 overflow-y-auto bg-amber-50 relative flex flex-col p-1">
             <div class="flex flex-col justify-center items-center h-full text-amber-800 opacity-50 gap-4">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl"></i>
@@ -80,9 +85,11 @@
             </div>
         </main>
 
+        <!-- Área Ticket (Oculto para impresión nativa) -->
         <div id="receipt-area" class="hidden bg-white p-4 text-xs w-[300px] mx-auto font-mono"></div>
     </div>
 
+    <!-- Modales -->
     <div id="modal-overlay" class="fixed inset-0 bg-stone-900 bg-opacity-70 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm">
         <div id="modal-content" class="bg-[#fffbeb] rounded-xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col border-4 border-amber-900/10"></div>
     </div>
@@ -182,7 +189,7 @@
 
         window.renderHome = () => {
             currentRole = null;
-            document.getElementById('header-title').innerText = 'Alas de Barril';
+            document.getElementById('header-title').innerText = 'A-LAS DE BARRIL';
             document.getElementById('content-area').innerHTML = `
                 <div class="p-6 flex flex-col gap-6 h-full justify-center items-center max-w-md mx-auto">
                     <img src="https://www.dropbox.com/scl/fi/jymn0kvgyx9ioqjojwbfw/Picture2.png?rlkey=u4k3ppl3f7vohb07au7bt8tw4&raw=1" class="w-48 mb-2 rounded-xl shadow-lg border-4 border-amber-900/10" alt="Logo" onerror="this.src='https://placehold.co/200x200?text=LOGO'">
@@ -297,7 +304,26 @@
             let totalDisplay = `<span>Total</span><span>$${total}</span>`;
             if (deposit > 0) totalDisplay = `<div class="flex justify-between text-xs text-stone-500"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-xs text-red-500"><span>A cuenta</span><span>-$${deposit}</span></div><div class="flex justify-between font-black text-xl text-amber-900 border-t border-stone-300 pt-1 mt-1"><span>Restante</span><span>$${remaining}</span></div>`;
             else totalDisplay = `<div class="flex justify-between mb-3 font-black text-xl text-amber-900 px-2"><span>Total</span><span>$${total}</span></div>`;
-            const footerHtml = isClosed ? `<div class="text-center font-bold text-stone-500 p-4 bg-stone-200 border-t border-stone-300">Mesa Cerrada - Solo Lectura</div>` : `<div id="order-footer" class="fixed bottom-0 w-full bg-[#fffbeb] p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-30 border-t border-amber-200">${totalDisplay}<button onclick="openCloseAccountModal('${tid}', ${total})" class="w-full ${closeBtnColor} text-white py-3.5 rounded-lg font-bold shadow-lg border-b-4 border-black/20 active:border-b-0 active:translate-y-1 transition uppercase tracking-wide">${closeBtnText}</button></div>`;
+            
+            // --- MODIFICACIÓN PARA MESA CERRADA ---
+            // Ahora mostramos botones de impresión incluso si la mesa está cerrada
+            let footerHtml = '';
+            
+            if (isClosed) {
+                // Footer para mesas cerradas: Solo botones de impresión y total final
+                 footerHtml = `
+                <div id="order-footer" class="fixed bottom-0 w-full bg-stone-100 p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-30 border-t border-stone-300">
+                     <div class="flex justify-between mb-2 font-bold text-xl text-stone-700 px-2"><span>Total Final</span><span>$${total}</span></div>
+                     <div class="flex gap-2">
+                        <button onclick="printR('${tid}')" class="flex-1 bg-stone-700 text-white py-3 rounded-lg font-bold shadow-md hover:bg-stone-800"><i class="fa-solid fa-print"></i> Ticket</button>
+                        <button onclick="downloadPDF('${tid}')" class="flex-1 bg-red-700 text-white py-3 rounded-lg font-bold shadow-md hover:bg-red-800"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                     </div>
+                     <div class="text-center text-[10px] text-stone-400 mt-2 font-bold uppercase tracking-widest">MESA CERRADA</div>
+                </div>`;
+            } else {
+                // Footer para mesas abiertas (normal)
+                footerHtml = `<div id="order-footer" class="fixed bottom-0 w-full bg-[#fffbeb] p-3 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] z-30 border-t border-amber-200">${totalDisplay}<button onclick="openCloseAccountModal('${tid}', ${total})" class="w-full ${closeBtnColor} text-white py-3.5 rounded-lg font-bold shadow-lg border-b-4 border-black/20 active:border-b-0 active:translate-y-1 transition uppercase tracking-wide">${closeBtnText}</button></div>`;
+            }
             
             const pageBg = t.isVip ? 'bg-pink-50' : 'bg-white';
             const vipHeader = t.isVip ? '<span class="ml-2 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded font-bold shadow"><i class="fa-solid fa-crown"></i> VIP</span>' : '';
@@ -719,7 +745,7 @@
                 `;
             }
 
-            document.getElementById('receipt-area').innerHTML = `<div style="text-align:center; margin-bottom:15px; font-family: monospace;"><img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" style="width: 60%; max-width: 150px; display: block; margin: 0 auto 10px auto;" onerror="this.style.display='none'"><h2 style="font-weight:bold; font-size:18px; margin:0;">ALAS DE BARRIL</h2><p style="margin:0; font-size:10px;">--- COPIA CLIENTE ---</p><br><p style="margin:0; font-size:12px;">Ticket #${t.uniqueId||'---'}</p><p style="margin:0; font-size:12px;">${date}</p></div><div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div><div style="font-weight:bold; margin-bottom:10px; font-size:14px;">Mesa: ${t.number}</div>${itemsHtml}${totalHtml}<div style="text-align:center; margin-top:30px; font-size:10px;"><p>¡Gracias por su visita!</p><p>Wifi: AlasInvitado</p></div>`;
+            document.getElementById('receipt-area').innerHTML = `<div style="text-align:center; margin-bottom:15px; font-family: monospace;"><img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" style="width: 60%; max-width: 150px; display: block; margin: 0 auto 10px auto;" onerror="this.style.display='none'"><h2 style="font-weight:bold; font-size:18px; margin:0;">A-LAS DE BARRIL</h2><p style="margin:0; font-size:10px;">--- COPIA CLIENTE ---</p><br><p style="margin:0; font-size:12px;">Ticket #${t.uniqueId||'---'}</p><p style="margin:0; font-size:12px;">${date}</p></div><div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div><div style="font-weight:bold; margin-bottom:10px; font-size:14px;">Mesa: ${t.number}</div>${itemsHtml}${totalHtml}<div style="text-align:center; margin-top:30px; font-size:10px;"><p>¡Gracias por su visita!</p><p>Wifi: AlasInvitado</p></div>`;
             window.print();
         }
 
@@ -731,7 +757,7 @@
             const total = ords.reduce((acc,c)=>acc+(c.price*c.quantity),0);
             const deposit = t.deposit || 0;
             const remaining = total - deposit;
-            doc.setFontSize(14); doc.text("ALAS DE BARRIL", 40, 10, { align: "center" });
+            doc.setFontSize(14); doc.text("A-LAS DE BARRIL", 40, 10, { align: "center" });
             doc.setFontSize(10); doc.text("Ticket #" + (t.uniqueId || '---'), 40, 18, { align: "center" });
             doc.text(new Date().toLocaleString(), 40, 23, { align: "center" });
             doc.line(5, 26, 75, 26); doc.text(`Mesa: ${t.number}`, 5, 32);
@@ -755,4 +781,3 @@
         initApp();
     </script>
 </body>
-</html>
