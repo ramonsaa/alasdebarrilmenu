@@ -396,11 +396,11 @@
                     const hiddenClass = localQty > 0 ? '' : 'hidden';
 
                     return `
-                    <div class="flex h-16 rounded-xl shadow-sm border border-slate-200 overflow-hidden bg-white hover:border-blue-300 transition-colors">
-                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-red-50 hover:bg-red-100 text-red-500 border-r border-slate-100 flex items-center justify-center active:bg-red-200 transition-colors">
+                    <div class="flex h-16 rounded-xl shadow-sm border border-slate-200 bg-white hover:border-blue-300 transition-colors relative">
+                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-red-50 hover:bg-red-100 text-red-500 border-r border-slate-100 flex items-center justify-center active:bg-red-200 transition-colors rounded-l-xl">
                             <i class="fa-solid fa-minus"></i>
                         </button>
-                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-green-50 transition-colors p-2">
+                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-green-50 transition-colors p-2 rounded-r-xl">
                             <div id="badge-${safeKey}" class="absolute -top-2 -right-2 bg-blue-500 text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md ${hiddenClass} z-20 transform transition-transform border-2 border-white">${localQty}</div>
                             <span class="text-[11px] font-bold text-slate-700 leading-tight text-center relative z-10">${i.displayName}</span>
                         </button>
