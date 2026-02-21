@@ -17,37 +17,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
-    <!-- Fuentes Retro de Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Special+Elite&family=Alfa+Slab+One&display=swap" rel="stylesheet">
-
     <style>
-        /* --- ESTILO RETRO GLOBAL --- */
-        :root {
-            --retro-cream: #f8f1e5;
-            --retro-dark: #2c1e16;
-            --retro-brown: #5c4033;
-            --retro-red: #a63e3e;
-            --retro-green: #557b55;
-            --retro-yellow: #d4a353;
-            --retro-blue: #4a6fa5;
-        }
-
+        /* Tipografía y Fondo Limpio */
         body { 
-            font-family: 'Old Standard TT', serif;
-            background-color: var(--retro-cream);
-            color: var(--retro-dark);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+            background-color: #f8fafc; /* Slate 50 */
+            color: #1e293b; /* Slate 800 */
             user-select: none; 
-            background-image: 
-                linear-gradient(to right, rgba(92, 64, 51, 0.05) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(92, 64, 51, 0.05) 1px, transparent 1px);
-            background-size: 20px 20px;
         }
-        
-        .font-slab { font-family: 'Alfa Slab One', cursive; letter-spacing: 0.05em; } 
-        .font-fancy { font-family: 'Abril Fatface', cursive; letter-spacing: 0.05em; }
-        .font-typewriter { font-family: 'Special Elite', cursive; }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -59,109 +36,84 @@
             @page { margin: 0; size: auto; }
         }
         
-        /* Botones */
-        .btn-retro {
-            @apply py-3 rounded-sm font-bold text-white shadow-md uppercase tracking-wide border-2 border-[#2c1e16] transition-all cursor-pointer font-slab;
-            box-shadow: 3px 3px 0 #2c1e16;
-        }
-        .btn-retro:active { box-shadow: 1px 1px 0 #2c1e16; transform: translate(2px, 2px); }
-        .btn-retro-green { background-color: var(--retro-green); }
-        .btn-retro-blue { background-color: var(--retro-blue); }
-        .btn-retro-red { background-color: var(--retro-red); }
-        .btn-retro-dark { background-color: var(--retro-brown); color: var(--retro-cream); }
-        .btn-retro-neutral { background-color: #dcdcdc; color: var(--retro-dark); border-color: #999; box-shadow: 3px 3px 0 #999; }
-        .btn-retro-yellow { background-color: var(--retro-yellow); color: var(--retro-dark); }
-
-        /* Tarjetas */
-        .card-retro {
-            @apply rounded-sm shadow-sm p-3 border-2 border-[#5c4033] relative cursor-pointer transition bg-[#fffdf9];
-            box-shadow: 4px 4px 0 rgba(92, 64, 51, 0.3);
-        }
-        .card-retro:active { box-shadow: 2px 2px 0 rgba(92, 64, 51, 0.3); transform: translate(2px, 2px); }
-        .card-retro-vip { background-color: #fff0e6; border-color: #cba135; }
-
-        /* Botones Selección */
-        .option-btn { @apply border-2 rounded-sm p-2 text-center cursor-pointer transition-all font-bold text-[#5c4033] bg-[#fffdf9] border-[#a89f91] text-sm shadow-[2px_2px_0_#a89f91]; }
-        .option-btn.clara.selected { background-color: var(--retro-yellow); border-color: var(--retro-brown); color: var(--retro-dark); box-shadow: 2px 2px 0 var(--retro-brown); }
-        .option-btn.oscura.selected { background-color: var(--retro-brown); border-color: var(--retro-dark); color: var(--retro-cream); box-shadow: 2px 2px 0 var(--retro-dark); }
+        /* ESTILOS DE BOTONES DE OPCIONES */
+        .option-btn { @apply border-2 rounded-xl p-2 text-center cursor-pointer transition-all font-bold text-slate-500 bg-white border-slate-200 text-sm; }
+        .option-btn.clara.selected { background-color: #fef08a; border-color: #eab308; color: #854d0e; }
+        .option-btn.oscura.selected { background-color: #1e293b; border-color: #0f172a; color: #f8fafc; }
         
-        .prep-radio { @apply border-2 rounded-sm p-2 text-center cursor-pointer transition-all font-medium text-[#5c4033] bg-[#fffdf9] border-[#a89f91] text-xs shadow-[2px_2px_0_#a89f91]; }
-        .prep-radio.selected { background-color: var(--retro-blue); border-color: var(--retro-brown); color: var(--retro-cream); font-weight: 800; box-shadow: 2px 2px 0 var(--retro-brown); }
+        .prep-radio { @apply border-2 rounded-xl p-2 text-center cursor-pointer transition-all font-medium text-slate-500 bg-white border-slate-200 text-xs; }
+        .prep-radio.selected { background-color: #bfdbfe; border-color: #3b82f6; color: #1e3a8a; font-weight: 800; }
 
-        .mod-btn { transition: all 0.1s; border-width: 2px; font-weight: 600; box-shadow: 2px 2px 0 var(--retro-brown); border-style: solid; }
-        .mod-btn.btn-red { color: var(--retro-red); background-color: #fce8e8; border-color: var(--retro-red); }
-        .mod-btn.btn-red.selected { background-color: var(--retro-red); color: var(--retro-cream); border-color: var(--retro-brown); }
-        .mod-btn.btn-green { color: var(--retro-green); background-color: #e8fce8; border-color: var(--retro-green); }
-        .mod-btn.btn-green.selected { background-color: var(--retro-green); color: var(--retro-cream); border-color: var(--retro-brown); }
-        .mod-btn.btn-neutral { color: var(--retro-brown); background-color: #fffdf9; border-color: var(--retro-brown); }
-        .mod-btn.btn-neutral.selected { background-color: var(--retro-brown); color: var(--retro-cream); border-color: var(--retro-dark); }
-
-        .cat-header { font-size: 1rem; font-family: 'Alfa Slab One', cursive; text-transform: uppercase; color: var(--retro-brown); margin-top: 1.5rem; margin-bottom: 0.8rem; letter-spacing: 0.05em; border-bottom: 3px double var(--retro-brown); padding-bottom: 4px; text-align: center; }
-
-        /* Inputs Retro */
-        input, select {
-            @apply border-2 border-[#a89f91] p-3 rounded-sm text-lg font-bold outline-none bg-[#fffdf9] text-[#5c4033] shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)];
-            font-family: 'Special Elite', cursive;
-        }
+        .mod-btn { transition: all 0.2s; border-width: 2px; font-weight: 600; border-style: solid; }
+        .mod-btn.btn-red { color: #ef4444; background-color: #fef2f2; border-color: #fecaca; }
+        .mod-btn.btn-red.selected { background-color: #ef4444; color: white; border-color: #dc2626; }
+        .mod-btn.btn-green { color: #22c55e; background-color: #f0fdf4; border-color: #bbf7d0; }
+        .mod-btn.btn-green.selected { background-color: #22c55e; color: white; border-color: #16a34a; }
+        .mod-btn.btn-neutral { color: #64748b; background-color: #f8fafc; border-color: #cbd5e1; }
+        .mod-btn.btn-neutral.selected { background-color: #64748b; color: white; border-color: #475569; }
         
-        .modal-retro { @apply bg-[#fffdf9] rounded-sm shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col border-4 border-double border-[#5c4033] shadow-[8px_8px_0_rgba(44,30,22,0.4)]; }
+        .cat-header { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; color: #64748b; margin-top: 1.5rem; margin-bottom: 0.5rem; letter-spacing: 0.05em; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; }
 
         /* Estilo para secciones de paquete */
-        .pkg-section { @apply mb-4 border-2 border-[#a89f91] rounded-sm p-3 bg-[#fffdf9] shadow-[2px_2px_0_#a89f91]; }
-        .pkg-title { @apply font-bold text-[#5c4033] mb-2 border-b-2 border-dashed border-[#a89f91] pb-1 text-sm uppercase font-typewriter; }
+        .pkg-section { @apply mb-4 border border-slate-200 rounded-xl p-3 bg-white shadow-sm; }
+        .pkg-title { @apply font-bold text-slate-700 mb-2 border-b border-slate-100 pb-1 text-sm uppercase; }
         
         /* Animación para el botón de cobro rápido */
         .fast-add-btn:active { transform: scale(0.95); background-color: #dcfce7; border-color: #22c55e; }
         @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
         .pop-anim { animation: pop 0.2s ease-in-out; }
+
+        /* Estilos generales limpios */
+        input, select {
+            @apply border-2 border-slate-200 p-3 rounded-xl text-lg font-bold outline-none bg-white text-slate-800 transition-colors focus:border-blue-500;
+        }
     </style>
 </head>
 <body>
 
-    <div id="app" class="h-screen w-full flex flex-col overflow-hidden relative font-serif">
-        <!-- Header -->
-        <header id="main-header" class="bg-[#2c1e16] text-[#f8f1e5] p-3 shadow-md flex justify-between items-center z-10 shrink-0 relative border-b-[6px] border-double border-[#5c4033]" style="box-shadow: 0 4px 0 rgba(92, 64, 51, 0.5);">
+    <div id="app" class="h-screen w-full flex flex-col overflow-hidden relative font-sans">
+        <!-- Header Moderno -->
+        <header id="main-header" class="bg-slate-900 text-white p-4 shadow-lg flex justify-between items-center z-10 shrink-0 relative">
             <div class="flex items-center gap-3">
-                <div class="bg-[#f8f1e5] p-1 rounded-full border-4 border-double border-[#cba135] overflow-hidden w-14 h-14 flex items-center justify-center shadow-sm" style="box-shadow: 2px 2px 0 #cba135;">
-                    <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain sepia" onerror="this.src='https://placehold.co/100x100?text=AB'">
+                <div class="bg-white p-1 rounded-full border-2 border-slate-200 overflow-hidden w-12 h-12 flex items-center justify-center shadow-sm">
+                    <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100?text=AB'">
                 </div>
-                <h1 class="font-bold text-2xl tracking-widest font-slab" id="header-title" style="text-shadow: 2px 2px 0 #000;">A-LAS DE BARRIL</h1>
+                <h1 class="font-bold text-xl tracking-tight" id="header-title">A-LAS DE BARRIL</h1>
             </div>
-            <div id="status-indicator" class="hidden absolute left-1/2 transform -translate-x-1/2 px-4 py-1 rounded-sm border-2 border-double border-[#2c1e16] text-xs font-bold shadow-[2px_2px_0_#2c1e16] animate-pulse flex items-center gap-2 top-14 md:top-auto bg-[#a63e3e] text-[#f8f1e5] font-typewriter">
+            <div id="status-indicator" class="hidden absolute left-1/2 transform -translate-x-1/2 px-4 py-1.5 rounded-full bg-red-500 border border-red-600 text-xs font-bold shadow-lg animate-pulse flex items-center gap-2 top-16 md:top-auto text-white">
                 <span id="status-text"></span>
             </div>
-            <button onclick="logoutToHome()" class="text-xs bg-[#5c4033] border-2 border-[#f8f1e5] px-3 py-1.5 rounded-sm hover:bg-[#4a3328] transition uppercase font-bold tracking-wider text-[#f8f1e5] font-slab shadow-[2px_2px_0_#f8f1e5]">
+            <button onclick="logoutToHome()" class="text-xs bg-slate-800 border border-slate-700 px-4 py-2 rounded-lg hover:bg-slate-700 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm">
                 <i class="fa-solid fa-right-from-bracket"></i> Salir
             </button>
         </header>
 
         <!-- Contenido -->
-        <main id="content-area" class="flex-1 overflow-y-auto bg-[#f8f1e5] relative flex flex-col p-2" style="background-image: url('data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%235c4033\' fill-opacity=\'0.05\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M0 38.59l2.83-2.83 1.41 1.41L1.41 40H0v-1.41zM0 1.4l2.83 2.83 1.41-1.41L1.41 0H0v1.41zM38.59 40l-2.83-2.83 1.41-1.41L40 38.59V40h-1.41zM40 1.41l-2.83 2.83-1.41-1.41L38.59 0H40v1.41zM20 18.6l2.83-2.83 1.41 1.41L21.41 20l2.83 2.83-1.41 1.41L20 21.41l-2.83 2.83-1.41-1.41L18.59 20l-2.83-2.83 1.41-1.41L20 18.59z\'/%3E%3C/g%3E%3C/svg%3E');">
-            <div class="flex flex-col justify-center items-center h-full text-[#5c4033] opacity-50 gap-4 font-typewriter">
-                <i class="fa-solid fa-circle-notch fa-spin text-4xl"></i>
+        <main id="content-area" class="flex-1 overflow-y-auto bg-slate-50 relative flex flex-col p-2">
+            <div class="flex flex-col justify-center items-center h-full text-slate-400 opacity-70 gap-4">
+                <i class="fa-solid fa-circle-notch fa-spin text-5xl text-blue-500"></i>
                 <p class="text-sm font-bold animate-pulse">Cargando sistema...</p>
             </div>
         </main>
 
-        <div id="receipt-area" class="hidden bg-[#fffdf9] p-4 text-xs w-[300px] mx-auto font-mono border-4 double border-[#5c4033] text-[#2c1e16]"></div>
+        <div id="receipt-area" class="hidden bg-white p-4 text-xs w-[300px] mx-auto font-mono text-black"></div>
     </div>
 
     <!-- Modales -->
-    <div id="modal-overlay" class="fixed inset-0 bg-[#2c1e16] bg-opacity-80 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm">
-        <div id="modal-content" class="modal-retro"></div>
+    <div id="modal-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-60 hidden z-50 flex justify-center items-center p-4 backdrop-blur-sm">
+        <div id="modal-content" class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden max-h-[90vh] flex flex-col"></div>
     </div>
 
-    <!-- OJO: Aquí le quitamos el type="module" -->
     <script>
         // ==========================================
         // 0. DETECTOR DE ERRORES VISUAL 
         // ==========================================
         window.onerror = function(message, source, lineno, colno, error) {
             document.getElementById('content-area').innerHTML = `
-                <div class="flex flex-col justify-center items-center h-full p-6 text-center bg-[#fce8e8]">
-                    <h2 class="font-bold text-3xl text-[#a63e3e] font-slab mb-4"><i class="fa-solid fa-triangle-exclamation"></i> Error Detectado</h2>
-                    <p class="text-[#5c4033] font-typewriter text-sm font-bold mb-2">${message}</p>
-                    <p class="text-[#a89f91] font-mono text-xs">Línea: ${lineno}</p>
+                <div class="flex flex-col justify-center items-center h-full p-6 text-center bg-red-50">
+                    <h2 class="font-bold text-2xl text-red-600 mb-4"><i class="fa-solid fa-triangle-exclamation"></i> Error Detectado</h2>
+                    <p class="text-slate-700 text-sm font-bold mb-2">${message}</p>
+                    <p class="text-slate-500 font-mono text-xs">Línea: ${lineno}</p>
                 </div>`;
             return false;
         };
@@ -237,7 +189,7 @@
         }
 
         window.showError = function(title, details) { 
-            document.getElementById('content-area').innerHTML = `<div class="flex flex-col justify-center items-center h-full p-6 text-center"><h2 class="font-bold text-2xl text-[#a63e3e] font-slab">${title}</h2><p class="text-[#5c4033] font-typewriter mt-2">${details}</p><button onclick="location.reload()" class="mt-6 btn-retro btn-retro-dark px-6 py-2">Reintentar</button></div>`; 
+            document.getElementById('content-area').innerHTML = `<div class="flex flex-col justify-center items-center h-full p-6 text-center"><h2 class="font-bold text-2xl text-red-600">${title}</h2><p class="text-slate-600 mt-2">${details}</p><button onclick="location.reload()" class="mt-6 bg-slate-800 text-white rounded-lg px-6 py-2 shadow">Reintentar</button></div>`; 
         }
 
         window.refreshCurrentView = function() {
@@ -251,14 +203,12 @@
             currentRole = null;
             document.getElementById('header-title').innerText = 'A-LAS DE BARRIL';
             document.getElementById('content-area').innerHTML = `
-                <div class="p-6 flex flex-col gap-6 h-full justify-center items-center max-w-md mx-auto">
-                    <div class="p-2 bg-[#fffdf9] border-4 border-double border-[#cba135] rounded-full shadow-[4px_4px_0_#5c4033]">
-                        <img src="https://www.dropbox.com/scl/fi/jymn0kvgyx9ioqjojwbfw/Picture2.png?rlkey=u4k3ppl3f7vohb07au7bt8tw4&raw=1" class="w-48 rounded-full sepia" alt="Logo" onerror="this.src='https://placehold.co/200x200?text=LOGO'">
-                    </div>
-                    <h2 class="text-3xl font-bold text-[#5c4033] mb-4 pb-2 border-b-[3px] double border-[#cba135] uppercase tracking-widest font-slab" style="text-shadow: 1px 1px 0 #f8f1e5;">Selecciona Perfil</h2>
-                    <button onclick="window.setRole('waiter')" class="w-full btn-retro btn-retro-yellow p-6 text-2xl flex gap-4 items-center"><div class="bg-[#5c4033] p-3 rounded-full text-[#f8f1e5] border-2 border-[#f8f1e5]"><i class="fa-solid fa-mobile-screen"></i></div><span>Mesero</span></button>
-                    <button onclick="window.setRole('bar')" class="w-full btn-retro btn-retro-dark p-6 text-2xl flex gap-4 items-center"><div class="bg-[#cba135] p-3 rounded-full text-[#2c1e16] border-2 border-[#2c1e16]"><i class="fa-solid fa-beer-mug-empty"></i></div><span>Barra</span></button>
-                    <button onclick="window.setRole('kitchen')" class="w-full btn-retro btn-retro-red p-6 text-2xl flex gap-4 items-center"><div class="bg-[#2c1e16] p-3 rounded-full text-[#f8f1e5] border-2 border-[#f8f1e5]"><i class="fa-solid fa-fire-burner"></i></div><span>Cocina</span></button>
+                <div class="p-6 flex flex-col gap-5 h-full justify-center items-center max-w-md mx-auto">
+                    <img src="https://www.dropbox.com/scl/fi/jymn0kvgyx9ioqjojwbfw/Picture2.png?rlkey=u4k3ppl3f7vohb07au7bt8tw4&raw=1" class="w-48 rounded-3xl shadow-md mb-2" alt="Logo" onerror="this.src='https://placehold.co/200x200?text=LOGO'">
+                    <h2 class="text-2xl font-black text-slate-800 mb-4 pb-2 border-b-2 border-slate-200 tracking-tight">Selecciona Perfil</h2>
+                    <button onclick="window.setRole('waiter')" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl p-5 text-xl font-bold flex gap-4 items-center shadow-lg transition transform active:scale-95"><div class="bg-blue-800/30 p-3 rounded-xl"><i class="fa-solid fa-mobile-screen"></i></div><span>Mesero</span></button>
+                    <button onclick="window.setRole('bar')" class="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-2xl p-5 text-xl font-bold flex gap-4 items-center shadow-lg transition transform active:scale-95"><div class="bg-amber-700/30 p-3 rounded-xl"><i class="fa-solid fa-beer-mug-empty"></i></div><span>Barra</span></button>
+                    <button onclick="window.setRole('kitchen')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl p-5 text-xl font-bold flex gap-4 items-center shadow-lg transition transform active:scale-95"><div class="bg-red-700/30 p-3 rounded-xl"><i class="fa-solid fa-fire-burner"></i></div><span>Cocina</span></button>
                 </div>`;
         }
         
@@ -285,28 +235,28 @@
                 return (now - closedDate) < eightDaysMs;
             }).sort((a,b) => (b.closedAt?.seconds||0) - (a.closedAt?.seconds||0));
             
-            const btnClass = showingDebts ? 'btn-retro-red' : 'btn-retro-dark';
+            const btnClass = showingDebts ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
             const sectionTitle = showingDebts ? 'Deudas Pendientes' : 'Mesas Abiertas';
 
             let html = `
                 <div class="p-4 flex flex-col gap-6 pb-24">
-                    <div class="flex gap-2 bg-[#fffdf9] p-2 rounded-sm shadow-[2px_2px_0_#5c4033] border-2 border-[#5c4033]">
-                        <input type="number" id="search-ticket-id" placeholder="Buscar Ticket #" class="flex-1 border-0 p-2 bg-transparent outline-none text-[#5c4033] placeholder-[#a89f91] font-typewriter font-bold" style="box-shadow: none;">
-                        <button onclick="window.searchTicket()" class="bg-[#5c4033] text-[#f8f1e5] px-4 rounded-sm hover:bg-[#4a3328] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-search"></i></button>
+                    <div class="flex gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
+                        <input type="number" id="search-ticket-id" placeholder="Buscar Ticket #" class="flex-1 border-0 p-2 bg-transparent outline-none text-slate-700 placeholder-slate-400 font-mono font-bold">
+                        <button onclick="window.searchTicket()" class="bg-slate-800 text-white px-5 rounded-lg hover:bg-slate-700 transition shadow-sm"><i class="fa-solid fa-search"></i></button>
                     </div>
-                    <div class="flex gap-3"><button onclick="window.toggleDebtView()" class="flex-1 btn-retro ${btnClass} py-3 text-sm">${showingDebts ? '⬅ Ver Mesas Activas' : '📂 Ver Deudas / Fiado'}</button></div>
+                    <div class="flex gap-3"><button onclick="window.toggleDebtView()" class="flex-1 ${btnClass} font-bold rounded-xl py-4 shadow-sm transition active:scale-95 text-sm">${showingDebts ? '⬅ Ver Mesas Activas' : '📂 Ver Deudas / Fiado'}</button></div>
                     <div>
-                        <div class="flex justify-between items-end mb-3 border-b-[3px] double border-[#5c4033] pb-1">
-                            <h3 class="font-black text-[#5c4033] text-xl uppercase tracking-wider font-slab">${sectionTitle}</h3>
-                            ${!showingDebts ? `<button onclick="window.openNewTableModal()" class="btn-retro btn-retro-green text-xs px-3 py-2 flex items-center gap-1"><i class="fa-solid fa-plus"></i> NUEVA</button>` : ''}
+                        <div class="flex justify-between items-end mb-4 border-b-2 border-slate-200 pb-2">
+                            <h3 class="font-black text-slate-800 text-lg uppercase tracking-wide">${sectionTitle}</h3>
+                            ${!showingDebts ? `<button onclick="window.openNewTableModal()" class="bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm font-bold text-xs px-4 py-2 flex items-center gap-1 transition active:scale-95"><i class="fa-solid fa-plus"></i> NUEVA</button>` : ''}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            ${!showingDebts && openTables.length === 0 ? '<p class="col-span-2 text-[#a89f91] text-sm text-center italic py-4 bg-[#fffdf9] rounded-sm border-2 border-dashed border-[#a89f91] font-typewriter">No hay mesas abiertas</p>' : ''}
-                            ${showingDebts && debtTables.length === 0 ? '<p class="col-span-2 text-[#a89f91] text-sm text-center italic py-4 bg-[#fffdf9] rounded-sm border-2 border-dashed border-[#a89f91] font-typewriter">No hay deudas</p>' : ''}
+                            ${!showingDebts && openTables.length === 0 ? '<p class="col-span-2 text-slate-400 text-sm text-center italic py-6 bg-white rounded-xl border border-dashed border-slate-300">No hay mesas abiertas</p>' : ''}
+                            ${showingDebts && debtTables.length === 0 ? '<p class="col-span-2 text-slate-400 text-sm text-center italic py-6 bg-white rounded-xl border border-dashed border-slate-300">No hay deudas</p>' : ''}
                             ${!showingDebts ? openTables.map(t => window.createTableCard(t)).join('') : debtTables.map(t => window.createTableCard(t)).join('')}
                         </div>
                     </div>
-                    ${!showingDebts ? `<div class="mt-6 opacity-80"><h3 class="font-bold text-[#5c4033] text-lg uppercase mb-3 border-b-[3px] double border-[#5c4033] pb-1 font-slab">Cerradas (8 días)</h3><div class="grid grid-cols-2 gap-4">${closedTables.length ? closedTables.map(t => window.createTableCard(t)).join('') : '<p class="col-span-2 text-[#a89f91] text-xs text-center font-typewriter">Historial vacío</p>'}</div></div>` : ''}
+                    ${!showingDebts ? `<div class="mt-6 opacity-80"><h3 class="font-bold text-slate-500 text-sm uppercase mb-3 border-b border-slate-200 pb-1">Cerradas (8 días)</h3><div class="grid grid-cols-2 gap-4">${closedTables.length ? closedTables.map(t => window.createTableCard(t)).join('') : '<p class="col-span-2 text-slate-400 text-xs text-center">Historial vacío</p>'}</div></div>` : ''}
                 </div>`;
             document.getElementById('content-area').innerHTML = html;
         }
@@ -316,33 +266,33 @@
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
             const deposit = t.deposit || 0;
             const remaining = total - deposit;
-            let cardBgClass = '', borderColor = 'border-[#5c4033]', badge = '', statusIconColor = 'text-[#5c4033]';
+            let cardBgClass = 'bg-white', borderColor = 'border-slate-200', badge = '', statusIconColor = 'text-slate-500';
             
-            if (t.isVip) { cardBgClass = 'card-retro-vip'; borderColor = 'border-[#cba135]'; }
+            if (t.isVip) { cardBgClass = 'bg-pink-50'; borderColor = 'border-pink-200'; }
             if (t.status === 'open') {
                 const pending = ords.some(o => o.status !== 'delivered');
-                borderColor = pending ? 'border-[#d4a353]' : 'border-[#557b55]';
-                statusIconColor = pending ? 'text-[#d4a353]' : 'text-[#557b55]';
+                borderColor = pending ? 'border-amber-400' : 'border-green-500';
+                statusIconColor = pending ? 'text-amber-500' : 'text-green-500';
                 badge = pending ? `<i class="fa-solid fa-clock animate-pulse ${statusIconColor}"></i>` : `<i class="fa-solid fa-check ${statusIconColor}"></i>`;
-            } else if (t.status === 'debt') { borderColor = 'border-[#a63e3e]'; cardBgClass = 'bg-[#fce8e8]'; statusIconColor = 'text-[#a63e3e]'; badge = `<i class="fa-solid fa-file-invoice-dollar ${statusIconColor}"></i>`;
-            } else { cardBgClass = 'bg-[#e0d8c8]'; statusIconColor = 'text-[#a89f91]'; badge = `<i class="fa-solid fa-lock ${statusIconColor}"></i>`; }
+            } else if (t.status === 'debt') { borderColor = 'border-red-400'; cardBgClass = 'bg-red-50'; statusIconColor = 'text-red-500'; badge = `<i class="fa-solid fa-file-invoice-dollar ${statusIconColor}"></i>`;
+            } else { cardBgClass = 'bg-slate-100'; statusIconColor = 'text-slate-400'; badge = `<i class="fa-solid fa-lock ${statusIconColor}"></i>`; }
             
-            let vipBadge = t.isVip ? `<span class="absolute -top-3 -left-3 bg-[#cba135] text-[#2c1e16] text-[10px] px-3 py-1 rounded-sm font-bold shadow-[2px_2px_0_#2c1e16] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
-            let priceDisplay = `$${total}`; if (deposit > 0) priceDisplay = `<span class="text-xs text-[#a63e3e] line-through mr-1 font-mono">$${total}</span> $${remaining}`;
+            let vipBadge = t.isVip ? `<span class="absolute -top-3 -left-3 bg-pink-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-md border-2 border-white"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
+            let priceDisplay = `$${total}`; if (deposit > 0) priceDisplay = `<span class="text-xs text-red-500 line-through mr-1 font-mono">$${total}</span> $${remaining}`;
             const dateStr = t.openedAt ? new Date(t.openedAt.seconds * 1000).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') : '';
 
-            return `<div onclick="window.renderTableDetail('${t.id}')" class="card-retro ${cardBgClass} ${borderColor}">
+            return `<div onclick="window.renderTableDetail('${t.id}')" class="rounded-xl shadow-sm p-4 border-2 ${cardBgClass} ${borderColor} relative cursor-pointer hover:shadow-md active:scale-95 transition-all">
                     ${vipBadge}
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-[11px] font-mono font-bold text-[#5c4033] bg-[#e0d8c8] px-2 py-0.5 rounded-sm border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91]">#${t.uniqueId || '---'}</span>
+                        <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/50 px-2 py-1 rounded-md">#${t.uniqueId || '---'}</span>
                         <div class="flex flex-col items-end">
-                             <span class="text-[10px] text-[#5c4033] font-mono mb-0.5 font-bold">${dateStr}</span>
-                             <div class="bg-[#fffdf9] border-2 border-[#a89f91] rounded-full p-1 shadow-[1px_1px_0_#a89f91]">${badge}</div>
+                             <span class="text-[10px] text-slate-400 font-mono mb-1 font-bold">${dateStr}</span>
+                             <div class="bg-white rounded-full p-1.5 shadow-sm">${badge}</div>
                         </div>
                     </div>
-                    <div class="text-3xl font-black text-[#2c1e16] leading-tight mb-1 text-center font-slab" style="text-shadow: 1px 1px 0 #cba135; overflow-wrap: break-word;">${t.nickname}</div>
-                    <div class="text-xs text-[#5c4033] font-bold mb-3 uppercase tracking-wider text-center font-typewriter border-b-2 border-dashed border-[#a89f91] pb-1">Mesa #${t.number}</div>
-                    <div class="text-xl font-bold text-[#2c1e16] text-right pt-1 font-typewriter">${priceDisplay}</div>
+                    <div class="text-2xl font-black text-slate-800 leading-tight mb-1 text-center truncate">${t.nickname}</div>
+                    <div class="text-xs text-slate-500 font-bold mb-3 uppercase tracking-wider text-center border-b border-dashed border-slate-200 pb-2">Mesa ${t.number}</div>
+                    <div class="text-xl font-bold text-blue-600 text-right">${priceDisplay}</div>
                 </div>`;
         }
 
@@ -363,20 +313,20 @@
 
         window.openDeleteQuantityModal = function(orderId, currentQty, itemName) {
              document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-[#f8f1e5] modal-retro border-0 shadow-none relative">
-                    <h3 class="font-black text-xl mb-4 text-[#a63e3e] font-slab border-b-2 border-[#a63e3e] pb-2 inline-block">BORRAR ARTÍCULO</h3>
-                    <p class="mb-2 text-[#5c4033] text-sm font-typewriter">Hay <strong>${currentQty}</strong> ordenados de:<br><span class="text-[#2c1e16] font-bold text-lg font-fancy">${itemName}</span></p>
-                    <p class="mb-4 text-[#a89f91] text-xs uppercase tracking-widest font-bold">¿Cuántos eliminar?</p>
+                <div class="p-6 text-center bg-white relative">
+                    <h3 class="font-black text-xl mb-4 text-slate-800 border-b border-slate-100 pb-3">Borrar Artículo</h3>
+                    <p class="mb-2 text-slate-600 text-sm">Hay <strong>${currentQty}</strong> ordenados de:<br><span class="text-slate-800 font-bold text-lg">${itemName}</span></p>
+                    <p class="mb-4 text-slate-400 text-xs font-bold uppercase tracking-wider">¿Cuántos eliminar?</p>
                     
-                    <div class="flex justify-center items-center gap-6 mb-6 bg-[#fffdf9] p-3 rounded-sm border-2 border-[#a89f91] shadow-inner">
-                         <button onclick="window.adjDelQty(-1)" class="w-12 h-12 rounded-full bg-[#e0d8c8] text-[#5c4033] font-bold text-2xl border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91] active:translate-y-1 active:shadow-none transition">-</button>
-                         <span id="del-qty-val" class="text-4xl font-black text-[#a63e3e] font-typewriter">1</span>
-                         <button onclick="window.adjDelQty(1, ${currentQty})" class="w-12 h-12 rounded-full bg-[#a63e3e] text-[#f8f1e5] font-bold text-2xl border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] active:translate-y-1 active:shadow-none transition">+</button>
+                    <div class="flex justify-center items-center gap-6 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                         <button onclick="window.adjDelQty(-1)" class="w-14 h-14 rounded-full bg-white text-slate-600 font-bold text-2xl border border-slate-200 shadow-sm active:scale-95 transition">-</button>
+                         <span id="del-qty-val" class="text-4xl font-black text-red-500 w-12 text-center">1</span>
+                         <button onclick="window.adjDelQty(1, ${currentQty})" class="w-14 h-14 rounded-full bg-red-500 text-white font-bold text-2xl shadow-md hover:bg-red-600 active:scale-95 transition">+</button>
                     </div>
 
                     <div class="flex gap-3">
-                        <button onclick="window.closeModal()" class="flex-1 btn-retro btn-retro-neutral py-3 text-[#5c4033]">Cancelar</button>
-                        <button onclick="window.confirmDelete('${orderId}', ${currentQty})" class="flex-1 btn-retro btn-retro-red py-3">Confirmar</button>
+                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition">Cancelar</button>
+                        <button onclick="window.confirmDelete('${orderId}', ${currentQty})" class="flex-1 bg-red-500 text-white font-bold py-4 rounded-xl shadow-md hover:bg-red-600 transition">Confirmar</button>
                     </div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
@@ -446,23 +396,23 @@
                     const hiddenClass = localQty > 0 ? '' : 'hidden';
 
                     return `
-                    <div class="flex h-16 rounded-sm shadow-[2px_2px_0_#a89f91] border-2 border-[#a89f91] overflow-hidden bg-[#fffdf9]">
-                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-[#fce8e8] hover:bg-[#f8d7d7] text-[#a63e3e] border-r-2 border-[#a89f91] flex items-center justify-center active:bg-[#f4c4c4] transition-colors">
+                    <div class="flex h-16 rounded-xl shadow-sm border border-slate-200 overflow-hidden bg-white hover:border-blue-300 transition-colors">
+                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-red-50 hover:bg-red-100 text-red-500 border-r border-slate-100 flex items-center justify-center active:bg-red-200 transition-colors">
                             <i class="fa-solid fa-minus"></i>
                         </button>
-                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-[#e8fce8] transition-colors p-1">
-                            <div id="badge-${safeKey}" class="absolute -top-1 -right-1 bg-[#a63e3e] text-[#fffdf9] text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-[1px_1px_0_#2c1e16] border border-[#2c1e16] ${hiddenClass} z-20 transform transition-transform">${localQty}</div>
-                            <span class="text-xs font-bold text-[#2c1e16] leading-tight text-center relative z-10" style="font-family: 'Abril Fatface', cursive;">${i.displayName}</span>
+                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-green-50 transition-colors p-2">
+                            <div id="badge-${safeKey}" class="absolute -top-2 -right-2 bg-blue-500 text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md ${hiddenClass} z-20 transform transition-transform border-2 border-white">${localQty}</div>
+                            <span class="text-[11px] font-bold text-slate-700 leading-tight text-center relative z-10">${i.displayName}</span>
                         </button>
                     </div>
                     `;
                 }).join('');
                 
                 return `
-                    <div class="mb-4 bg-[#e0d8c8] p-3 rounded-sm border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91]">
-                        <h4 class="font-black text-[#5c4033] border-b-2 border-dashed border-[#a89f91] mb-3 pb-1 flex justify-between font-slab text-lg">
+                    <div class="mb-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <h4 class="font-black text-slate-800 border-b border-slate-100 mb-3 pb-2 flex justify-between items-center text-lg">
                             <span>$${price}</span>
-                            <span class="text-xs text-[#a89f91] font-normal self-end font-typewriter">${items.length} items</span>
+                            <span class="text-xs text-slate-400 font-normal bg-slate-100 px-2 py-1 rounded-md">${items.length} items</span>
                         </h4>
                         <div class="grid grid-cols-2 gap-3">
                             ${buttons}
@@ -523,7 +473,7 @@
             const btn = document.getElementById('floating-fast-add');
             if (btn) {
                 if (count > 0) {
-                    btn.innerHTML = `AGREGAR $${total} <span class="text-xs ml-2 bg-[#fffdf9] text-[#557b55] px-2 py-0.5 rounded-full border-2 border-[#557b55] shadow-inner">${count}</span>`;
+                    btn.innerHTML = `AGREGAR $${total} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full font-bold shadow-sm">${count}</span>`;
                     btn.classList.remove('hidden');
                 } else { btn.classList.add('hidden'); }
             }
@@ -548,8 +498,8 @@
                 localFastOrders = {}; 
                 
                 const statusTxt = document.getElementById('status-indicator');
-                statusTxt.innerHTML = `<i class="fa-solid fa-check text-[#557b55]"></i> Agregados correctamente`;
-                statusTxt.className = "absolute left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-sm border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] flex items-center gap-2 top-14 md:top-auto bg-[#fffdf9] text-[#2c1e16] z-[60] font-bold font-typewriter";
+                statusTxt.innerHTML = `<i class="fa-solid fa-check"></i> Guardado`;
+                statusTxt.className = "absolute left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 top-16 md:top-auto bg-green-500 text-white z-[60] font-bold text-sm transition-opacity";
                 statusTxt.classList.remove('hidden');
                 setTimeout(() => { statusTxt.classList.add('hidden'); }, 2000);
 
@@ -568,18 +518,21 @@
                 return;
             }
             currentTab = t;
+            const activeClass = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm";
+            const inactiveClass = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
+            
             if(t==='menu'){ 
                 document.getElementById('tab-menu')?.classList.remove('hidden'); 
                 document.getElementById('tab-orders')?.classList.add('hidden'); 
                 document.getElementById('order-footer')?.classList.add('hidden'); 
-                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide font-fancy";
-                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide font-fancy";
+                document.getElementById('tab-btn-menu').className = activeClass;
+                document.getElementById('tab-btn-orders').className = inactiveClass;
             } else { 
                 document.getElementById('tab-menu')?.classList.add('hidden'); 
                 document.getElementById('tab-orders')?.classList.remove('hidden'); 
                 document.getElementById('order-footer')?.classList.remove('hidden');
-                document.getElementById('tab-btn-orders').className="flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide font-fancy";
-                document.getElementById('tab-btn-menu').className="flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide font-fancy";
+                document.getElementById('tab-btn-orders').className = activeClass;
+                document.getElementById('tab-btn-menu').className = inactiveClass;
             }
         }
 
@@ -603,20 +556,22 @@
             const showMenu = !isClosed && currentTab === 'menu';
             const showOrders = isClosed || currentTab === 'orders';
 
-            const menuBtnClass = showMenu ? "flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide font-fancy" : "flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide font-fancy";
-            const ordersBtnClass = showOrders ? "flex-1 py-3 text-[#2c1e16] border-b-4 border-[#cba135] bg-[#fff0e6] font-bold tracking-wide font-fancy" : "flex-1 py-3 text-[#a89f91] font-bold hover:bg-[#fff0e6] transition tracking-wide font-fancy";
+            const activeClass = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm";
+            const inactiveClass = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
+            const menuBtnClass = showMenu ? activeClass : inactiveClass;
+            const ordersBtnClass = showOrders ? activeClass : inactiveClass;
 
             let closeBtnText = t.status === 'debt' ? "Liquidar Deuda" : "Cerrar Cuenta";
-            let closeBtnColorClass = t.status === 'debt' ? "btn-retro-blue" : "btn-retro-green";
+            let closeBtnColorClass = t.status === 'debt' ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700";
             
-            let totalDisplay = `<div class="flex justify-between mb-3 font-black text-2xl text-[#2c1e16] px-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Total</span><span>$${total}</span></div>`;
-            if (deposit > 0) totalDisplay = `<div class="flex justify-between text-sm text-[#5c4033] font-mono"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-sm text-[#a63e3e] font-mono"><span>A cuenta</span><span>-$${deposit}</span></div><div class="flex justify-between font-black text-2xl text-[#2c1e16] border-t-4 double border-[#5c4033] pt-2 mt-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Restante</span><span>$${remaining}</span></div>`;
+            let totalDisplay = `<div class="flex justify-between mb-3 font-black text-2xl text-slate-800 px-2"><span>Total</span><span>$${total}</span></div>`;
+            if (deposit > 0) totalDisplay = `<div class="flex justify-between text-sm text-slate-500 font-mono"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-sm text-red-500 font-mono"><span>A cuenta</span><span>-$${deposit}</span></div><div class="flex justify-between font-black text-2xl text-slate-800 border-t border-slate-200 pt-2 mt-2"><span>Restante</span><span>$${remaining}</span></div>`;
             
-            let footerHtml = isClosed ? `<div id="order-footer" class="fixed bottom-0 w-full bg-[#e0d8c8] p-4 shadow-[0_-4px_0_rgba(92,64,51,0.8)] z-30 border-t-[3px] double border-[#5c4033]"><div class="flex justify-between mb-3 font-bold text-2xl text-[#2c1e16] px-2" style="font-family: 'Special Elite', cursive;"><span style="font-family: 'Abril Fatface', cursive;">Total Final</span><span>$${total}</span></div><div class="flex gap-3"><button onclick="window.printR('${tid}')" class="flex-1 btn-retro btn-retro-dark py-3"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="window.downloadPDF('${tid}')" class="flex-1 btn-retro btn-retro-red py-3"><i class="fa-solid fa-file-pdf"></i> PDF</button></div><div class="text-center text-xs text-[#a63e3e] mt-3 font-bold uppercase tracking-[0.2em] font-mono border-t-2 border-dashed border-[#a63e3e] pt-2">MESA CERRADA - ARCHIVO</div></div>` : 
-            `<div id="order-footer" class="fixed bottom-0 w-full bg-[#fffdf9] p-4 shadow-[0_-4px_0_rgba(92,64,51,0.3)] z-30 border-t-[3px] double border-[#cba135] ${showOrders ? '' : 'hidden'}">${totalDisplay}<button onclick="window.openCloseAccountModal('${tid}')" class="w-full btn-retro ${closeBtnColorClass} py-4 text-lg mt-2">${closeBtnText}</button></div>`;
+            let footerHtml = isClosed ? `<div id="order-footer" class="fixed bottom-0 w-full bg-slate-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-30 border-t border-slate-300"><div class="flex justify-between mb-3 font-bold text-2xl text-slate-800 px-2"><span>Total Final</span><span>$${total}</span></div><div class="flex gap-3"><button onclick="window.printR('${tid}')" class="flex-1 bg-slate-800 text-white font-bold rounded-xl py-3 shadow hover:bg-slate-700 transition"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="window.downloadPDF('${tid}')" class="flex-1 bg-red-500 text-white font-bold rounded-xl py-3 shadow hover:bg-red-600 transition"><i class="fa-solid fa-file-pdf"></i> PDF</button></div><div class="text-center text-xs text-slate-400 mt-3 font-bold uppercase tracking-widest pt-2">MESA CERRADA</div></div>` : 
+            `<div id="order-footer" class="fixed bottom-0 w-full bg-white p-4 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-30 border-t border-slate-200 ${showOrders ? '' : 'hidden'}">${totalDisplay}<button onclick="window.openCloseAccountModal('${tid}')" class="w-full ${closeBtnColorClass} text-white font-bold rounded-xl py-4 text-lg mt-2 shadow-md transition active:scale-95 uppercase tracking-wide">${closeBtnText}</button></div>`;
             
-            const pageBgClass = t.isVip ? 'bg-[#fff0e6]' : 'bg-[#fffdf9]';
-            const vipHeader = t.isVip ? `<span class="ml-3 bg-[#cba135] text-[#2c1e16] text-[11px] px-3 py-1 rounded-sm font-bold shadow-[2px_2px_0_#2c1e16] border-2 border-[#2c1e16]" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
+            const pageBgClass = t.isVip ? 'bg-pink-50' : 'bg-slate-50';
+            const vipHeader = t.isVip ? `<span class="ml-3 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
 
             let menuContentHtml = ''; let floatingBtnHtml = '';
 
@@ -626,58 +581,59 @@
                 Object.values(localFastOrders).forEach(o => { localTotal += o.finalPrice * o.quantity; localCount += o.quantity; });
                 const floatHidden = localCount > 0 ? '' : 'hidden';
                 
-                floatingBtnHtml = `<button id="floating-fast-add" onclick="window.submitLocalFastOrders()" class="${floatHidden} fixed bottom-6 right-6 btn-retro btn-retro-green font-black text-xl py-4 px-6 rounded-sm shadow-[4px_4px_0_#2c1e16] z-[60] flex items-center justify-center gap-2">AGREGAR $${localTotal} <span class="text-xs ml-2 bg-[#fffdf9] text-[#557b55] px-2 py-0.5 rounded-full border-2 border-[#557b55] shadow-inner font-mono">${localCount}</span></button>`;
+                floatingBtnHtml = `<button id="floating-fast-add" onclick="window.submitLocalFastOrders()" class="${floatHidden} fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white font-black text-lg py-4 px-6 rounded-full shadow-lg z-[60] flex items-center justify-center gap-2 transition active:scale-95 border border-green-400">AGREGAR $${localTotal} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full shadow-sm">${localCount}</span></button>`;
             } else {
                 menuContentHtml = `<h3 class="cat-header">Cocina</h3><div class="grid gap-3 mb-8">${window.renderMenuSection('kitchen')}</div><h3 class="cat-header">Barra</h3><div class="grid gap-3">${window.renderMenuSection('bar')}</div>`;
             }
 
             const switchHtml = isClosed ? '' : `
                 <div class="flex justify-center mb-6">
-                    <div class="bg-[#e0d8c8] rounded-sm p-1 flex shadow-[inset_2px_2px_0_rgba(92,64,51,0.2)] w-full max-w-[320px] relative h-12 items-center border-2 border-[#a89f91]">
-                        <button onclick="window.setCobrarMode(false)" class="flex-1 text-xs font-black z-10 transition-colors ${!isCobrarMode ? 'text-[#f8f1e5]' : 'text-[#5c4033]'} font-slab">📝 ORDENAR</button>
-                        <button onclick="window.setCobrarMode(true)" class="flex-1 text-xs font-black z-10 transition-colors ${isCobrarMode ? 'text-[#f8f1e5]' : 'text-[#5c4033]'} font-slab">💲 RÁPIDO</button>
-                        <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] ${!isCobrarMode ? 'bg-[#cba135] border-[#5c4033]' : 'bg-[#557b55] border-[#2c1e16]'} rounded-sm border-2 shadow-[2px_2px_0_rgba(44,30,22,0.5)] transition-all duration-300 ${isCobrarMode ? 'translate-x-[calc(100%+4px)]' : ''}"></div>
+                    <div class="bg-slate-200 rounded-xl p-1 flex w-full max-w-[320px] relative h-12 items-center">
+                        <button onclick="window.setCobrarMode(false)" class="flex-1 text-xs font-bold z-10 transition-colors ${!isCobrarMode ? 'text-blue-700' : 'text-slate-500'}">📝 ORDENAR</button>
+                        <button onclick="window.setCobrarMode(true)" class="flex-1 text-xs font-bold z-10 transition-colors ${isCobrarMode ? 'text-green-700' : 'text-slate-500'}">💲 RÁPIDO</button>
+                        <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-transform duration-300 ${isCobrarMode ? 'translate-x-[calc(100%+4px)]' : ''}"></div>
                     </div>
                 </div>
             `;
 
             let html = `<div class="flex flex-col h-full ${pageBgClass}">
-                <div class="bg-[#2c1e16] text-[#f8f1e5] p-3 flex items-center justify-between shadow-[0_4px_0_rgba(92,64,51,0.5)] shrink-0 border-b-[4px] double border-[#cba135]">
-                    <button onclick="window.renderWaiterDashboard()" class="text-[#f8f1e5] font-bold text-sm flex items-center gap-2 hover:text-[#cba135] transition" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-chevron-left"></i> Volver</button>
-                    <div class="text-center"><div class="font-black text-xl leading-none flex items-center justify-center tracking-wider" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #cba135;">MESA ${t.number} ${vipHeader}</div><div class="text-[11px] font-mono text-[#cba135] opacity-90 mt-1 font-bold">Ticket ${uniqueDisplay}</div></div><div class="w-14"></div>
+                <div class="bg-slate-800 text-white p-4 flex items-center justify-between shadow-md shrink-0">
+                    <button onclick="window.renderWaiterDashboard()" class="text-slate-300 font-bold text-sm flex items-center gap-2 hover:text-white transition"><i class="fa-solid fa-chevron-left"></i> Volver</button>
+                    <div class="text-center"><div class="font-black text-xl leading-none flex items-center justify-center tracking-tight">MESA ${t.number} ${vipHeader}</div><div class="text-[10px] font-mono text-slate-400 mt-1 font-bold">Ticket ${uniqueDisplay}</div></div><div class="w-14"></div>
                 </div>
-                <div class="bg-[#fffdf9] shadow-[0_2px_0_#a89f91] flex border-b-2 border-[#a89f91] shrink-0">
+                <div class="bg-white shadow-sm flex border-b border-slate-200 shrink-0">
                     <button onclick="window.switchTab('menu')" id="tab-btn-menu" class="${menuBtnClass}">MENÚ</button>
                     <button onclick="window.switchTab('orders')" id="tab-btn-orders" class="${ordersBtnClass}">CUENTA</button>
                 </div>
-                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-32 ${showMenu ? '' : 'hidden'} bg-[#f8f1e5] relative">
+                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-32 ${showMenu ? '' : 'hidden'} ${pageBgClass} relative">
                     ${switchHtml}
                     ${menuContentHtml}
                     ${floatingBtnHtml}
                 </div>
-                <div id="tab-orders" class="${showOrders ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-52 ${t.isVip ? 'bg-[#fff0e6]' : 'bg-[#fffdf9]'}">
-                    ${ords.length === 0 ? '<div class="text-center py-10 text-[#a89f91] italic font-mono border-2 border-dashed border-[#a89f91] p-4 rounded-sm m-4 bg-[#fffdf9]">Mesa vacía - Sin pedidos</div>' : ''}
+                <div id="tab-orders" class="${showOrders ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-52 ${pageBgClass}">
+                    ${ords.length === 0 ? '<div class="text-center py-12 text-slate-400 italic font-medium bg-white rounded-2xl border border-dashed border-slate-300">Mesa vacía - Sin pedidos</div>' : ''}
                     ${ords.map(o => {
-                        let stClass = "bg-[#e0d8c8] text-[#5c4033] border-[#a89f91]", stIcon = "fa-clock";
-                        if(o.status === 'preparing') { stClass = "bg-[#fff9c4] text-[#d4a353] border-[#d4a353]"; stIcon = "fa-fire"; }
-                        if(o.status === 'ready') { stClass = "bg-[#e8fce8] text-[#557b55] border-[#557b55]"; stIcon = "fa-bell"; }
-                        if(o.status === 'delivered') { stClass = "bg-[#d0e0ff] text-[#4a6fa5] border-[#4a6fa5]"; stIcon = "fa-thumbs-up"; }
-                        const itemBgClass = t.isVip ? 'bg-[#fff5ee] border-[#cba135]' : 'bg-[#fffdf9] border-[#a89f91]';
+                        let stClass = "bg-slate-100 text-slate-500", stIcon = "fa-clock";
+                        if(o.status === 'preparing') { stClass = "bg-amber-100 text-amber-700"; stIcon = "fa-fire"; }
+                        if(o.status === 'ready') { stClass = "bg-green-100 text-green-700"; stIcon = "fa-bell"; }
+                        if(o.status === 'delivered') { stClass = "bg-blue-100 text-blue-700"; stIcon = "fa-thumbs-up"; }
+                        const itemBgClass = t.isVip ? 'bg-white border-pink-200' : 'bg-white border-slate-200';
                         const safeName = o.itemName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                         const timeDisplay = o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '...';
 
-                        return `<div class="${itemBgClass} p-3 rounded-sm shadow-[2px_2px_0_#a89f91] mb-3 border-2 relative overflow-hidden">
-                        ${t.isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-transparent border-r-[#cba135]/30"></div>' : ''}
+                        return `<div class="${itemBgClass} p-4 rounded-2xl shadow-sm mb-3 border relative overflow-hidden">
+                        ${t.isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-transparent border-r-pink-100"></div>' : ''}
                         <div class="flex justify-between items-start relative z-10">
-                            <div><div class="font-bold text-[#2c1e16] text-xl leading-tight flex items-center gap-2" style="font-family: 'Abril Fatface', cursive;">
-                                <span class="text-[#a63e3e]">${o.quantity}x</span> ${o.itemName}
-                                ${!isClosed ? `<button onclick="event.stopPropagation(); window.deleteOrder('${o.id}', ${o.quantity}, '${safeName}')" class="text-[#a63e3e] hover:text-red-700 ml-1 bg-transparent border-none cursor-pointer"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                            <div><div class="font-bold text-slate-800 text-lg leading-tight flex items-center gap-2">
+                                <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md text-sm">${o.quantity}x</span> 
+                                <span>${o.itemName}</span>
+                                ${!isClosed ? `<button onclick="event.stopPropagation(); window.deleteOrder('${o.id}', ${o.quantity}, '${safeName}')" class="text-slate-400 hover:text-red-500 ml-1 bg-transparent border-none cursor-pointer transition-colors"><i class="fa-solid fa-trash-can"></i></button>` : ''}
                             </div>
-                                ${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-[#a63e3e] font-bold mt-2 bg-[#fce8e8] p-1.5 rounded-sm inline-block border-2 border-[#a63e3e] font-mono shadow-[1px_1px_0_#a63e3e]"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}
-                                <div class="text-[10px] text-[#a89f91] mt-1 font-mono font-bold flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div></div>
+                                ${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-amber-700 font-bold mt-2 bg-amber-50 px-2 py-1 rounded-md inline-block border border-amber-100"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}
+                                <div class="text-[10px] text-slate-400 mt-2 font-mono font-medium flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div></div>
                             <div class="text-right flex flex-col items-end gap-2">
-                                <div class="font-black text-[#5c4033] text-xl" style="font-family: 'Special Elite', cursive;">$${o.price*o.quantity}</div>
-                                <span class="text-[10px] font-bold px-2 py-1 rounded-sm flex items-center gap-1 justify-end border-2 uppercase tracking-wider shadow-[1px_1px_0_rgba(0,0,0,0.2)] ${stClass}" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
+                                <div class="font-black text-slate-700 text-xl">$${o.price*o.quantity}</div>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 justify-end uppercase tracking-wider ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
                             </div>
                         </div></div>`;
                     }).join('')}
@@ -695,13 +651,12 @@
 
         window.renderMenuSection = function(cat) {
             return MENU.filter(i => i.category === cat).map(i => `
-                <button onclick="window.openCustomizeModal('${i.id}')" class="bg-[#fffdf9] p-3 rounded-sm shadow-[2px_2px_0_#a89f91] flex justify-between items-center text-left active:bg-[#fff0e6] border-2 border-[#a89f91] active:border-[#cba135] transition group relative overflow-hidden active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0_#a89f91] w-full">
+                <button onclick="window.openCustomizeModal('${i.id}')" class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-left hover:bg-slate-50 border border-slate-200 active:border-blue-400 transition-all group w-full active:scale-[0.98]">
                     <div class="flex items-center gap-4 relative z-10">
-                        <div class="w-12 h-12 bg-[#e0d8c8] rounded-full flex items-center justify-center text-[#5c4033] group-active:scale-110 transition border-2 border-[#a89f91] shadow-[1px_1px_0_#a89f91] text-xl"><i class="fa-solid ${i.icon}"></i></div>
-                        <div><div class="font-bold text-lg text-[#2c1e16] group-active:text-[#a63e3e]" style="font-family: 'Abril Fatface', cursive;">${i.name}</div><div class="text-sm text-[#5c4033] font-mono font-bold">$${i.price}</div></div>
+                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-blue-500 group-active:bg-blue-100 transition-colors text-xl"><i class="fa-solid ${i.icon}"></i></div>
+                        <div><div class="font-bold text-slate-800 text-base group-active:text-blue-700">${i.name}</div><div class="text-sm text-slate-500 font-semibold mt-0.5">$${i.price}</div></div>
                     </div>
-                    <div class="bg-[#cba135] text-[#2c1e16] w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-[2px_2px_0_#2c1e16] group-active:bg-[#2c1e16] group-active:text-[#cba135] transition border-2 border-[#2c1e16] text-lg relative z-10"><i class="fa-solid fa-plus"></i></div>
-                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#fff0e6]/50 opacity-0 group-active:opacity-100 transition"></div>
+                    <div class="bg-slate-100 text-slate-400 w-8 h-8 rounded-full flex items-center justify-center font-bold group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors text-sm relative z-10"><i class="fa-solid fa-plus"></i></div>
                 </button>`).join('');
         }
 
@@ -712,33 +667,33 @@
             
             if (item.isBeer && item.category === 'bar') {
                 const isGeneric = item.type === 'regular'; 
-                modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#f8f1e5] modal-retro border-0 shadow-none">
-                        <div class="p-4 border-b-4 double border-[#5c4033] bg-[#fffdf9] flex justify-between items-center relative"><div><h3 class="font-black text-xl text-[#2c1e16] uppercase font-slab tracking-wide">${item.name}</h3><p class="text-[#a63e3e] font-bold font-mono">$${item.price}</p></div><button onclick="window.closeModal()" class="text-[#5c4033] text-xl hover:text-[#a63e3e] transition bg-[#e0d8c8] rounded-full w-8 h-8 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033] absolute top-4 right-4"><i class="fa-solid fa-times"></i></button></div>
-                        <div class="p-5 overflow-y-auto flex-1 space-y-6">
-                            <div class="flex justify-center items-center gap-6 bg-[#fffdf9] p-3 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-2 border-[#a89f91]"><button onclick="window.adjQty(-1)" class="w-12 h-12 rounded-full bg-[#e0d8c8] text-[#5c4033] font-bold text-2xl border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91] active:translate-y-1 active:shadow-none transition">-</button><span id="modal-qty" class="text-4xl font-black text-[#2c1e16] font-typewriter">1</span><button onclick="window.adjQty(1)" class="w-12 h-12 rounded-full bg-[#cba135] text-[#2c1e16] font-bold text-2xl border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] active:translate-y-1 active:shadow-none transition">+</button></div>
-                            ${isGeneric ? `<div><h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-typewriter tracking-widest border-b-2 border-dashed border-[#a89f91] pb-1">Tipo</h4><div class="grid grid-cols-2 gap-3" id="beer-type-group"><div onclick="window.selectBeerType(this)" class="option-btn clara selected" data-val="Clara">CLARA</div><div onclick="window.selectBeerType(this)" class="option-btn oscura" data-val="Oscura">OSCURA</div></div></div>` : ''}
-                            <div><h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-typewriter tracking-widest border-b-2 border-dashed border-[#a89f91] pb-1">Escarchado</h4><div class="grid grid-cols-1 gap-3" id="beer-prep-group"><div onclick="window.selectBeerPrep(this)" class="prep-radio" data-val="Escarchado Sal">Escarchado Sal</div><div onclick="window.selectBeerPrep(this)" class="prep-radio selected" data-val="Escarchado Chamoy">Escarchado Chamoy</div><div onclick="window.selectBeerPrep(this)" class="prep-radio" data-val="Sin Escarchar">Sin Escarchar</div></div></div>
-                            <div class="flex gap-3"><button onclick="window.toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-sm font-bold uppercase font-slab" id="btn-sin-limon">SIN LIMÓN</button><button onclick="window.toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-sm font-bold uppercase font-slab hidden" id="btn-sin-ajonjoli">SIN AJONJOLI</button></div>
-                            <div onclick="window.toggleMod(this)" class="mod-btn btn-green p-4 rounded-sm flex justify-between items-center cursor-pointer mt-2" id="btn-clamato"><span class="font-bold flex items-center gap-3 text-lg font-slab uppercase tracking-wide"><i class="fa-solid fa-droplet text-2xl"></i> EXTRA CLAMATO</span><span class="font-black bg-[#fffdf9] text-[#557b55] px-3 py-1 rounded-sm text-sm border-2 border-[#557b55] shadow-inner font-mono">+$5</span></div>
-                            <input type="text" id="manual-note" placeholder="Nota extra..." class="w-full">
+                modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[85vh] bg-white relative">
+                        <div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div>
+                        <div class="p-5 overflow-y-auto flex-1 space-y-6 bg-slate-50">
+                            <div class="flex justify-center items-center gap-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200"><button onclick="window.adjQty(-1)" class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 font-bold text-2xl active:scale-95 transition">-</button><span id="modal-qty" class="text-4xl font-black text-slate-800 w-12 text-center">1</span><button onclick="window.adjQty(1)" class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-2xl active:scale-95 transition shadow-md">+</button></div>
+                            ${isGeneric ? `<div><h4 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Tipo de Cerveza</h4><div class="grid grid-cols-2 gap-3" id="beer-type-group"><div onclick="window.selectBeerType(this)" class="option-btn clara selected" data-val="Clara">CLARA</div><div onclick="window.selectBeerType(this)" class="option-btn oscura" data-val="Oscura">OSCURA</div></div></div>` : ''}
+                            <div><h4 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Preparación</h4><div class="grid grid-cols-1 gap-3" id="beer-prep-group"><div onclick="window.selectBeerPrep(this)" class="prep-radio" data-val="Escarchado Sal">Escarchado con Sal</div><div onclick="window.selectBeerPrep(this)" class="prep-radio selected" data-val="Escarchado Chamoy">Escarchado con Chamoy</div><div onclick="window.selectBeerPrep(this)" class="prep-radio" data-val="Sin Escarchar">Sin Escarchar</div></div></div>
+                            <div class="flex gap-3"><button onclick="window.toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-xl font-bold uppercase text-sm" id="btn-sin-limon">SIN LIMÓN</button><button onclick="window.toggleMod(this)" class="mod-btn btn-red flex-1 py-3 rounded-xl font-bold uppercase text-sm hidden" id="btn-sin-ajonjoli">SIN AJONJOLÍ</button></div>
+                            <div onclick="window.toggleMod(this)" class="mod-btn btn-green p-4 rounded-xl flex justify-between items-center cursor-pointer mt-2" id="btn-clamato"><span class="font-bold flex items-center gap-3 text-base uppercase"><i class="fa-solid fa-droplet text-xl"></i> EXTRA CLAMATO</span><span class="font-black bg-white text-green-600 px-3 py-1 rounded-lg text-sm border border-green-200">+$5</span></div>
+                            <input type="text" id="manual-note" placeholder="Nota especial (opcional)..." class="w-full text-base">
                         </div>
-                        <div class="p-4 border-t-4 double border-[#5c4033] bg-[#fffdf9] flex gap-4"><button onclick="window.closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4">CANCELAR</button><button onclick="window.submitBeerOrder('${item.id}')" class="flex-1 btn-retro btn-retro-green py-4">AGREGAR</button></div>
+                        <div class="p-4 border-t border-slate-100 bg-white flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.submitBeerOrder('${item.id}')" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition">Agregar Orden</button></div>
                     </div>`;
                 window.checkChamoy();
             } else {
                 let mods = item.modGroup ? MODIFIERS[item.modGroup] : (MODIFIERS['general_' + item.category] || []);
                 modal.innerHTML = `
-                    <div class="flex-1 flex flex-col h-full max-h-[85vh] bg-[#f8f1e5] modal-retro border-0 shadow-none">
-                        <div class="p-4 border-b-4 double border-[#5c4033] bg-[#fffdf9] flex justify-between items-center relative"><div><h3 class="font-black text-xl text-[#2c1e16] uppercase font-slab tracking-wide">${item.name}</h3><p class="text-[#a63e3e] font-bold font-mono">$${item.price}</p></div><button onclick="window.closeModal()" class="text-[#5c4033] text-xl hover:text-[#a63e3e] transition bg-[#e0d8c8] rounded-full w-8 h-8 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033] absolute top-4 right-4"><i class="fa-solid fa-times"></i></button></div>
-                        <div class="p-5 overflow-y-auto flex-1 space-y-6">
-                            <div class="flex justify-center items-center gap-6 bg-[#fffdf9] p-3 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-2 border-[#a89f91]"><button onclick="window.adjQty(-1)" class="w-12 h-12 rounded-full bg-[#e0d8c8] text-[#5c4033] font-bold text-2xl border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91] active:translate-y-1 active:shadow-none transition">-</button><span id="modal-qty" class="text-4xl font-black text-[#2c1e16] font-typewriter">1</span><button onclick="window.adjQty(1)" class="w-12 h-12 rounded-full bg-[#cba135] text-[#2c1e16] font-bold text-2xl border-2 border-[#2c1e16] shadow-[2px_2px_0_#2c1e16] active:translate-y-1 active:shadow-none transition">+</button></div>
-                            ${mods.length > 0 ? `<div><h4 class="text-sm font-bold text-[#5c4033] uppercase mb-3 font-typewriter tracking-widest border-b-2 border-dashed border-[#a89f91] pb-1">Personalizar</h4><div class="flex flex-wrap gap-3">${mods.map(m => {
+                    <div class="flex-1 flex flex-col h-full max-h-[85vh] bg-white relative">
+                        <div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div>
+                        <div class="p-5 overflow-y-auto flex-1 space-y-6 bg-slate-50">
+                            <div class="flex justify-center items-center gap-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200"><button onclick="window.adjQty(-1)" class="w-12 h-12 rounded-full bg-slate-100 text-slate-600 font-bold text-2xl active:scale-95 transition">-</button><span id="modal-qty" class="text-4xl font-black text-slate-800 w-12 text-center">1</span><button onclick="window.adjQty(1)" class="w-12 h-12 rounded-full bg-blue-600 text-white font-bold text-2xl active:scale-95 transition shadow-md">+</button></div>
+                            ${mods.length > 0 ? `<div><h4 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">Opciones y Quites</h4><div class="flex flex-wrap gap-2">${mods.map(m => {
                                 let cls = m.startsWith("Sin") ? "btn-red" : (m.startsWith("Con")||m.includes("+") ? "btn-green" : "btn-neutral");
-                                return `<button onclick="window.toggleMod(this)" class="mod-btn px-4 py-3 rounded-sm text-sm font-slab tracking-wide uppercase ${cls}">${m}</button>`;
+                                return `<button onclick="window.toggleMod(this)" class="mod-btn px-4 py-2.5 rounded-xl text-sm font-bold tracking-wide ${cls}">${m}</button>`;
                             }).join('')}</div></div>` : ''}
-                            <input type="text" id="manual-note" placeholder="Nota extra..." class="w-full">
+                            <input type="text" id="manual-note" placeholder="Nota especial (opcional)..." class="w-full text-base">
                         </div>
-                        <div class="p-4 border-t-4 double border-[#5c4033] bg-[#fffdf9] flex gap-4"><button onclick="window.closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4">CANCELAR</button><button onclick="window.submitGeneralOrder('${item.id}')" class="flex-1 btn-retro btn-retro-green py-4">AGREGAR</button></div>
+                        <div class="p-4 border-t border-slate-100 bg-white flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.submitGeneralOrder('${item.id}')" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition">Agregar Orden</button></div>
                     </div>`;
             }
             document.getElementById('modal-overlay').classList.remove('hidden');
@@ -751,51 +706,51 @@
             const salsaSection = (title, name) => `
                 <div class="pkg-section">
                     <h4 class="pkg-title">${title}</h4>
-                    <div class="grid grid-cols-2 gap-3">
-                        ${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-2 text-xs border-2 border-[#a89f91] p-3 rounded-sm cursor-pointer hover:bg-[#e0d8c8] font-bold uppercase font-slab text-[#5c4033] shadow-[2px_2px_0_#a89f91] transition-colors bg-[#fffdf9]"><input type="radio" name="${name}" value="${s}" class="accent-[#cba135] w-4 h-4"> ${s}</label>`).join('')}
+                    <div class="grid grid-cols-2 gap-2">
+                        ${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-2 text-xs border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-50 font-bold text-slate-600 transition-colors bg-white"><input type="radio" name="${name}" value="${s}" class="accent-amber-500 w-4 h-4"> ${s}</label>`).join('')}
                     </div>
                 </div>`;
 
             const beerSection = (num) => `
                 <div class="pkg-section">
-                    <h4 class="pkg-title"><i class="fa-solid fa-beer-mug-empty mr-2 text-[#cba135]"></i>Tarro ${num} (½ Litro)</h4>
+                    <h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> Tarro ${num} (½ Lt)</h4>
                     <div class="grid grid-cols-2 gap-3 mb-3">
-                        <select id="p_beer_type_${num}" class="w-full text-base"><option value="Clara">C. Clara</option><option value="Oscura">C. Oscura</option></select>
-                        <select id="p_beer_prep_${num}" class="w-full text-base"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select>
+                        <select id="p_beer_type_${num}" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select>
+                        <select id="p_beer_prep_${num}" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select>
                     </div>
-                    <label class="flex items-center gap-3 text-sm font-bold text-[#a63e3e] uppercase font-slab bg-[#fce8e8] p-3 rounded-sm border-2 border-[#a63e3e] shadow-[2px_2px_0_#a63e3e] cursor-pointer w-fit"><input type="checkbox" id="p_beer_nolimon_${num}" class="w-5 h-5 accent-[#a63e3e]"> Sin Limón</label>
+                    <label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p_beer_nolimon_${num}" class="w-4 h-4 accent-red-500"> Sin Limón</label>
                 </div>`;
 
             if(item.id === 'p1') {
                 content = `
                     ${salsaSection('Salsa Alitas', 'p1_salsa_alitas')}
                     ${salsaSection('Salsa Boneless', 'p1_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4"><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16]"><input type="radio" name="p1_side" value="Media Papas" checked class="w-5 h-5 accent-[#cba135]"> ½ Papas</label><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16]"><input type="radio" name="p1_side" value="Media Aros" class="w-5 h-5 accent-[#cba135]"> ½ Aros</label></div></div>
+                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div></div>
                     ${beerSection(1)} ${beerSection(2)}
                 `;
             } else if(item.id === 'p2') {
                 content = `
-                    <div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4><div class="flex gap-4 mb-4"><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16] text-lg"><input type="radio" name="p2_main" value="Alitas" checked class="w-6 h-6 accent-[#cba135]"> Alitas</label><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16] text-lg"><input type="radio" name="p2_main" value="Boneless" class="w-6 h-6 accent-[#cba135]"> Boneless</label></div>${salsaSection('Salsa (Para elección)', 'p2_salsa_main').replace('<div class="pkg-section">','<div>')}</div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4><div class="grid grid-cols-2 gap-3">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-[#fffdf9] border-2 border-[#a89f91] p-2 font-bold font-slab text-[#5c4033] uppercase shadow-[1px_1px_0_#a89f91]"><input type="checkbox" class="p2_h1_mod w-4 h-4 accent-[#a63e3e]" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4><div class="grid grid-cols-2 gap-3">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-[#fffdf9] border-2 border-[#a89f91] p-2 font-bold font-slab text-[#5c4033] uppercase shadow-[1px_1px_0_#a89f91]"><input type="checkbox" class="p2_h2_mod w-4 h-4 accent-[#a63e3e]" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 mb-4"><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16]"><input type="radio" name="p2_side" value="Media Papas" checked class="w-5 h-5 accent-[#cba135]"> ½ Papas</label><label class="flex items-center gap-2 font-bold font-slab text-[#2c1e16]"><input type="radio" name="p2_side" value="Media Aros" class="w-5 h-5 accent-[#cba135]"> ½ Aros</label></div><div class="grid grid-cols-2 gap-3">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-[#fffdf9] border-2 border-[#a89f91] p-2 font-bold font-slab text-[#5c4033] uppercase shadow-[1px_1px_0_#a89f91]"><input type="checkbox" class="p2_side_mod w-4 h-4 accent-[#a63e3e]" value="${m}"> ${m}</label>`).join('')}</div></div>
+                    <div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Alitas" checked class="w-5 h-5 accent-blue-500"> Alitas</label><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Boneless" class="w-5 h-5 accent-blue-500"> Boneless</label></div>${salsaSection('Salsa Principal', 'p2_salsa_main').replace('<div class="pkg-section">','<div>').replace('pkg-title', 'text-xs font-bold text-slate-400 uppercase mb-2 block')}</div>
+                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h1_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
+                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h2_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
+                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_side_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
                     ${beerSection(1)} ${beerSection(2)}
                 `;
             } else if(item.id === 'p3') {
                 content = `
                     ${salsaSection('Salsa Alitas', 'p3_salsa_alitas')}
                     ${salsaSection('Salsa Boneless', 'p3_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla (Completa)</h4><div class="grid grid-cols-2 gap-3">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-[#fffdf9] border-2 border-[#a89f91] p-2 font-bold font-slab text-[#5c4033] uppercase shadow-[1px_1px_0_#a89f91]"><input type="checkbox" class="p3_aros_mod w-4 h-4 accent-[#a63e3e]" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4><div class="grid grid-cols-2 gap-3">${MODIFIERS.hotdogs.map(m=>`<label class="text-xs flex items-center gap-2 bg-[#fffdf9] border-2 border-[#a89f91] p-2 font-bold font-slab text-[#5c4033] uppercase shadow-[1px_1px_0_#a89f91]"><input type="checkbox" class="p3_hd_mod w-4 h-4 accent-[#a63e3e]" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">3 Tarros Pequeños (Iguales)</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p3_beer_type" class="w-full text-base"><option value="Clara">C. Clara</option><option value="Oscura">C. Oscura</option></select><select id="p3_beer_prep" class="w-full text-base"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select></div><label class="flex items-center gap-3 text-sm font-bold text-[#a63e3e] uppercase font-slab bg-[#fce8e8] p-3 rounded-sm border-2 border-[#a63e3e] shadow-[2px_2px_0_#a63e3e] cursor-pointer w-fit"><input type="checkbox" id="p3_beer_nolimon" class="w-5 h-5 accent-[#a63e3e]"> Sin Limón</label></div>
+                    <div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_aros_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
+                    <div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.hotdogs.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_hd_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
+                    <div class="pkg-section"><h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> 3 Tarros Chicos</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p3_beer_type" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select><select id="p3_beer_prep" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p3_beer_nolimon" class="w-4 h-4 accent-red-500"> Sin Limón</label></div>
                 `;
             }
 
             modal.innerHTML = `
-                <div class="flex-1 flex flex-col h-full max-h-[90vh] bg-[#f8f1e5] modal-retro border-0 shadow-none relative">
-                    <div class="p-4 border-b-4 double border-[#5c4033] bg-[#fffdf9] flex justify-between items-center"><div><h3 class="font-black text-xl text-[#2c1e16] uppercase font-slab tracking-wide">${item.name}</h3><p class="text-[#a63e3e] font-bold font-mono">$${item.price}</p></div><button onclick="window.closeModal()" class="text-[#5c4033] text-xl hover:text-[#a63e3e] transition bg-[#e0d8c8] rounded-full w-8 h-8 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033] absolute top-4 right-4"><i class="fa-solid fa-times"></i></button></div>
-                    <div class="p-4 overflow-y-auto flex-1">${content}</div>
-                    <div class="p-4 border-t-4 double border-[#5c4033] bg-[#fffdf9] flex gap-4"><button onclick="window.closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4">CANCELAR</button><button onclick="window.submitPackageOrder('${item.id}')" class="flex-1 btn-retro btn-retro-green py-4">AGREGAR PAQUETE</button></div>
+                <div class="flex-1 flex flex-col h-full max-h-[90vh] bg-white relative">
+                    <div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div>
+                    <div class="p-4 overflow-y-auto flex-1 bg-slate-50">${content}</div>
+                    <div class="p-4 border-t border-slate-100 bg-white flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.submitPackageOrder('${item.id}')" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition">Agregar Paquete</button></div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
@@ -886,7 +841,32 @@
         }
 
         window.openNewTableModal = function() { 
-            document.getElementById('modal-content').innerHTML = `<div class="p-6 bg-[#f8f1e5] modal-retro border-0 shadow-none relative"><button onclick="window.closeModal()" class="absolute top-4 right-4 text-[#5c4033] text-xl hover:text-[#a63e3e] transition bg-[#fffdf9] rounded-full w-8 h-8 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033]"><i class="fa-solid fa-times"></i></button><h3 class="font-black text-2xl mb-6 text-[#2c1e16] font-slab uppercase tracking-wide">NUEVA MESA</h3><input type="number" id="ntn" placeholder="Número de Mesa" class="w-full mb-4 text-center font-typewriter text-2xl p-4 border-4 double border-[#5c4033] bg-[#fffdf9] rounded-sm shadow-inner text-[#a63e3e]"><input type="text" id="ntnm" placeholder="Apodo / Referencia" class="w-full mb-6 font-slab text-xl p-4 text-center bg-[#fffdf9] border-2 border-[#a89f91] shadow-inner text-[#5c4033]"><label class="flex items-center justify-center gap-3 mb-8 p-3 border-2 border-[#cba135] bg-[#fff0e6] rounded-sm cursor-pointer shadow-[2px_2px_0_#cba135]"><input type="checkbox" id="ntvip" class="w-6 h-6 accent-[#cba135]"><span class="font-bold text-[#2c1e16] font-slab tracking-wide uppercase"><i class="fa-solid fa-crown text-[#cba135] mr-1"></i> Cliente VIP</span></label><div class="flex gap-4"><button onclick="window.closeModal()" class="flex-1 btn-retro btn-retro-neutral py-4">CANCELAR</button><button onclick="window.subNT()" class="flex-1 btn-retro btn-retro-green py-4 text-lg">ABRIR MESA</button></div></div>`; 
+            document.getElementById('modal-content').innerHTML = `
+                <div class="p-6 bg-white relative">
+                    <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+                    <h3 class="font-black text-2xl mb-6 text-slate-800 tracking-tight">Nueva Mesa</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Número de Mesa</label>
+                            <input type="number" id="ntn" placeholder="Ej. 5" class="w-full text-center text-xl p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Referencia / Apodo</label>
+                            <input type="text" id="ntnm" placeholder="Ej. Los de la esquina" class="w-full text-center text-lg p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <label class="flex items-center justify-center gap-3 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-xl cursor-pointer hover:bg-pink-100 transition">
+                        <input type="checkbox" id="ntvip" class="w-5 h-5 accent-pink-500">
+                        <span class="font-bold text-pink-700 uppercase tracking-wide text-sm"><i class="fa-solid fa-crown text-pink-500 mr-1"></i> Cliente VIP</span>
+                    </label>
+
+                    <div class="flex gap-3">
+                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
+                        <button onclick="window.subNT()" class="flex-1 bg-green-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-green-700 transition">Abrir Mesa</button>
+                    </div>
+                </div>`; 
             document.getElementById('modal-overlay').classList.remove('hidden'); 
         }
         
@@ -924,27 +904,27 @@
                 return ta - tb; 
             });
             const ready = ordersData.filter(o => o.category === cat && o.status === 'ready');
-            let html = `<div class="flex h-full p-2 gap-3 overflow-x-auto bg-stone-200">`;
-            html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-red-500"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div> PENDIENTES (${active.filter(o=>o.status==='ordered').length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${active.filter(o=>o.status==='ordered').map(o=>window.card(o,'ordered')).join('')}</div></div>`;
-            if(cat==='kitchen') html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-yellow-400"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-400"></div> COCINANDO (${active.filter(o=>o.status==='preparing').length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${active.filter(o=>o.status==='preparing').map(o=>window.card(o,'preparing')).join('')}</div></div>`;
-            html += `<div class="flex-1 min-w-[300px] bg-white rounded-xl shadow-md p-3 flex flex-col border-t-8 border-green-600"><h3 class="font-black text-stone-700 mb-3 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-600"></div> LISTOS (${ready.length})</h3><div class="flex-1 overflow-y-auto space-y-3 p-1">${ready.map(o=>window.card(o,'ready')).join('')}</div></div>`;
+            let html = `<div class="flex h-full p-3 gap-4 overflow-x-auto bg-slate-100">`;
+            html += `<div class="flex-1 min-w-[300px] bg-white rounded-2xl shadow-sm p-4 flex flex-col border-t-4 border-red-500"><h3 class="font-black text-slate-800 mb-4 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div> Pendientes (${active.filter(o=>o.status==='ordered').length})</h3><div class="flex-1 overflow-y-auto space-y-3 pr-1">${active.filter(o=>o.status==='ordered').map(o=>window.card(o,'ordered')).join('')}</div></div>`;
+            if(cat==='kitchen') html += `<div class="flex-1 min-w-[300px] bg-white rounded-2xl shadow-sm p-4 flex flex-col border-t-4 border-amber-400"><h3 class="font-black text-slate-800 mb-4 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-400"></div> Cocinando (${active.filter(o=>o.status==='preparing').length})</h3><div class="flex-1 overflow-y-auto space-y-3 pr-1">${active.filter(o=>o.status==='preparing').map(o=>window.card(o,'preparing')).join('')}</div></div>`;
+            html += `<div class="flex-1 min-w-[300px] bg-white rounded-2xl shadow-sm p-4 flex flex-col border-t-4 border-green-500"><h3 class="font-black text-slate-800 mb-4 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-green-500"></div> Listos (${ready.length})</h3><div class="flex-1 overflow-y-auto space-y-3 pr-1">${ready.map(o=>window.card(o,'ready')).join('')}</div></div>`;
             document.getElementById('content-area').innerHTML = html + `</div>`;
         }
         
         window.card = function(o,s) {
             const t = tablesData.find(x=>x.id===o.tableId);
             const timeAgo = Math.floor((new Date()-new Date(o.timestamp?.seconds*1000))/60000);
-            let btnClass = "bg-stone-500", btnText = "Acción";
-            if(s==='ordered') { if(o.category==='bar') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } else { btnText="Cocinar"; btnClass="bg-yellow-600 hover:bg-yellow-700"; } }
+            let btnClass = "bg-slate-500", btnText = "Acción";
+            if(s==='ordered') { if(o.category==='bar') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } else { btnText="Cocinar"; btnClass="bg-amber-500 hover:bg-amber-600"; } }
             else if(s==='preparing') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } 
             else { btnText="Entregar"; btnClass="bg-blue-600 hover:bg-blue-700"; }
             let nextSt = s==='ordered' ? (o.category==='bar'?'ready':'preparing') : (s==='preparing'?'ready':'delivered');
             
             const isVip = t?.isVip;
-            const cardBg = isVip ? "bg-pink-50 border-pink-300" : "bg-stone-50 border-stone-200";
-            const vipBadge = isVip ? '<span class="bg-pink-500 text-white text-[10px] px-1 py-0.5 rounded ml-1"><i class="fa-solid fa-crown"></i></span>' : '';
+            const cardBg = isVip ? "bg-pink-50 border-pink-200" : "bg-white border-slate-200";
+            const vipBadge = isVip ? '<span class="bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full ml-2 shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>' : '';
             
-            return `<div class="${cardBg} p-4 rounded-lg shadow border"><div class="flex justify-between font-bold text-lg mb-2"><span class="bg-stone-800 text-white px-2 py-0.5 rounded text-sm flex items-center">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-normal text-stone-500 bg-white border px-2 py-1 rounded flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div><div class="text-xl leading-tight text-stone-800 mb-2"><span class="font-black bg-amber-200 px-2 rounded-md mr-1">${o.quantity}</span> ${o.itemName}</div>${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-700 font-bold bg-red-50 p-2 rounded border border-red-100 mb-2 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}<button onclick="window.upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 mt-1 rounded-lg font-bold shadow-md active:translate-y-0.5 transition uppercase tracking-wide">${btnText}</button></div>`;
+            return `<div class="${cardBg} p-4 rounded-xl shadow-sm border"><div class="flex justify-between font-bold text-sm mb-3"><span class="bg-slate-800 text-white px-2 py-1 rounded-md flex items-center shadow-sm">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-md flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div><div class="text-lg font-bold text-slate-800 leading-tight mb-2"><span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md mr-1">${o.quantity}x</span> ${o.itemName}</div>${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-600 font-bold bg-red-50 p-2 rounded-lg border border-red-100 mb-3 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}<button onclick="window.upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition uppercase tracking-wide">${btnText}</button></div>`;
         }
         
         window.upd = async function(id,s) { await db.collection('orders').doc(id).update({status:s}); }
@@ -958,34 +938,32 @@
             const amountToPay = total - deposit;
 
             document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-[#f8f1e5] modal-retro border-0 shadow-none relative">
-                    <button onclick="window.closeModal()" class="absolute top-4 right-4 text-[#5c4033] text-2xl hover:text-[#a63e3e] transition bg-[#fffdf9] rounded-full w-10 h-10 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033] z-10"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-4xl text-[#2c1e16] mb-2 uppercase tracking-widest mt-2" style="font-family: 'Abril Fatface', cursive; text-shadow: 2px 2px 0 #cba135;">MESA ${t.number}</h3>
-                    <p class="text-[#5c4033] font-mono text-lg mb-6 font-bold border-b-2 border-dashed border-[#a89f91] pb-4 inline-block px-6">Ticket #${t.uniqueId || '---'}</p>
+                <div class="p-6 text-center bg-white relative">
+                    <button onclick="window.closeModal()" class="absolute top-4 right-4 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+                    <h3 class="font-black text-3xl text-slate-800 mb-1 uppercase tracking-tight mt-2">MESA ${t.number}</h3>
+                    <p class="text-slate-400 font-mono text-sm mb-6 font-medium">Ticket #${t.uniqueId || '---'}</p>
                     
-                    <label class="flex items-center justify-center gap-4 mb-6 cursor-pointer bg-[#fffdf9] p-4 rounded-sm shadow-[3px_3px_0_#a89f91] border-2 border-[#a89f91] hover:bg-[#e0d8c8] transition w-fit mx-auto">
-                        <input type="checkbox" id="close-card-check" onchange="window.calcCloseTotal(${amountToPay})" class="w-6 h-6 accent-[#4a6fa5] border-2 border-[#2c1e16]">
-                        <span class="font-bold text-[#2c1e16] flex items-center gap-3 text-lg" style="font-family: 'Abril Fatface', cursive;"><i class="fa-solid fa-credit-card text-[#4a6fa5] text-2xl drop-shadow-[1px_1px_0_#2c1e16]"></i> Pago con Tarjeta (+4%)</span>
+                    <label class="flex items-center justify-center gap-3 mb-6 cursor-pointer bg-slate-50 p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition w-fit mx-auto">
+                        <input type="checkbox" id="close-card-check" onchange="window.calcCloseTotal(${amountToPay})" class="w-5 h-5 accent-blue-600">
+                        <span class="font-bold text-slate-700 flex items-center gap-2 text-sm"><i class="fa-solid fa-credit-card text-blue-500 text-lg"></i> Pago con Tarjeta (+4%)</span>
                     </label>
 
-                    <div class="bg-[#fffdf9] p-6 rounded-sm shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)] border-4 double border-[#5c4033] mb-8 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-2 bg-repeat-x" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'10\' viewBox=\'0 0 20 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 10L10 0L20 10H0Z\' fill=\'%235c4033\'/%3E%3C/svg%3E');"></div>
-                         <div id="close-breakdown" class="hidden text-base mb-4 space-y-2 font-mono text-[#5c4033] border-b-2 border-dashed border-[#a89f91] pb-4">
-                            <div class="flex justify-between"><span>Subtotal:</span><span>$${amountToPay}</span></div>
-                            <div class="flex justify-between text-[#a63e3e] font-bold"><span>Comisión (4%):</span><span id="close-comm-val">$0</span></div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-6 relative overflow-hidden">
+                         <div id="close-breakdown" class="hidden text-sm mb-4 space-y-2 text-slate-500 border-b border-dashed border-slate-300 pb-4">
+                            <div class="flex justify-between"><span>Subtotal:</span><span class="font-bold">$${amountToPay}</span></div>
+                            <div class="flex justify-between text-red-500 font-bold"><span>Comisión (4%):</span><span id="close-comm-val">$0</span></div>
                         </div>
-                        <span class="block text-[#a89f91] text-sm uppercase font-bold tracking-[0.3em] mb-2 font-mono">Total a Pagar</span>
-                        <span class="block text-7xl font-black text-[#2c1e16]" id="close-total-val" style="font-family: 'Special Elite', cursive; text-shadow: 2px 2px 0 rgba(92,64,51,0.2);">$${amountToPay}</span>
-                        <div class="absolute bottom-0 left-0 w-full h-2 bg-repeat-x transform rotate-180" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'10\' viewBox=\'0 0 20 10\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 10L10 0L20 10H0Z\' fill=\'%235c4033\'/%3E%3C/svg%3E');"></div>
+                        <span class="block text-slate-400 text-xs uppercase font-bold tracking-widest mb-1">Total a Pagar</span>
+                        <span class="block text-6xl font-black text-slate-800 tracking-tighter" id="close-total-val">$${amountToPay}</span>
                     </div>
                     
-                    <div class="flex flex-col gap-4">
-                        <button onclick="window.openDebtModal('${tid}')" class="btn-retro btn-retro-blue py-4 text-lg">Dejar en Deuda / Fiado</button>
-                        <div class="flex gap-4">
-                            <button onclick="window.printR('${tid}')" class="flex-1 btn-retro btn-retro-dark py-4 text-lg"><i class="fa-solid fa-print"></i> Ticket</button>
-                            <button onclick="window.downloadPDF('${tid}')" class="flex-1 btn-retro btn-retro-red py-4 text-lg"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="window.openDebtModal('${tid}')" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold py-3.5 rounded-xl transition text-sm">Dejar en Deuda / Fiado</button>
+                        <div class="flex gap-3">
+                            <button onclick="window.printR('${tid}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i> Ticket</button>
+                            <button onclick="window.downloadPDF('${tid}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-xl shadow-sm transition flex items-center justify-center gap-2"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                         </div>
-                        <button onclick="window.closeFinal('${tid}')" class="btn-retro btn-retro-green py-5 text-2xl shadow-[4px_4px_0_#2c1e16]">COBRAR Y CERRAR</button>
+                        <button onclick="window.closeFinal('${tid}')" class="bg-green-500 hover:bg-green-600 text-white font-black py-5 text-xl rounded-xl shadow-md transition active:scale-95 mt-2">COBRAR Y CERRAR</button>
                     </div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
@@ -1011,28 +989,31 @@
 
         window.openDebtModal = function(tid) {
             document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-[#f8f1e5] modal-retro border-0 shadow-none relative">
-                    <button onclick="window.openCloseAccountModal('${tid}')" class="absolute top-4 right-4 text-[#5c4033] text-2xl hover:text-[#a63e3e] transition bg-[#fffdf9] rounded-full w-10 h-10 flex items-center justify-center border-2 border-[#5c4033] shadow-[2px_2px_0_#5c4033] z-10"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-3xl mb-4 text-[#a63e3e] uppercase tracking-widest mt-2" style="font-family: 'Abril Fatface', cursive; text-shadow: 1px 1px 0 #2c1e16;">DEJAR EN DEUDA</h3>
-                    <p class="mb-4 text-[#5c4033] font-bold text-lg font-mono">¿Cuánto dinero dejaron a cuenta hoy?</p>
+                <div class="p-6 text-center bg-white relative">
+                    <button onclick="window.openCloseAccountModal('${tid}')" class="absolute top-4 right-4 text-slate-400 text-xl hover:text-slate-600 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h3 class="font-black text-2xl mb-2 text-slate-800 tracking-tight mt-2">DEJAR EN DEUDA</h3>
+                    <p class="mb-6 text-slate-500 text-sm">¿Cuánto dinero dejaron a cuenta hoy?</p>
                     
-                    <input type="number" id="debt-deposit" value="0" oninput="window.calcDebtTotal()" class="w-full p-4 text-center text-4xl border-4 double border-[#5c4033] rounded-sm font-black mb-6 outline-none focus:border-[#4a6fa5] transition bg-[#fffdf9] text-[#2c1e16] shadow-[inset_2px_2px_4px_rgba(92,64,51,0.1)]" style="font-family: 'Special Elite', cursive;">
+                    <div class="relative max-w-[200px] mx-auto mb-6">
+                        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 text-2xl font-bold">$</span>
+                        <input type="number" id="debt-deposit" value="0" oninput="window.calcDebtTotal()" class="w-full py-4 pl-10 pr-4 text-center text-4xl border-2 border-slate-200 rounded-2xl font-black outline-none focus:border-blue-500 transition text-slate-800 bg-slate-50">
+                    </div>
                     
-                    <label class="flex items-center justify-center gap-3 mb-6 cursor-pointer bg-[#fffdf9] p-3 rounded-sm shadow-[3px_3px_0_#a89f91] border-2 border-[#a89f91] hover:bg-[#e0d8c8] transition w-fit mx-auto">
-                        <input type="checkbox" id="debt-card-check" onchange="window.calcDebtTotal()" class="w-5 h-5 accent-[#4a6fa5] border-2 border-[#2c1e16]">
-                        <span class="font-bold text-[#2c1e16] text-base" style="font-family: 'Abril Fatface', cursive;">Pago con Tarjeta (+4%)</span>
+                    <label class="flex items-center justify-center gap-3 mb-6 cursor-pointer bg-slate-50 p-3 rounded-xl border border-slate-200 hover:bg-slate-100 transition w-fit mx-auto">
+                        <input type="checkbox" id="debt-card-check" onchange="window.calcDebtTotal()" class="w-5 h-5 accent-blue-600">
+                        <span class="font-bold text-slate-700 text-sm">Pago con Tarjeta (+4%)</span>
                     </label>
 
-                    <div id="debt-breakdown" class="hidden bg-[#e0d8c8] p-4 rounded-sm mb-6 text-base font-mono border-2 border-[#a89f91] shadow-[2px_2px_0_#a89f91]">
-                        <div class="flex justify-between text-[#5c4033]"><span>Monto a Cuenta:</span><span id="debt-base-val">$0</span></div>
-                        <div class="flex justify-between text-[#a63e3e] font-bold"><span>Comisión (4%):</span><span id="debt-comm-val">$0</span></div>
-                        <div class="border-t-2 border-dashed border-[#a89f91] my-3"></div>
-                        <div class="flex justify-between font-black text-2xl text-[#2c1e16]" style="font-family: 'Special Elite', cursive;"><span>Total a Cobrar:</span><span id="debt-total-val">$0</span></div>
+                    <div id="debt-breakdown" class="hidden bg-slate-50 p-4 rounded-xl mb-6 text-sm border border-slate-200">
+                        <div class="flex justify-between text-slate-500"><span>Monto a Cuenta:</span><span class="font-bold" id="debt-base-val">$0</span></div>
+                        <div class="flex justify-between text-red-500 font-bold mt-1"><span>Comisión (4%):</span><span id="debt-comm-val">$0</span></div>
+                        <div class="border-t border-dashed border-slate-300 my-3"></div>
+                        <div class="flex justify-between font-black text-lg text-slate-800"><span>Total a Cobrar:</span><span id="debt-total-val">$0</span></div>
                     </div>
 
-                    <div class="flex gap-4">
-                        <button onclick="window.openCloseAccountModal('${tid}')" class="flex-1 btn-retro btn-retro-neutral py-4 text-[#5c4033]">Volver al Cobro</button>
-                        <button onclick="window.confirmDebt('${tid}')" class="flex-1 btn-retro btn-retro-blue py-4 text-lg">Confirmar Deuda</button>
+                    <div class="flex gap-3">
+                        <button onclick="window.openCloseAccountModal('${tid}')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition">Cancelar</button>
+                        <button onclick="window.confirmDebt('${tid}')" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-xl shadow-md hover:bg-blue-700 transition">Confirmar Deuda</button>
                     </div>
                 </div>`;
         }
