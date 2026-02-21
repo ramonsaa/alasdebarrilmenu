@@ -1153,12 +1153,17 @@
                 if (user) {
                     currentUser = user;
                     
-                    db.collection('tables').onSnapshot(s => { 
+                    // OPTIMIZACIÓN DE LECTURAS: Solo traer datos de los últimos 15 días
+                    const limitDate = new Date();
+                    limitDate.setDate(limitDate.getDate() - 15);
+                    const limitFb = firebase.firestore.Timestamp.fromDate(limitDate);
+
+                    db.collection('tables').where('openedAt', '>=', limitFb).onSnapshot(s => { 
                         tablesData = s.docs.map(d=>({id:d.id, ...d.data()})); 
                         window.refreshCurrentView(); 
                     }, err => window.showError("Error leyendo Mesas", err.message));
                     
-                    db.collection('orders').onSnapshot(s => { 
+                    db.collection('orders').where('timestamp', '>=', limitFb).onSnapshot(s => { 
                         ordersData = s.docs.map(d=>({id:d.id, ...d.data()})); 
                         window.refreshCurrentView(); 
                     }, err => window.showError("Error leyendo Pedidos", err.message));
