@@ -142,6 +142,7 @@
         // DATOS MAESTROS
         let MENU = [];
         let MASTER_INVENTORY = [];
+        let currentAdminTab = 'inventory'; // Estado para el panel admin
 
         const MODIFIERS = {
             burgers: ["Sin cebolla", "Sin jitomate", "Sin piña", "Sin picante", "Sin catsup", "Sin mayonesa", "Sin queso", "Sin jamón", "Sin carne"],
@@ -156,7 +157,6 @@
         };
 
         // --- DICCIONARIO INICIAL CON VÍNCULOS DE INVENTARIO ---
-        // invId: ID del insumo maestro | invName: Nombre del insumo | invCost: Lo que consume 1 orden
         const INITIAL_MENU = [
             { id: 'b_md', name: 'Barril 1/2 Lt', price: 35, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty', invId: 'inv_barril_clara', invName: 'Cerveza Barril Clara (Litros)', invCost: 0.5 },
             { id: 'b_1l', name: 'Barril 1 Lt', price: 70, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty', invId: 'inv_barril_clara', invName: 'Cerveza Barril Clara (Litros)', invCost: 1 },
@@ -296,37 +296,71 @@
             } catch(e) { alert("Error: " + e.message); }
         }
 
+        // ==========================================
+        // VISTAS SEPARADAS DE ADMIN (INVENTARIO VS MENÚ)
+        // ==========================================
+        window.switchAdminMainTab = function(tab) {
+            currentAdminTab = tab;
+            window.renderAdminDashboard();
+        }
+
         window.renderAdminDashboard = function() {
             currentTableId = null;
             document.getElementById('header-title').innerText = 'Panel de Administración';
 
-            let html = `
-                <div class="p-4 md:p-8 max-w-6xl mx-auto pb-24">
-                    <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-black text-slate-800">Menú e Inventario Integrado</h2>
-                            <p class="text-sm text-slate-500 font-medium">Gestiona precios y supervisa el stock descontado según cada receta.</p>
-                        </div>
-                        <button onclick="window.openChangePinModal()" class="bg-white border border-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-bold hover:bg-slate-50 hover:text-blue-600 transition text-sm shadow-sm flex items-center gap-2"><i class="fa-solid fa-key"></i> Cambiar PIN</button>
+            const activeClass = "bg-blue-600 text-white shadow-md border border-blue-700";
+            const inactiveClass = "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 transition";
+
+            let contentHtml = '';
+
+            if (currentAdminTab === 'inventory') {
+                contentHtml = `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[600px]">
+                            <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
+                                <tr>
+                                    <th class="p-4">Insumo Maestro</th>
+                                    <th class="p-4 text-center">Stock Real Disponible</th>
+                                    <th class="p-4 text-center w-48">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 text-sm">
+                                ${MASTER_INVENTORY.map(inv => `
+                                    <tr class="hover:bg-slate-50 transition">
+                                        <td class="p-4">
+                                            <div class="font-bold text-slate-800 text-base">${inv.name}</div>
+                                            <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${inv.id}</div>
+                                        </td>
+                                        <td class="p-4 text-center">
+                                            <span class="font-black text-2xl ${inv.stock > 10 ? 'text-green-600' : (inv.stock > 0 ? 'text-amber-500' : 'text-red-500')}">
+                                                ${inv.stock}
+                                            </span>
+                                        </td>
+                                        <td class="p-4 text-center">
+                                            <button onclick="window.openEditMasterInvModal('${inv.id}')" class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-xl font-bold hover:bg-amber-500 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-boxes-stacked"></i> Ajustar</button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
                     </div>
-                    
+                `;
+            } else {
+                contentHtml = `
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden overflow-x-auto">
                         <table class="w-full text-left border-collapse min-w-[900px]">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
                                 <tr>
                                     <th class="p-4">Producto del Menú</th>
                                     <th class="p-4">Precio Público</th>
-                                    <th class="p-4 text-center text-amber-600 bg-amber-50">Consume</th>
-                                    <th class="p-4 text-center text-amber-600 bg-amber-50">Insumo Maestro / Stock</th>
+                                    <th class="p-4 text-center">Receta (Consume)</th>
                                     <th class="p-4 text-center">Órdenes Vendidas</th>
-                                    <th class="p-4 text-center">Acción</th>
+                                    <th class="p-4 text-center w-48">Acción</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-sm">
                                 ${MENU.map(item => {
-                                    // Buscar inventario maestro vinculado a este item
-                                    const masterInv = MASTER_INVENTORY.find(inv => inv.id === item.invId) || { name: 'Sin Insumo', stock: 0 };
-                                    
+                                    const masterInv = MASTER_INVENTORY.find(inv => inv.id === item.invId) || { name: 'Sin Insumo vinculado', stock: 0 };
                                     return `
                                     <tr class="hover:bg-slate-50 transition">
                                         <td class="p-4">
@@ -334,102 +368,152 @@
                                             <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">${item.category}</span>
                                         </td>
                                         <td class="p-4 text-blue-600 font-black text-lg">$${item.price}</td>
-                                        <td class="p-4 text-center font-bold text-slate-600 bg-amber-50/30 border-l border-amber-100">
-                                            ${item.invCost || 0} un.
-                                        </td>
-                                        <td class="p-4 text-center bg-amber-50/30 border-r border-amber-100">
-                                            <div class="text-xs font-bold text-slate-500 mb-1">${masterInv.name}</div>
-                                            <div class="text-base font-black ${masterInv.stock > 10 ? 'text-green-600' : (masterInv.stock > 0 ? 'text-amber-500' : 'text-red-500')}">${masterInv.stock} disponibles</div>
+                                        <td class="p-4 text-center">
+                                            <div class="font-bold text-slate-600">${item.invCost || 0} de:</div>
+                                            <div class="text-xs text-slate-400 mt-1 truncate max-w-[200px] mx-auto">${masterInv.name}</div>
                                         </td>
                                         <td class="p-4 text-slate-500 font-bold text-center text-base">${item.sold_since_update || 0}</td>
                                         <td class="p-4 text-center">
-                                            <button onclick="window.openEditItemModal('${item.id}')" class="bg-blue-50 border border-blue-100 text-blue-600 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-pen-to-square"></i> Configurar</button>
+                                            <button onclick="window.openEditMenuItemModal('${item.id}')" class="bg-blue-50 border border-blue-100 text-blue-600 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-pen-to-square"></i> Modificar</button>
                                         </td>
                                     </tr>
                                 `}).join('')}
                             </tbody>
                         </table>
                     </div>
+                `;
+            }
+
+            let html = `
+                <div class="p-4 md:p-8 max-w-6xl mx-auto pb-24">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-black text-slate-800">Panel de Administración</h2>
+                            <p class="text-sm text-slate-500 font-medium">Gestiona el almacén y el punto de venta por separado.</p>
+                        </div>
+                        <button onclick="window.openChangePinModal()" class="bg-white border border-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-bold hover:bg-slate-50 hover:text-blue-600 transition text-sm shadow-sm flex items-center gap-2"><i class="fa-solid fa-key"></i> Cambiar PIN</button>
+                    </div>
+
+                    <!-- Botones de Navegación Admin -->
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="window.switchAdminMainTab('inventory')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'inventory' ? activeClass : inactiveClass}">
+                            <i class="fa-solid fa-warehouse mr-2"></i> Lista de Almacén (Insumos)
+                        </button>
+                        <button onclick="window.switchAdminMainTab('menu')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'menu' ? activeClass : inactiveClass}">
+                            <i class="fa-solid fa-book-open mr-2"></i> Lista de Menú (Punto de Venta)
+                        </button>
+                    </div>
+                    
+                    ${contentHtml}
                 </div>
             `;
             document.getElementById('content-area').innerHTML = html;
         }
 
-        window.openEditItemModal = function(id) {
-            const item = MENU.find(i => i.id === id);
-            const masterInv = MASTER_INVENTORY.find(inv => inv.id === item.invId) || { id: 'none', name: 'Sin Insumo Maestro', stock: 0 };
-
+        // --- EDICIÓN DE INVENTARIO MAESTRO ---
+        window.openEditMasterInvModal = function(invId) {
+            const inv = MASTER_INVENTORY.find(i => i.id === invId);
             document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 bg-white relative">
+                <div class="p-6 bg-white relative border-t-8 border-amber-500 rounded-t-xl">
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight">${item.name}</h3>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-6 pb-4 border-b border-slate-100">Panel de Receta e Inventario</p>
+                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-boxes-stacked text-amber-500 mr-2"></i> Ajustar Almacén</h3>
+                    <p class="text-sm text-slate-500 font-bold mb-6">${inv.name}</p>
                     
-                    <div class="space-y-4 mb-6">
-                        <!-- PRECIO MENÚ -->
-                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-tag text-blue-500"></i> Precio Público (Menú)</label>
-                            <div class="flex items-center">
-                                <span class="text-slate-400 text-2xl font-bold ml-2 mr-1">$</span>
-                                <input type="number" id="edit-item-price" value="${item.price}" class="w-full text-2xl font-black p-2 bg-transparent border-b-2 border-slate-300 focus:border-blue-500 outline-none text-blue-600 rounded-none">
-                            </div>
-                        </div>
-                        
-                        <!-- RECETA (CUÁNTO CONSUME) -->
-                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                            <label class="text-xs font-bold text-amber-700 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-scale-balanced"></i> Porción (Descuenta por Orden)</label>
-                            <input type="number" step="0.1" id="edit-item-cost" value="${item.invCost || 1}" class="w-full text-xl font-black p-3 bg-white border border-amber-200 rounded-lg focus:border-amber-500 outline-none text-amber-700">
-                            <p class="text-[10px] font-medium text-amber-600 mt-2 leading-tight">Ej. Si es 1/2 litro, pon 0.5. Si trae 8 alitas, pon 8.</p>
-                        </div>
-
-                        <!-- STOCK MAESTRO -->
-                        <div class="bg-green-50 p-4 rounded-xl border border-green-200 relative overflow-hidden">
-                            <div class="absolute right-0 top-0 text-6xl text-green-500 opacity-10 -mr-2 -mt-2"><i class="fa-solid fa-boxes-stacked"></i></div>
-                            <label class="text-xs font-bold text-green-700 uppercase flex items-center gap-2 mb-1 relative z-10">Inventario Maestro Vinculado</label>
-                            <p class="font-bold text-slate-800 text-sm mb-3 relative z-10">${masterInv.name}</p>
-                            <label class="text-[10px] font-bold text-green-600 uppercase mb-1 block relative z-10">Stock Real Disponible</label>
-                            <input type="number" step="0.5" id="edit-master-stock" value="${masterInv.stock}" class="w-full text-2xl font-black p-3 bg-white border border-green-300 rounded-lg focus:border-green-500 outline-none text-green-700 relative z-10">
-                            <p class="text-[10px] font-medium text-green-700 mt-2 leading-tight relative z-10"><i class="fa-solid fa-circle-info mr-1"></i> Al modificar este Stock, las "Órdenes Vendidas" de este producto volverán a 0.</p>
-                        </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
+                        <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Stock Físico Real</label>
+                        <input type="number" step="0.5" id="edit-master-stock-val" value="${inv.stock}" class="w-full text-4xl text-center font-black p-4 bg-white border border-slate-300 focus:border-amber-500 outline-none text-amber-600 rounded-xl shadow-sm">
+                        <p class="text-[11px] font-medium text-amber-700 mt-3 bg-amber-100/50 p-2 rounded border border-amber-200"><i class="fa-solid fa-circle-info mr-1"></i> Al guardar, los contadores de "Vendidos" de los productos del menú vinculados a este insumo volverán a 0.</p>
                     </div>
 
                     <div class="flex gap-3">
                         <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.saveItemUpdate('${item.id}', '${masterInv.id}', ${masterInv.stock})" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition active:scale-95">Guardar Todo</button>
+                        <button onclick="window.saveMasterInvUpdate('${inv.id}', ${inv.stock})" class="flex-[2] bg-amber-500 text-white font-bold rounded-xl py-4 shadow-md hover:bg-amber-600 transition active:scale-95 text-lg">Guardar Stock</button>
                     </div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
 
-        window.saveItemUpdate = async function(menuId, invId, oldStock) {
-            const newPrice = parseFloat(document.getElementById('edit-item-price').value) || 0;
-            const newCost = parseFloat(document.getElementById('edit-item-cost').value) || 0;
-            const newStock = parseFloat(document.getElementById('edit-master-stock').value) || 0;
-            
-            try {
-                // Actualiza propiedades del Menú
-                let menuUpdates = {
-                    price: newPrice,
-                    invCost: newCost,
-                    last_updated: firebase.firestore.FieldValue.serverTimestamp()
-                };
+        window.saveMasterInvUpdate = async function(invId, oldStock) {
+            const newStock = parseFloat(document.getElementById('edit-master-stock-val').value) || 0;
+            if (newStock === oldStock) {
+                window.closeModal();
+                return;
+            }
 
-                // Si detecta un cambio manual en el stock físico, resetea el contador de ventas de esta receta
-                if (newStock !== oldStock) {
-                    menuUpdates.sold_since_update = 0;
-                    
-                    // Actualiza el stock del Inventario Maestro
-                    if (invId !== 'none') {
-                        await db.collection('inventory').doc(invId).update({
-                            stock: newStock
-                        });
-                    }
+            try {
+                // 1. Actualizar el stock
+                await db.collection('inventory').doc(invId).update({ stock: newStock });
+
+                // 2. Buscar todos los items del menú que usan este invId y resetear sus ventas
+                const itemsToReset = MENU.filter(m => m.invId === invId);
+                if (itemsToReset.length > 0) {
+                    const batch = db.batch();
+                    itemsToReset.forEach(item => {
+                        const ref = db.collection('menu_items').doc(item.id);
+                        batch.update(ref, { sold_since_update: 0 });
+                    });
+                    await batch.commit();
                 }
 
-                await db.collection('menu_items').doc(menuId).update(menuUpdates);
-                
                 window.closeModal();
-            } catch(e) { alert("Error al actualizar: " + e.message); }
+            } catch(e) { alert("Error al actualizar inventario: " + e.message); }
+        }
+
+        // --- EDICIÓN DE MENÚ Y RECETA ---
+        window.openEditMenuItemModal = function(menuId) {
+            const item = MENU.find(i => i.id === menuId);
+            const currentInvId = item.invId || 'none';
+
+            const invOptions = MASTER_INVENTORY.map(inv => 
+                `<option value="${inv.id}" ${inv.id === currentInvId ? 'selected' : ''}>${inv.name}</option>`
+            ).join('');
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="p-6 bg-white relative border-t-8 border-blue-600 rounded-t-xl">
+                    <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-book-open text-blue-500 mr-2"></i> Ajustar Menú</h3>
+                    <p class="text-sm text-slate-500 font-bold mb-6">${item.name}</p>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <label class="text-xs font-bold text-blue-700 uppercase flex items-center gap-2 mb-2">Precio de Venta ($)</label>
+                            <input type="number" id="edit-menu-price" value="${item.price}" class="w-full text-2xl font-black p-3 bg-white border border-blue-200 focus:border-blue-500 outline-none text-blue-700 rounded-xl shadow-sm">
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-link"></i> Insumo del almacén asociado</label>
+                            <select id="edit-menu-invid" class="w-full text-sm font-bold p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 mb-4 shadow-sm">
+                                <option value="none">-- No descontar de almacén --</option>
+                                ${invOptions}
+                            </select>
+
+                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-scale-balanced"></i> Porción a descontar por orden</label>
+                            <input type="number" step="0.1" id="edit-menu-cost" value="${item.invCost || 1}" class="w-full text-xl font-black p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 shadow-sm">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
+                        <button onclick="window.saveMenuItemUpdate('${item.id}')" class="flex-[2] bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition active:scale-95 text-lg">Guardar Receta</button>
+                    </div>
+                </div>`;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        window.saveMenuItemUpdate = async function(menuId) {
+            const newPrice = parseFloat(document.getElementById('edit-menu-price').value) || 0;
+            const newCost = parseFloat(document.getElementById('edit-menu-cost').value) || 0;
+            const invId = document.getElementById('edit-menu-invid').value;
+            
+            try {
+                await db.collection('menu_items').doc(menuId).update({
+                    price: newPrice,
+                    invCost: newCost,
+                    invId: invId === 'none' ? null : invId,
+                    last_updated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                window.closeModal();
+            } catch(e) { alert("Error al actualizar menú: " + e.message); }
         }
 
         // ==========================================
