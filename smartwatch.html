@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A-LAS Watch</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FIREBASE COMPAT -->
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background-color: #000000; /* Fondo negro puro para OLED */
+            color: #ffffff;
+            user-select: none; 
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Simulación de la esfera del reloj para navegador, en un reloj real ocupará el 100% */
+        #watch-face {
+            width: 100vw;
+            height: 100vh;
+            max-width: 320px;
+            max-height: 320px;
+            border-radius: 50%;
+            background-color: #0f172a;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        @media (min-width: 400px) {
+            #watch-face {
+                border: 8px solid #333;
+            }
+        }
+
+        /* Padding vertical extremo para que el contenido pase por el centro (la parte ancha del círculo) */
+        #content {
+            padding: 60px 20px;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        .watch-btn {
+            width: 100%;
+            background-color: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 999px;
+            padding: 14px 20px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.1s, background-color 0.1s;
+        }
+        .watch-btn:active {
+            transform: scale(0.95);
+            background-color: #3b82f6;
+            border-color: #60a5fa;
+        }
+
+        .watch-title {
+            font-size: 14px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="watch-face" class="no-scrollbar">
+        <div id="content">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500 my-auto mt-20"></i>
+            <p class="text-xs text-slate-400 mt-2">Conectando...</p>
+        </div>
+    </div>
+
+    <!-- Tostada de notificación en el reloj -->
+    <div id="toast" class="fixed top-[20%] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none z-50 shadow-lg flex items-center gap-2">
+        <i class="fa-solid fa-check"></i> <span id="toast-msg">Agregado</span>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE FIREBASE (Misma que index.html)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBqrR3FQ7L7KCE5Wg8thRvyA6GpiUV2DPs",
+            authDomain: "alasdebarrilwings.firebaseapp.com",
+            projectId: "alasdebarrilwings",
+            storageBucket: "alasdebarrilwings.firebasestorage.app",
+            messagingSenderId: "826542576836",
+            appId: "1:826542576836:web:dd1bc6f8bc4fd73d57a591"
+        };
+
+        let app, auth, db;
+        let MENU = [];
+        let tablesData = [];
+        let ordersData = [];
+        let currentTableId = null;
+        let viewState = 'home'; // home | table | fastMenu
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 1500);
+        }
+
+        function renderHome() {
+            viewState = 'home';
+            currentTableId = null;
+            const openTables = tablesData.filter(t => t.status === 'open').sort((a,b) => (b.openedAt?.seconds||0) - (a.openedAt?.seconds||0));
+
+            let html = `<div class="watch-title"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> A-LAS BARRIL</div>`;
+            
+            if(openTables.length === 0) {
+                html += `<div class="text-sm text-slate-500 mt-10 text-center">No hay mesas abiertas</div>`;
+            } else {
+                html += openTables.map(t => {
+                    const isVip = t.isVip ? '<i class="fa-solid fa-crown text-pink-500 ml-1 text-[10px]"></i>' : '';
+                    return `
+                    <button onclick="renderTableDetail('${t.id}')" class="watch-btn">
+                        <span class="truncate">Mesa ${t.number} ${isVip}</span>
+                    </button>`;
+                }).join('');
+            }
+            
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function renderTableDetail(tid) {
+            viewState = 'table';
+            currentTableId = tid;
+            const t = tablesData.find(x => x.id === tid);
+            if(!t) return renderHome();
+
+            const ords = ordersData.filter(o => o.tableId === tid && o.status !== 'cancelled');
+            const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
+            
+            let html = `
+                <button onclick="renderHome()" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-2 active:bg-slate-700">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="text-2xl font-black text-white">Mesa ${t.number}</div>
+                <div class="text-[10px] text-slate-400 truncate w-full px-4 mb-2 text-center">${t.nickname}</div>
+                
+                <div class="text-3xl font-black text-blue-400 mb-4">$${total}</div>
+                
+                <button onclick="renderFastMenu()" class="watch-btn !bg-green-600 !border-green-500 mb-2">
+                    <i class="fa-solid fa-plus"></i> Rápido
+                </button>
+            `;
+            document.getElementById('content').innerHTML = html;
+        }
+
+        function renderFastMenu() {
+            viewState = 'fastMenu';
+            let html = `
+                <button onclick="renderTableDetail('${currentTableId}')" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-2 active:bg-slate-700">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="watch-title mb-4">Añadir Rápido</div>
+            `;
+
+            // Filtrar solo los más comunes para el reloj
+            const topItems = MENU.slice(0, 15); // Mostrar los primeros 15 para no saturar la memoria del reloj
+
+            html += topItems.map(i => `
+                <button onclick="fastAdd('${i.id}')" class="watch-btn !justify-between !px-5 w-full">
+                    <span class="truncate text-sm flex-1 text-left">${i.name}</span>
+                    <span class="text-xs text-blue-400 font-bold bg-slate-800 px-2 py-1 rounded-full shrink-0">$${i.price}</span>
+                </button>
+            `).join('');
+
+            document.getElementById('content').innerHTML = html;
+        }
+
+        window.fastAdd = async function(itemId) {
+            const item = MENU.find(i => i.id === itemId);
+            if(!item || !currentTableId) return;
+
+            // Feedback visual en el reloj para confirmar toque
+            showToast("+$" + item.price);
+            
+            try {
+                await db.collection('orders').add({
+                    tableId: currentTableId, 
+                    itemId: item.id, 
+                    itemName: item.name, 
+                    category: item.category,
+                    price: item.price, 
+                    quantity: 1, 
+                    modifiers: ['Cobro reloj'], 
+                    status: 'delivered', 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                if (item.invId) {
+                    await db.collection('menu_items').doc(item.id).update({
+                        sold_since_update: firebase.firestore.FieldValue.increment(1)
+                    });
+                    await db.collection('inventory').doc(item.invId).update({
+                        stock: firebase.firestore.FieldValue.increment(-(item.invCost || 1))
+                    });
+                }
+            } catch(e) {
+                console.error("Error watch order:", e);
+                showToast("Error de red");
+            }
+        }
+
+        // ==========================================
+        // ARRANQUE FIREBASE
+        // ==========================================
+        try {
+            firebase.initializeApp(firebaseConfig); 
+            auth = firebase.auth(); 
+            db = firebase.firestore();
+            
+            db.enablePersistence({synchronizeTabs:true}).catch(err => console.warn("Offline:", err.code));
+            
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Menu
+                    db.collection('menu_items').onSnapshot(s => {
+                        if (!s.empty) {
+                            MENU = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (a.order || 0) - (b.order || 0));
+                            if(viewState === 'fastMenu') renderFastMenu();
+                        }
+                    });
+
+                    // Tables y Orders (Limitados a 3 dias para no saturar memoria del reloj)
+                    const limitDate = new Date();
+                    limitDate.setDate(limitDate.getDate() - 3);
+                    const limitFb = firebase.firestore.Timestamp.fromDate(limitDate);
+
+                    db.collection('tables').where('openedAt', '>=', limitFb).onSnapshot(s => { 
+                        tablesData = s.docs.map(d=>({id:d.id, ...d.data()})); 
+                        if(viewState === 'home') renderHome(); 
+                        else if(viewState === 'table') renderTableDetail(currentTableId);
+                    });
+                    
+                    db.collection('orders').where('timestamp', '>=', limitFb).onSnapshot(s => { 
+                        ordersData = s.docs.map(d=>({id:d.id, ...d.data()})); 
+                        if(viewState === 'table') renderTableDetail(currentTableId);
+                    });
+                }
+            });
+
+            auth.signInAnonymously().catch(e => {
+                document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Error Auth: ${e.message}</p>`;
+            });
+
+        } catch (e) { 
+            document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Firebase Error: ${e.message}</p>`;
+        }
+    </script>
+</body>
+</html>
