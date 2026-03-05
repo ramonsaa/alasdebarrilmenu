@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>A-LAS Watch</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
+    <!-- Se eliminó el script pesado de Tailwind CSS para evitar Crash de Memoria en el Reloj -->
+    
+    <!-- Font Awesome (Iconos) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- FIREBASE COMPAT -->
@@ -16,43 +16,53 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
     <style>
+        /* =========================================================
+           CSS NATIVO ULTRALIGERO (Reemplazo optimizado de Tailwind)
+           ========================================================= */
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
-            background-color: #0f172a; /* Fondo azul muy oscuro directo al body */
+            background-color: #0f172a; 
             color: #ffffff;
             user-select: none; 
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow-y: auto; /* El scroll va directo en el body */
-            overflow-x: hidden;
+            margin: 0; padding: 0;
+            width: 100vw; height: 100vh;
+            overflow-y: auto; overflow-x: hidden;
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Contenedor principal que se adapta al 100% del reloj */
+        /* Layout Principal */
         #watch-face {
-            width: 100%;
-            min-height: 100%;
-            display: flex;
-            flex-direction: column;
-            /* Si se abre en PC, centrarlo */
-            max-width: 400px;
-            margin: 0 auto;
+            width: 100%; min-height: 100%;
+            display: flex; flex-direction: column;
+            max-width: 400px; margin: 0 auto;
         }
 
-        /* Padding vertical extremo para que los elementos se puedan desplazar 
-           hasta el centro del círculo de la pantalla y no queden escondidos arriba/abajo */
         #content {
             padding: 25% 10% 35% 10%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-grow: 1;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 12px; flex-grow: 1;
+        }
+
+        /* Utilidades de Texto y Color */
+        .text-center { text-align: center; }
+        .text-blue { color: #3b82f6; }
+        .text-blue-light { color: #60a5fa; }
+        .text-slate-light { color: #94a3b8; }
+        .text-slate-dim { color: #64748b; }
+        .text-red { color: #ef4444; }
+        .text-green { color: #4ade80; }
+        .text-amber { color: #fbbf24; }
+        .text-pink { color: #ec4899; }
+        .font-bold { font-weight: 700; }
+
+        /* Botones y UI */
+        .watch-title {
+            font-size: 14px; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 8px; text-align: center; font-weight: 800;
         }
 
         .watch-btn {
@@ -61,43 +71,103 @@
             border: 2px solid #334155;
             border-radius: 999px;
             padding: 16px 20px;
-            font-weight: bold;
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            font-weight: bold; font-size: 16px; color: white;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             transition: transform 0.1s, background-color 0.1s;
-            box-sizing: border-box;
+            box-sizing: border-box; cursor: pointer; outline: none;
         }
         .watch-btn:active {
             transform: scale(0.95);
-            background-color: #3b82f6;
-            border-color: #60a5fa;
+            background-color: #3b82f6; border-color: #60a5fa;
+        }
+        
+        .watch-btn-item {
+            justify-content: space-between;
+            padding-left: 24px; padding-right: 24px;
+        }
+        
+        .watch-btn.btn-green {
+            background-color: #16a34a; border-color: #22c55e;
+            box-shadow: 0 4px 14px rgba(20, 83, 45, 0.5);
+            padding-top: 16px; padding-bottom: 16px;
+        }
+        .watch-btn.btn-green:active { background-color: #15803d; border-color: #16a34a; }
+
+        .item-name {
+            font-size: 14px; flex: 1; text-align: left;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        
+        .item-price {
+            font-size: 12px; color: #4ade80; font-weight: 900;
+            background-color: #1e293b; padding: 6px 12px;
+            border-radius: 999px; border: 1px solid #334155;
+            flex-shrink: 0;
         }
 
-        .watch-title {
-            font-size: 14px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-align: center;
-            font-weight: 800;
+        .back-btn {
+            width: 48px; height: 48px;
+            background-color: #1e293b; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #cbd5e1; border: 1px solid #334155;
+            margin-bottom: 16px; font-size: 18px; cursor: pointer; outline: none;
         }
+        .back-btn:active { background-color: #334155; }
+
+        .table-title { font-size: 30px; font-weight: 900; color: white; margin-top: 8px; text-align: center;}
+        
+        .table-subtitle {
+            font-size: 11px; color: #94a3b8; text-transform: uppercase;
+            letter-spacing: 2px; overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; width: 100%; padding: 0 16px; text-align: center;
+            margin-bottom: 8px; box-sizing: border-box;
+        }
+        
+        .table-total {
+            font-size: 36px; font-weight: 900; color: #60a5fa;
+            background-color: rgba(30, 41, 59, 0.5); padding: 12px 24px;
+            border-radius: 24px; border: 1px solid #334155; margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .empty-state {
+            font-size: 14px; color: #94a3b8; margin-top: 16px; text-align: center;
+            background-color: rgba(30, 41, 59, 0.5); padding: 16px;
+            border-radius: 16px; border: 1px solid #334155; width: 100%; box-sizing: border-box;
+        }
+        
+        .error-state {
+            background-color: rgba(127, 29, 29, 0.5); padding: 16px; border-radius: 16px;
+            border: 1px solid #ef4444; color: white; font-size: 12px; text-align: center;
+        }
+
+        /* Notificación Flotante */
+        #toast {
+            position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
+            background-color: #22c55e; color: white; padding: 8px 16px;
+            border-radius: 999px; font-size: 12px; font-weight: bold;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            z-index: 50; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+        #toast.show { opacity: 1; }
+
+        /* Animación Carga */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .fa-spin { animation: spin 1s linear infinite; }
     </style>
 </head>
 <body class="no-scrollbar">
 
     <div id="watch-face">
         <div id="content">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
-            <p class="text-xs text-slate-400 mt-2 font-bold">Conectando...</p>
+            <i class="fa-solid fa-circle-notch fa-spin text-blue" style="font-size: 36px;"></i>
+            <p class="text-slate-light font-bold" style="font-size: 12px; margin-top: 8px;">Conectando...</p>
         </div>
     </div>
 
     <!-- Tostada de notificación -->
-    <div id="toast" class="fixed top-[15%] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none z-50 shadow-lg flex items-center gap-2">
+    <div id="toast">
         <i class="fa-solid fa-check"></i> <span id="toast-msg">Agregado</span>
     </div>
 
@@ -121,11 +191,9 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').innerText = msg;
-            toast.classList.remove('opacity-0');
-            toast.classList.add('opacity-100');
+            toast.classList.add('show');
             setTimeout(() => {
-                toast.classList.remove('opacity-100');
-                toast.classList.add('opacity-0');
+                toast.classList.remove('show');
             }, 1500);
         }
 
@@ -134,22 +202,22 @@
             currentTableId = null;
             const openTables = tablesData.filter(t => t.status === 'open').sort((a,b) => (b.openedAt?.seconds||0) - (a.openedAt?.seconds||0));
 
-            let html = `<div class="watch-title"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> A-LAS BARRIL</div>`;
+            let html = `<div class="watch-title"><i class="fa-solid fa-clock text-blue" style="margin-right:4px;"></i> A-LAS BARRIL</div>`;
             
             if(openTables.length === 0) {
-                html += `<div class="text-sm text-slate-500 mt-4 text-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700">No hay mesas abiertas</div>`;
+                html += `<div class="empty-state">No hay mesas abiertas</div>`;
             } else {
                 html += openTables.map(t => {
-                    const isVip = t.isVip ? '<i class="fa-solid fa-crown text-pink-500 ml-2 text-[10px]"></i>' : '';
+                    const isVip = t.isVip ? '<i class="fa-solid fa-crown text-pink" style="margin-left: 8px; font-size: 10px;"></i>' : '';
                     return `
                     <button onclick="renderTableDetail('${t.id}')" class="watch-btn">
-                        <span class="truncate text-lg">Mesa ${t.number}</span> ${isVip}
+                        <span class="truncate" style="font-size: 18px;">Mesa ${t.number}</span> ${isVip}
                     </button>`;
                 }).join('');
             }
             
             document.getElementById('content').innerHTML = html;
-            window.scrollTo(0, 0); // Regresar al tope de la pantalla
+            window.scrollTo(0, 0); 
         }
 
         function renderTableDetail(tid) {
@@ -162,15 +230,15 @@
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
             
             let html = `
-                <button onclick="renderHome()" class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-2 border border-slate-700 active:bg-slate-700">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                <button onclick="renderHome()" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div class="text-3xl font-black text-white mt-2">Mesa ${t.number}</div>
-                <div class="text-[11px] text-slate-400 truncate w-full px-4 mb-2 text-center uppercase tracking-widest">${t.nickname}</div>
+                <div class="table-title">Mesa ${t.number}</div>
+                <div class="table-subtitle">${t.nickname}</div>
                 
-                <div class="text-4xl font-black text-blue-400 mb-6 bg-slate-800/50 px-6 py-3 rounded-3xl border border-slate-700">$${total}</div>
+                <div class="table-total">$${total}</div>
                 
-                <button onclick="renderFastMenu()" class="watch-btn !bg-green-600 !border-green-500 !py-4 shadow-lg shadow-green-900/50">
+                <button onclick="renderFastMenu()" class="watch-btn btn-green">
                     <i class="fa-solid fa-bolt"></i> Cobro Rápido
                 </button>
             `;
@@ -181,17 +249,17 @@
         function renderFastMenu() {
             viewState = 'fastMenu';
             let html = `
-                <button onclick="renderTableDetail('${currentTableId}')" class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-4 border border-slate-700 active:bg-slate-700">
-                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                <button onclick="renderTableDetail('${currentTableId}')" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
                 </button>
-                <div class="watch-title mb-4"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Rápido</div>
+                <div class="watch-title"><i class="fa-solid fa-bolt text-amber" style="margin-right:4px;"></i> Rápido</div>
             `;
 
-            // Filtrar y mostrar todo el menú para el reloj (si son muchos, el usuario hará scroll)
+            // Filtrar y mostrar todo el menú
             html += MENU.map(i => `
-                <button onclick="fastAdd('${i.id}')" class="watch-btn !justify-between !px-6 w-full">
-                    <span class="truncate text-sm flex-1 text-left">${i.name}</span>
-                    <span class="text-xs text-green-400 font-black bg-slate-800 px-3 py-1.5 rounded-full shrink-0 border border-slate-700">$${i.price}</span>
+                <button onclick="fastAdd('${i.id}')" class="watch-btn watch-btn-item">
+                    <span class="item-name">${i.name}</span>
+                    <span class="item-price">$${i.price}</span>
                 </button>
             `).join('');
 
@@ -247,8 +315,8 @@
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     document.getElementById('content').innerHTML = `
-                        <i class="fa-solid fa-cloud-arrow-down fa-bounce text-4xl text-green-500"></i>
-                        <p class="text-xs text-slate-400 mt-2 font-bold">Cargando mesas...</p>
+                        <i class="fa-solid fa-cloud-arrow-down text-green" style="font-size: 36px; margin-bottom: 8px;"></i>
+                        <p class="text-slate-light font-bold" style="font-size: 12px;">Cargando mesas...</p>
                     `;
 
                     // Menu
@@ -269,7 +337,7 @@
                         if(viewState === 'home') renderHome(); 
                         else if(viewState === 'table') renderTableDetail(currentTableId);
                     }, e => {
-                        document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs px-4">Error Mesas: ${e.message}</p>`;
+                        document.getElementById('content').innerHTML = `<div class="error-state">Error Mesas: ${e.message}</div>`;
                     });
                     
                     db.collection('orders').where('timestamp', '>=', limitFb).onSnapshot(s => { 
@@ -280,11 +348,11 @@
             });
 
             auth.signInAnonymously().catch(e => {
-                document.getElementById('content').innerHTML = `<div class="bg-red-900/50 p-4 rounded-xl border border-red-500"><i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl mb-2"></i><p class="text-white text-xs text-center">Error de Conexión: ${e.message}</p></div>`;
+                document.getElementById('content').innerHTML = `<div class="error-state"><i class="fa-solid fa-triangle-exclamation" style="font-size:24px; margin-bottom:8px;"></i><br>Error de Conexión: ${e.message}</div>`;
             });
 
         } catch (e) { 
-            document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Error Crítico: ${e.message}</p>`;
+            document.getElementById('content').innerHTML = `<div class="error-state">Error Crítico: ${e.message}</div>`;
         }
     </script>
 </body>
