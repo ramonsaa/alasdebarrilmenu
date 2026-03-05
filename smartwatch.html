@@ -18,51 +18,41 @@
     <style>
         body { 
             font-family: system-ui, -apple-system, sans-serif; 
-            background-color: #000000; /* Fondo negro puro para OLED */
+            background-color: #0f172a; /* Fondo azul muy oscuro directo al body */
             color: #ffffff;
             user-select: none; 
             margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding: 0;
             width: 100vw;
-            overflow: hidden;
+            height: 100vh;
+            overflow-y: auto; /* El scroll va directo en el body */
+            overflow-x: hidden;
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Simulación de la esfera del reloj: se expande al 100% de la pantalla del smartwatch */
+        /* Contenedor principal que se adapta al 100% del reloj */
         #watch-face {
-            width: 100vw;
-            height: 100vh;
-            /* Eliminamos el max-width/max-height para que se expanda de borde a borde en el reloj */
-            border-radius: 50%;
-            background-color: #0f172a;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        /* Solo limitamos el tamaño si se abre en una computadora o tablet (pantalla mayor a 450px) */
-        @media (min-width: 450px) {
-            #watch-face {
-                max-width: 350px;
-                max-height: 350px;
-                border: 8px solid #333;
-            }
-        }
-
-        /* Padding vertical usando porcentajes para que la curvatura escale en cualquier reloj */
-        #content {
-            padding: 18% 10%;
+            width: 100%;
             min-height: 100%;
             display: flex;
             flex-direction: column;
+            /* Si se abre en PC, centrarlo */
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Padding vertical extremo para que los elementos se puedan desplazar 
+           hasta el centro del círculo de la pantalla y no queden escondidos arriba/abajo */
+        #content {
+            padding: 25% 10% 35% 10%;
+            display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: center;
             gap: 12px;
+            flex-grow: 1;
         }
 
         .watch-btn {
@@ -70,7 +60,7 @@
             background-color: #1e293b;
             border: 2px solid #334155;
             border-radius: 999px;
-            padding: 14px 20px;
+            padding: 16px 20px;
             font-weight: bold;
             font-size: 16px;
             display: flex;
@@ -78,6 +68,7 @@
             justify-content: center;
             gap: 10px;
             transition: transform 0.1s, background-color 0.1s;
+            box-sizing: border-box;
         }
         .watch-btn:active {
             transform: scale(0.95);
@@ -90,27 +81,27 @@
             color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             text-align: center;
+            font-weight: 800;
         }
     </style>
 </head>
-<body>
+<body class="no-scrollbar">
 
-    <div id="watch-face" class="no-scrollbar">
+    <div id="watch-face">
         <div id="content">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500 my-auto mt-20"></i>
-            <p class="text-xs text-slate-400 mt-2">Conectando...</p>
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-blue-500"></i>
+            <p class="text-xs text-slate-400 mt-2 font-bold">Conectando...</p>
         </div>
     </div>
 
-    <!-- Tostada de notificación en el reloj -->
-    <div id="toast" class="fixed top-[20%] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none z-50 shadow-lg flex items-center gap-2">
+    <!-- Tostada de notificación -->
+    <div id="toast" class="fixed top-[15%] left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 transition-opacity duration-300 pointer-events-none z-50 shadow-lg flex items-center gap-2">
         <i class="fa-solid fa-check"></i> <span id="toast-msg">Agregado</span>
     </div>
 
     <script>
-        // CONFIGURACIÓN DE FIREBASE (Misma que index.html)
         const firebaseConfig = {
             apiKey: "AIzaSyBqrR3FQ7L7KCE5Wg8thRvyA6GpiUV2DPs",
             authDomain: "alasdebarrilwings.firebaseapp.com",
@@ -125,7 +116,7 @@
         let tablesData = [];
         let ordersData = [];
         let currentTableId = null;
-        let viewState = 'home'; // home | table | fastMenu
+        let viewState = 'home';
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -146,18 +137,19 @@
             let html = `<div class="watch-title"><i class="fa-solid fa-clock text-blue-500 mr-1"></i> A-LAS BARRIL</div>`;
             
             if(openTables.length === 0) {
-                html += `<div class="text-sm text-slate-500 mt-10 text-center">No hay mesas abiertas</div>`;
+                html += `<div class="text-sm text-slate-500 mt-4 text-center bg-slate-800/50 p-4 rounded-2xl border border-slate-700">No hay mesas abiertas</div>`;
             } else {
                 html += openTables.map(t => {
-                    const isVip = t.isVip ? '<i class="fa-solid fa-crown text-pink-500 ml-1 text-[10px]"></i>' : '';
+                    const isVip = t.isVip ? '<i class="fa-solid fa-crown text-pink-500 ml-2 text-[10px]"></i>' : '';
                     return `
                     <button onclick="renderTableDetail('${t.id}')" class="watch-btn">
-                        <span class="truncate">Mesa ${t.number} ${isVip}</span>
+                        <span class="truncate text-lg">Mesa ${t.number}</span> ${isVip}
                     </button>`;
                 }).join('');
             }
             
             document.getElementById('content').innerHTML = html;
+            window.scrollTo(0, 0); // Regresar al tope de la pantalla
         }
 
         function renderTableDetail(tid) {
@@ -170,48 +162,48 @@
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
             
             let html = `
-                <button onclick="renderHome()" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-2 active:bg-slate-700">
-                    <i class="fa-solid fa-arrow-left"></i>
+                <button onclick="renderHome()" class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-2 border border-slate-700 active:bg-slate-700">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
-                <div class="text-2xl font-black text-white">Mesa ${t.number}</div>
-                <div class="text-[10px] text-slate-400 truncate w-full px-4 mb-2 text-center">${t.nickname}</div>
+                <div class="text-3xl font-black text-white mt-2">Mesa ${t.number}</div>
+                <div class="text-[11px] text-slate-400 truncate w-full px-4 mb-2 text-center uppercase tracking-widest">${t.nickname}</div>
                 
-                <div class="text-3xl font-black text-blue-400 mb-4">$${total}</div>
+                <div class="text-4xl font-black text-blue-400 mb-6 bg-slate-800/50 px-6 py-3 rounded-3xl border border-slate-700">$${total}</div>
                 
-                <button onclick="renderFastMenu()" class="watch-btn !bg-green-600 !border-green-500 mb-2">
-                    <i class="fa-solid fa-plus"></i> Rápido
+                <button onclick="renderFastMenu()" class="watch-btn !bg-green-600 !border-green-500 !py-4 shadow-lg shadow-green-900/50">
+                    <i class="fa-solid fa-bolt"></i> Cobro Rápido
                 </button>
             `;
             document.getElementById('content').innerHTML = html;
+            window.scrollTo(0, 0);
         }
 
         function renderFastMenu() {
             viewState = 'fastMenu';
             let html = `
-                <button onclick="renderTableDetail('${currentTableId}')" class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-400 mb-2 active:bg-slate-700">
-                    <i class="fa-solid fa-arrow-left"></i>
+                <button onclick="renderTableDetail('${currentTableId}')" class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-slate-300 mb-4 border border-slate-700 active:bg-slate-700">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
                 </button>
-                <div class="watch-title mb-4">Añadir Rápido</div>
+                <div class="watch-title mb-4"><i class="fa-solid fa-bolt text-amber-400 mr-1"></i> Rápido</div>
             `;
 
-            // Filtrar solo los más comunes para el reloj
-            const topItems = MENU.slice(0, 15); // Mostrar los primeros 15 para no saturar la memoria del reloj
-
-            html += topItems.map(i => `
-                <button onclick="fastAdd('${i.id}')" class="watch-btn !justify-between !px-5 w-full">
+            // Filtrar y mostrar todo el menú para el reloj (si son muchos, el usuario hará scroll)
+            html += MENU.map(i => `
+                <button onclick="fastAdd('${i.id}')" class="watch-btn !justify-between !px-6 w-full">
                     <span class="truncate text-sm flex-1 text-left">${i.name}</span>
-                    <span class="text-xs text-blue-400 font-bold bg-slate-800 px-2 py-1 rounded-full shrink-0">$${i.price}</span>
+                    <span class="text-xs text-green-400 font-black bg-slate-800 px-3 py-1.5 rounded-full shrink-0 border border-slate-700">$${i.price}</span>
                 </button>
             `).join('');
 
             document.getElementById('content').innerHTML = html;
+            window.scrollTo(0, 0);
         }
 
         window.fastAdd = async function(itemId) {
             const item = MENU.find(i => i.id === itemId);
             if(!item || !currentTableId) return;
 
-            // Feedback visual en el reloj para confirmar toque
+            // Feedback visual inmediato en el reloj
             showToast("+$" + item.price);
             
             try {
@@ -222,7 +214,7 @@
                     category: item.category,
                     price: item.price, 
                     quantity: 1, 
-                    modifiers: ['Cobro reloj'], 
+                    modifiers: ['Añadido desde Reloj'], 
                     status: 'delivered', 
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -242,17 +234,23 @@
         }
 
         // ==========================================
-        // ARRANQUE FIREBASE
+        // ARRANQUE FIREBASE (OPTIMIZADO PARA RELOJ)
         // ==========================================
         try {
             firebase.initializeApp(firebaseConfig); 
             auth = firebase.auth(); 
             db = firebase.firestore();
             
-            db.enablePersistence({synchronizeTabs:true}).catch(err => console.warn("Offline:", err.code));
+            // ELIMINADA la persistencia de datos (enablePersistence) para evitar bloqueos
+            // en navegadores limitados de Smartwatches.
             
             auth.onAuthStateChanged((user) => {
                 if (user) {
+                    document.getElementById('content').innerHTML = `
+                        <i class="fa-solid fa-cloud-arrow-down fa-bounce text-4xl text-green-500"></i>
+                        <p class="text-xs text-slate-400 mt-2 font-bold">Cargando mesas...</p>
+                    `;
+
                     // Menu
                     db.collection('menu_items').onSnapshot(s => {
                         if (!s.empty) {
@@ -261,7 +259,7 @@
                         }
                     });
 
-                    // Tables y Orders (Limitados a 3 dias para no saturar memoria del reloj)
+                    // Limitamos la lectura de Firebase solo a 3 días
                     const limitDate = new Date();
                     limitDate.setDate(limitDate.getDate() - 3);
                     const limitFb = firebase.firestore.Timestamp.fromDate(limitDate);
@@ -270,6 +268,8 @@
                         tablesData = s.docs.map(d=>({id:d.id, ...d.data()})); 
                         if(viewState === 'home') renderHome(); 
                         else if(viewState === 'table') renderTableDetail(currentTableId);
+                    }, e => {
+                        document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs px-4">Error Mesas: ${e.message}</p>`;
                     });
                     
                     db.collection('orders').where('timestamp', '>=', limitFb).onSnapshot(s => { 
@@ -280,11 +280,11 @@
             });
 
             auth.signInAnonymously().catch(e => {
-                document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Error Auth: ${e.message}</p>`;
+                document.getElementById('content').innerHTML = `<div class="bg-red-900/50 p-4 rounded-xl border border-red-500"><i class="fa-solid fa-triangle-exclamation text-red-500 text-2xl mb-2"></i><p class="text-white text-xs text-center">Error de Conexión: ${e.message}</p></div>`;
             });
 
         } catch (e) { 
-            document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Firebase Error: ${e.message}</p>`;
+            document.getElementById('content').innerHTML = `<p class="text-red-500 text-xs text-center px-4">Error Crítico: ${e.message}</p>`;
         }
     </script>
 </body>
