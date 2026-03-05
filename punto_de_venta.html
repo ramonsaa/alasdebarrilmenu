@@ -18,12 +18,30 @@
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 
     <style>
-        body { 
+        /* FIX DE ALTURA PARA TABLETS Y NAVEGADORES MÓVILES */
+        html, body { 
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             background-color: #f1f5f9; /* Slate 100 */
             color: #1e293b; /* Slate 800 */
             user-select: none; 
-            overflow: hidden; /* Evita scroll en el body, se maneja por paneles */
+            margin: 0;
+            padding: 0;
+            /* Evita el scroll general de la página para simular una app nativa */
+            overflow: hidden; 
+            /* Se ancla a las dimensiones exactas de la ventana visible */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100%;
+            height: 100dvh; /* Altura dinámica que se ajusta si la barra del navegador aparece/desaparece */
+        }
+        
+        /* Compatibilidad para Safari antiguo en iOS */
+        @supports (-webkit-touch-callout: none) {
+            html, body {
+                height: -webkit-fill-available;
+            }
         }
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -67,7 +85,7 @@
         .slide-in { animation: slideIn 0.2s ease-out forwards; }
     </style>
 </head>
-<body class="h-screen w-full flex flex-col">
+<body class="flex flex-col">
 
     <!-- Header Global -->
     <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-20 shrink-0">
@@ -139,7 +157,7 @@
         let isCobrarMode = false; 
         let localFastOrders = {};
         let appInitialized = false;
-        let scrollPositions = { menu: 0, orders: 0 }; // <--- Variable recuperada para evitar errores
+        let scrollPositions = { menu: 0, orders: 0 };
 
         let MENU = [];
         let MASTER_INVENTORY = [];
@@ -800,6 +818,44 @@
                     </div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        window.submitPackageOrder = async function(itemId) {
+            const item = MENU.find(i => i.id === itemId);
+            let kitchenMods = [];
+            let barMods = [];
+
+            const getRadio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || 'Sin elección';
+            const getChecks = (cls) => Array.from(document.querySelectorAll(`.${cls}:checked`)).map(c => c.value).join(', ');
+            const getBeer = (n) => `T${n}: ${document.getElementById(`p_beer_type_${n}`).value}, ${document.getElementById(`p_beer_prep_${n}`).value}` + (document.getElementById(`p_beer_nolimon_${n}`).checked ? ' (Sin Limón)' : '');
+
+            if(itemId === 'p1') {
+                kitchenMods.push(`Alitas: ${getRadio('p1_salsa_alitas')}`);
+                kitchenMods.push(`Boneless: ${getRadio('p1_salsa_boneless')}`);
+                kitchenMods.push(`Guarnición: ${getRadio('p1_side')}`);
+                barMods.push(getBeer(1));
+                barMods.push(getBeer(2));
+            } else if(itemId === 'p2') {
+                kitchenMods.push(`Principal: ${getRadio('p2_main')} (${getRadio('p2_salsa_main')})`);
+                kitchenMods.push(`Burg 1: ${getChecks('p2_h1_mod') || 'Sencilla'}`);
+                kitchenMods.push(`Burg 2: ${getChecks('p2_h2_mod') || 'Sencilla'}`);
+                kitchenMods.push(`Guarnición: ${getRadio('p2_side')} (${getChecks('p2_side_mod')})`);
+                barMods.push(getBeer(1));
+                barMods.push(getBeer(2));
+            } else if(itemId === 'p3') {
+                kitchenMods.push(`Alitas: ${getRadio('p3_salsa_alitas')}`);
+                kitchenMods.push(`Boneless: ${getRadio('p3_salsa_boneless')}`);
+                kitchenMods.push(`Aros: ${getChecks('p3_aros_mod')}`);
+                kitchenMods.push(`3 HotDogs: ${getChecks('p3_hd_mod')}`);
+                barMods.push(`3 Tarros: ${document.getElementById('p3_beer_type').value}, ${document.getElementById('p3_beer_prep').value}` + (document.getElementById('p3_beer_nolimon').checked ? ' (Sin Limón)' : ''));
+            }
+
+            // Para los paquetes, registramos y solo bajamos inventario con el primero
+            await window.addOrderToDb(item, item.price, 1, kitchenMods, `${item.name} (Cocina)`, 'kitchen', true);
+            await window.addOrderToDb(item, 0, 1, barMods, `${item.name} (Barra)`, 'bar', false); 
+            
+            window.closeModal();
+            window.renderSplitScreenPOS(currentTableId);
         }
 
         window.selectRadio = function(el, groupId) { const group = document.getElementById(groupId); if(group) { group.querySelectorAll('.beer-radio, .prep-radio').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); } }
