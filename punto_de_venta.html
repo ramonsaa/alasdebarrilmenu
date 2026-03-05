@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -105,7 +104,7 @@
         </div>
 
         <div class="flex gap-2 md:gap-3">
-             <button onclick="toggleFullScreen()" class="text-sm bg-slate-700 border border-slate-600 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-slate-600 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer" title="Pantalla Completa">
+             <button onclick="window.toggleFullScreen()" class="text-sm bg-slate-700 border border-slate-600 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-slate-600 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer" title="Pantalla Completa">
                 <i class="fa-solid fa-expand"></i>
             </button>
             <a href="index.html" class="text-sm bg-slate-800 border border-slate-700 px-3 py-2 md:px-5 md:py-2.5 rounded-xl hover:bg-slate-700 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer no-underline">
@@ -133,9 +132,8 @@
         // ==========================================
         // FUNCION PANTALLA COMPLETA
         // ==========================================
-        function toggleFullScreen() {
-            if (!document.fullscreenElement &&    // alternative standard method
-                !document.mozFullScreenElement && !document.webkitFullscreenElement) {  // current working methods
+        window.toggleFullScreen = function() {
+            if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
                 if (document.documentElement.requestFullscreen) {
                     document.documentElement.requestFullscreen();
                 } else if (document.documentElement.mozRequestFullScreen) {
@@ -459,6 +457,8 @@
             if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
 
             try {
+                // Al enviar un pedido rápido, en vez de marcarlo como "delivered", lo mandamos como "ordered"
+                // para que aparezca correctamente en las pantallas de Cocina o Barra y siga su flujo natural.
                 const promises = orders.map(o => window.addOrderToDb(o.item, o.finalPrice, o.quantity, ['Cobro rápido'], o.finalName, o.item.category, true, 'ordered'));
                 
                 await Promise.all(promises);
