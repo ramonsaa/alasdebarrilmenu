@@ -427,6 +427,55 @@
             window.renderSplitScreenPOS(currentTableId);
         }
 
+        // ==========================================
+        // FUNCIONES DE COBRO RÁPIDO (Memoria Local)
+        // ==========================================
+        window.fastAddOrder = function(itemId) {
+            const item = MENU.find(i => i.id === itemId);
+            if (!localFastOrders[itemId]) {
+                localFastOrders[itemId] = { item: item, quantity: 0, finalPrice: item.price, finalName: item.name };
+            }
+            localFastOrders[itemId].quantity += 1;
+            window.renderSplitScreenPOS(currentTableId); // Re-renderiza el lado derecho
+        }
+
+        window.fastRemoveOrder = function(itemId) {
+            if (localFastOrders[itemId] && localFastOrders[itemId].quantity > 0) {
+                localFastOrders[itemId].quantity -= 1;
+                if (localFastOrders[itemId].quantity === 0) {
+                    delete localFastOrders[itemId];
+                }
+                window.renderSplitScreenPOS(currentTableId);
+            }
+        }
+
+        window.submitLocalFastOrders = async function() {
+            const orders = Object.values(localFastOrders);
+            if (orders.length === 0) return;
+
+            // Bloquear botón mientras guarda
+            const btn = document.querySelector('#pos-ticket-footer button');
+            if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+
+            try {
+                const promises = orders.map(o => window.addOrderToDb(o.item, o.finalPrice, o.quantity, ['Cobro rápido'], o.finalName, o.item.category, true, 'ordered'));
+                
+                await Promise.all(promises);
+                localFastOrders = {}; 
+                
+                const statusTxt = document.getElementById('status-indicator');
+                statusTxt.innerHTML = `<i class="fa-solid fa-check"></i> Enviado a preparación`;
+                statusTxt.className = "fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 bg-green-600 text-white z-[100] font-black text-lg transition-opacity slide-in";
+                statusTxt.classList.remove('hidden');
+                setTimeout(() => { statusTxt.classList.add('hidden'); }, 2500);
+
+                window.renderSplitScreenPOS(currentTableId);
+            } catch (e) {
+                alert("Error al guardar orden: " + e.message);
+                window.renderSplitScreenPOS(currentTableId); // reset UI
+            }
+        }
+
         // --- RENDERIZADORES INTERNOS DEL POS ---
         function renderPOSMenuGrid() {
             let html = '<div class="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 lg:gap-4 mb-8">';
