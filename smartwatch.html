@@ -31,6 +31,7 @@
         
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hidden { display: none !important; }
 
         /* Layout Principal */
         #watch-face {
@@ -100,10 +101,19 @@
         
         .item-price {
             font-size: 12px; color: #4ade80; font-weight: 900;
-            background-color: #1e293b; padding: 6px 12px;
+            background-color: #0f172a; padding: 6px 12px;
             border-radius: 999px; border: 1px solid #334155;
             flex-shrink: 0;
         }
+
+        /* Botón de restar */
+        .btn-minus {
+            width: 52px; background-color: #7f1d1d; border: 2px solid #ef4444; 
+            border-radius: 26px; color: white; font-weight: bold; font-size: 18px; 
+            display: flex; align-items: center; justify-content: center; 
+            outline: none; flex-shrink: 0; transition: transform 0.1s;
+        }
+        .btn-minus:active { transform: scale(0.90); background-color: #991b1b; }
 
         .back-btn {
             width: 48px; height: 48px;
@@ -152,6 +162,21 @@
         }
         #toast.show { opacity: 1; }
 
+        /* Botón de Agregar Flotante */
+        #floating-fast-add {
+            position: fixed; bottom: 12%; left: 50%; transform: translateX(-50%);
+            background-color: #16a34a; border: 2px solid #4ade80; color: white;
+            font-weight: 900; font-size: 16px; padding: 14px 28px;
+            border-radius: 999px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.8);
+            z-index: 60; display: flex; align-items: center; justify-content: center;
+            gap: 8px; outline: none; white-space: nowrap; transition: transform 0.1s;
+        }
+        #floating-fast-add:active { transform: translateX(-50%) scale(0.95); }
+        .badge-flotante {
+            background: white; color: #16a34a; padding: 2px 8px; 
+            border-radius: 12px; font-size: 14px; margin-left: 4px;
+        }
+
         /* Animación Carga */
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .fa-spin { animation: spin 1s linear infinite; }
@@ -168,8 +193,11 @@
 
     <!-- Tostada de notificación -->
     <div id="toast">
-        <i class="fa-solid fa-check"></i> <span id="toast-msg">Agregado</span>
+        <i class="fa-solid fa-check"></i> <span id="toast-msg">Guardado</span>
     </div>
+
+    <!-- Botón de guardado rápido -->
+    <button id="floating-fast-add" class="hidden" onclick="submitLocalFastOrders()"></button>
 
     <script>
         const firebaseConfig = {
@@ -187,6 +215,9 @@
         let ordersData = [];
         let currentTableId = null;
         let viewState = 'home';
+        
+        // Memoria para cobro rápido en smartwatch
+        let localFastOrders = {};
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -200,6 +231,9 @@
         function renderHome() {
             viewState = 'home';
             currentTableId = null;
+            localFastOrders = {}; // Limpiar memoria
+            updateFloatingFastAddButton(); // Ocultar flotante
+            
             const openTables = tablesData.filter(t => t.status === 'open').sort((a,b) => (b.openedAt?.seconds||0) - (a.openedAt?.seconds||0));
 
             let html = `<div class="watch-title"><i class="fa-solid fa-clock text-blue" style="margin-right:4px;"></i> A-LAS BARRIL</div>`;
@@ -223,6 +257,9 @@
         function renderTableDetail(tid) {
             viewState = 'table';
             currentTableId = tid;
+            localFastOrders = {}; // Limpiar memoria al entrar a la mesa
+            updateFloatingFastAddButton(); // Ocultar flotante
+            
             const t = tablesData.find(x => x.id === tid);
             if(!t) return renderHome();
 
@@ -255,49 +292,120 @@
                 <div class="watch-title"><i class="fa-solid fa-bolt text-amber" style="margin-right:4px;"></i> Rápido</div>
             `;
 
-            // Filtrar y mostrar todo el menú
-            html += MENU.map(i => `
-                <button onclick="fastAdd('${i.id}')" class="watch-btn watch-btn-item">
-                    <span class="item-name">${i.name}</span>
-                    <span class="item-price">$${i.price}</span>
-                </button>
-            `).join('');
+            // Filtrar y mostrar todo el menú con botones de + y -
+            html += MENU.map(i => {
+                const localQty = localFastOrders[i.id] ? localFastOrders[i.id].quantity : 0;
+                const hiddenClass = localQty > 0 ? '' : 'hidden';
+
+                return `
+                <div style="display: flex; width: 100%; gap: 6px; margin-bottom: 8px;">
+                    <button onclick="fastRemoveOrder('${i.id}')" class="btn-minus">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                    <button onclick="fastAddOrder('${i.id}')" class="watch-btn watch-btn-item" style="margin-bottom: 0; position: relative; flex: 1;">
+                        <div id="badge-${i.id}" class="${hiddenClass}" style="position: absolute; top: -4px; right: -4px; background-color: #3b82f6; color: white; font-size: 11px; font-weight: 900; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; z-index: 10;">${localQty}</div>
+                        <span class="item-name">${i.name}</span>
+                        <span class="item-price">$${i.price}</span>
+                    </button>
+                </div>
+                `;
+            }).join('');
+
+            // Espaciador al final para que el botón flotante no tape el último producto
+            html += `<div style="height: 70px; width: 100%;"></div>`;
 
             document.getElementById('content').innerHTML = html;
+            updateFloatingFastAddButton();
             window.scrollTo(0, 0);
         }
 
-        window.fastAdd = async function(itemId) {
+        window.fastAddOrder = function(itemId) {
             const item = MENU.find(i => i.id === itemId);
-            if(!item || !currentTableId) return;
-
-            // Feedback visual inmediato en el reloj
-            showToast("+$" + item.price);
+            if (!localFastOrders[itemId]) {
+                localFastOrders[itemId] = { item: item, quantity: 0 };
+            }
+            localFastOrders[itemId].quantity += 1;
             
-            try {
-                await db.collection('orders').add({
-                    tableId: currentTableId, 
-                    itemId: item.id, 
-                    itemName: item.name, 
-                    category: item.category,
-                    price: item.price, 
-                    quantity: 1, 
-                    modifiers: ['Añadido desde Reloj'], 
-                    status: 'delivered', 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
+            const badge = document.getElementById(`badge-${itemId}`);
+            if (badge) {
+                badge.innerText = localFastOrders[itemId].quantity;
+                badge.classList.remove('hidden');
+            }
+            updateFloatingFastAddButton();
+        }
 
-                if (item.invId) {
-                    await db.collection('menu_items').doc(item.id).update({
-                        sold_since_update: firebase.firestore.FieldValue.increment(1)
-                    });
-                    await db.collection('inventory').doc(item.invId).update({
-                        stock: firebase.firestore.FieldValue.increment(-(item.invCost || 1))
-                    });
+        window.fastRemoveOrder = function(itemId) {
+            if (localFastOrders[itemId] && localFastOrders[itemId].quantity > 0) {
+                localFastOrders[itemId].quantity -= 1;
+                const badge = document.getElementById(`badge-${itemId}`);
+                if (badge) {
+                    if (localFastOrders[itemId].quantity > 0) {
+                        badge.innerText = localFastOrders[itemId].quantity;
+                    } else {
+                        badge.classList.add('hidden');
+                        delete localFastOrders[itemId];
+                    }
                 }
-            } catch(e) {
+                updateFloatingFastAddButton();
+            }
+        }
+
+        window.updateFloatingFastAddButton = function() {
+            let total = 0; let count = 0;
+            Object.values(localFastOrders).forEach(o => { total += o.item.price * o.quantity; count += o.quantity; });
+            
+            const btn = document.getElementById('floating-fast-add');
+            if (count > 0) {
+                btn.innerHTML = `AGREGAR $${total} <span class="badge-flotante">${count}</span>`;
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        window.submitLocalFastOrders = async function() {
+            const orders = Object.values(localFastOrders);
+            if (orders.length === 0) return;
+
+            const btn = document.getElementById('floating-fast-add');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO';
+
+            try {
+                const batch = db.batch();
+                orders.forEach(o => {
+                    const orderRef = db.collection('orders').doc();
+                    batch.set(orderRef, {
+                        tableId: currentTableId,
+                        itemId: o.item.id,
+                        itemName: o.item.name,
+                        category: o.item.category,
+                        price: o.item.price,
+                        quantity: o.quantity,
+                        modifiers: ['Reloj Rápido'],
+                        status: 'delivered',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // Descuento de inventario integrado
+                    if (o.item.invId) {
+                        const menuRef = db.collection('menu_items').doc(o.item.id);
+                        batch.update(menuRef, { sold_since_update: firebase.firestore.FieldValue.increment(o.quantity) });
+                        
+                        const invRef = db.collection('inventory').doc(o.item.invId);
+                        batch.update(invRef, { stock: firebase.firestore.FieldValue.increment(-(o.item.invCost || 1) * o.quantity) });
+                    }
+                });
+                
+                await batch.commit();
+                localFastOrders = {};
+                btn.classList.add('hidden');
+                
+                showToast("Guardado");
+                renderTableDetail(currentTableId);
+            } catch (e) {
                 console.error("Error watch order:", e);
                 showToast("Error de red");
+                btn.innerHTML = 'ERROR, INTENTA DE NUEVO';
             }
         }
 
@@ -308,9 +416,6 @@
             firebase.initializeApp(firebaseConfig); 
             auth = firebase.auth(); 
             db = firebase.firestore();
-            
-            // ELIMINADA la persistencia de datos (enablePersistence) para evitar bloqueos
-            // en navegadores limitados de Smartwatches.
             
             auth.onAuthStateChanged((user) => {
                 if (user) {
