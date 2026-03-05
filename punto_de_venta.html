@@ -88,14 +88,14 @@
 <body class="flex flex-col">
 
     <!-- Header Global -->
-    <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-20 shrink-0">
-        <div class="flex items-center gap-4">
-            <div class="bg-white p-1 rounded-xl border-2 border-slate-200 overflow-hidden w-12 h-12 flex items-center justify-center shadow-sm">
+    <header class="bg-slate-900 text-white p-3 md:p-4 shadow-md flex justify-between items-center z-20 shrink-0">
+        <div class="flex items-center gap-3 md:gap-4">
+            <div class="bg-white p-1 rounded-xl border-2 border-slate-200 overflow-hidden w-10 h-10 md:w-12 md:h-12 flex items-center justify-center shadow-sm">
                 <img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" alt="Logo" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100?text=AB'">
             </div>
             <div>
-                <h1 class="font-black text-2xl tracking-tight leading-none">POS TABLET</h1>
-                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">A-LAS DE BARRIL</p>
+                <h1 class="font-black text-xl md:text-2xl tracking-tight leading-none">POS TABLET</h1>
+                <p class="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest">A-LAS DE BARRIL</p>
             </div>
         </div>
         
@@ -103,12 +103,12 @@
             <span id="status-text"></span>
         </div>
 
-        <div class="flex gap-3">
-             <button onclick="toggleFullScreen()" class="text-sm bg-slate-700 border border-slate-600 px-4 py-2.5 rounded-xl hover:bg-slate-600 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer" title="Pantalla Completa">
+        <div class="flex gap-2 md:gap-3">
+             <button onclick="toggleFullScreen()" class="text-sm bg-slate-700 border border-slate-600 px-3 py-2 md:px-4 md:py-2.5 rounded-xl hover:bg-slate-600 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer" title="Pantalla Completa">
                 <i class="fa-solid fa-expand"></i>
             </button>
-            <a href="index.html" class="text-sm bg-slate-800 border border-slate-700 px-5 py-2.5 rounded-xl hover:bg-slate-700 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer no-underline">
-                <i class="fa-solid fa-mobile-screen"></i> Versión Móvil
+            <a href="index.html" class="text-sm bg-slate-800 border border-slate-700 px-3 py-2 md:px-5 md:py-2.5 rounded-xl hover:bg-slate-700 transition font-bold text-slate-200 flex items-center gap-2 shadow-sm cursor-pointer no-underline">
+                <i class="fa-solid fa-mobile-screen"></i> <span class="hidden md:inline">Versión Móvil</span>
             </a>
         </div>
     </header>
@@ -182,6 +182,7 @@
         let currentUser = null, ordersData = [], tablesData = [];
         let currentTableId = null, showingDebts = false;
         let isCobrarMode = false; 
+        let posCategory = 'kitchen'; // Variable para doble pestaña (Cocina/Barra)
         let localFastOrders = {};
         let appInitialized = false;
         let scrollPositions = { menu: 0, orders: 0 };
@@ -341,26 +342,35 @@
                     <!-- LADO IZQUIERDO: MENÚ E INTERACCIÓN (60%) -->
                     <div class="w-3/5 h-full flex flex-col bg-slate-50 relative z-10 shadow-[5px_0_15px_rgba(0,0,0,0.03)]">
                         
-                        <!-- Header del Menú -->
-                        <div class="bg-white p-4 shadow-sm border-b border-slate-200 flex justify-between items-center shrink-0">
-                            <div class="flex items-center gap-4">
-                                <button onclick="window.renderDashboard()" class="w-12 h-12 bg-slate-100 hover:bg-slate-200 rounded-xl flex items-center justify-center text-slate-600 text-xl transition-colors active:scale-95 border border-slate-300"><i class="fa-solid fa-arrow-left"></i></button>
+                        <!-- Header del Menú (Doble Interruptor) -->
+                        <div class="bg-white p-3 lg:p-4 shadow-sm border-b border-slate-200 flex flex-col xl:flex-row xl:items-center justify-between gap-3 shrink-0">
+                            <div class="flex items-center gap-3">
+                                <button onclick="window.renderDashboard()" class="w-10 h-10 lg:w-12 lg:h-12 bg-slate-100 hover:bg-slate-200 rounded-xl flex items-center justify-center text-slate-600 text-lg lg:text-xl transition-colors active:scale-95 border border-slate-300"><i class="fa-solid fa-arrow-left"></i></button>
                                 <div>
-                                    <h2 class="font-black text-2xl text-slate-800 leading-none tracking-tight">Menú de Productos</h2>
-                                    <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Toque para ordenar</p>
+                                    <h2 class="font-black text-xl lg:text-2xl text-slate-800 leading-none tracking-tight">Menú POS</h2>
                                 </div>
                             </div>
                             
-                            <!-- Toggle Cobro Rápido / Personalizado -->
-                            <div class="bg-slate-100 p-1 rounded-xl flex border border-slate-300 w-64 relative">
-                                <button onclick="window.togglePOSMode(false)" class="flex-1 py-2.5 text-sm font-bold z-10 transition-colors ${!isCobrarMode ? 'text-white' : 'text-slate-500'}">Personalizar</button>
-                                <button onclick="window.togglePOSMode(true)" class="flex-1 py-2.5 text-sm font-bold z-10 transition-colors flex items-center justify-center gap-1 ${isCobrarMode ? 'text-white' : 'text-slate-500'}"><i class="fa-solid fa-bolt text-amber-300"></i> Rápido</button>
-                                <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] ${!isCobrarMode ? 'bg-blue-600 left-1' : 'bg-green-600 right-1'} rounded-lg shadow-sm transition-all duration-300"></div>
+                            <!-- Toggles Integrados -->
+                            <div class="flex gap-2 w-full xl:w-auto">
+                                <!-- Toggle Categoría -->
+                                <div class="bg-slate-100 p-1 rounded-lg flex border border-slate-300 flex-1 xl:w-48 relative">
+                                    <button onclick="window.togglePOSCategory('kitchen')" class="flex-1 py-2 text-xs lg:text-sm font-bold z-10 transition-colors flex items-center justify-center gap-1 ${posCategory === 'kitchen' ? 'text-white' : 'text-slate-500'}"><i class="fa-solid fa-fire-burner"></i> Cocina</button>
+                                    <button onclick="window.togglePOSCategory('bar')" class="flex-1 py-2 text-xs lg:text-sm font-bold z-10 transition-colors flex items-center justify-center gap-1 ${posCategory === 'bar' ? 'text-white' : 'text-slate-500'}"><i class="fa-solid fa-beer-mug-empty"></i> Barra</button>
+                                    <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] ${posCategory === 'kitchen' ? 'bg-red-500 left-1' : 'bg-amber-500 right-1'} rounded-md shadow-sm transition-all duration-300"></div>
+                                </div>
+
+                                <!-- Toggle Modo -->
+                                <div class="bg-slate-100 p-1 rounded-lg flex border border-slate-300 flex-1 xl:w-48 relative">
+                                    <button onclick="window.togglePOSMode(false)" class="flex-1 py-2 text-xs lg:text-sm font-bold z-10 transition-colors flex items-center justify-center ${!isCobrarMode ? 'text-white' : 'text-slate-500'}">Personalizar</button>
+                                    <button onclick="window.togglePOSMode(true)" class="flex-1 py-2 text-xs lg:text-sm font-bold z-10 transition-colors flex items-center justify-center gap-1 ${isCobrarMode ? 'text-white' : 'text-slate-500'}"><i class="fa-solid fa-bolt text-amber-300"></i> Rápido</button>
+                                    <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] ${!isCobrarMode ? 'bg-blue-600 left-1' : 'bg-green-600 right-1'} rounded-md shadow-sm transition-all duration-300"></div>
+                                </div>
                             </div>
                         </div>
 
                         <!-- Grid de Productos -->
-                        <div id="pos-menu-grid" class="flex-1 overflow-y-auto p-6 no-scrollbar">
+                        <div id="pos-menu-grid" class="flex-1 overflow-y-auto p-4 lg:p-6 no-scrollbar">
                             ${renderPOSMenuGrid()}
                         </div>
                     </div>
@@ -368,26 +378,26 @@
                     <!-- LADO DERECHO: TICKET Y COBRO (40%) -->
                     <div class="w-2/5 h-full flex flex-col bg-white relative z-20">
                         <!-- Info de la Mesa -->
-                        <div class="bg-slate-800 text-white p-5 shadow-md flex justify-between items-center shrink-0 ${t.isVip ? 'bg-pink-900' : ''}">
+                        <div class="bg-slate-800 text-white p-3 lg:p-4 shadow-md flex justify-between items-center shrink-0 ${t.isVip ? 'bg-pink-900' : ''}">
                             <div>
-                                <div class="font-black text-3xl tracking-tight leading-none mb-1 flex items-center gap-2">
+                                <div class="font-black text-2xl lg:text-3xl tracking-tight leading-none mb-1 flex items-center gap-2">
                                     MESA ${t.number} ${t.isVip ? '<i class="fa-solid fa-crown text-pink-400 text-xl"></i>' : ''}
                                 </div>
-                                <div class="text-sm font-bold text-slate-300">${t.nickname}</div>
+                                <div class="text-xs lg:text-sm font-bold text-slate-300 truncate max-w-[150px] lg:max-w-[200px]">${t.nickname}</div>
                             </div>
                             <div class="text-right">
-                                <div class="text-xs font-mono text-slate-400 mb-1">Ticket #${t.uniqueId || '---'}</div>
-                                <span class="bg-slate-700 text-slate-200 text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-widest border border-slate-600">${t.status === 'open' ? 'Abierta' : (t.status === 'debt' ? 'En Deuda' : 'Cerrada')}</span>
+                                <div class="text-[10px] lg:text-xs font-mono text-slate-400 mb-1">Ticket #${t.uniqueId || '---'}</div>
+                                <span class="bg-slate-700 text-slate-200 text-[10px] lg:text-xs font-bold px-2 py-1 rounded border border-slate-600 uppercase tracking-widest">${t.status === 'open' ? 'Abierta' : (t.status === 'debt' ? 'En Deuda' : 'Cerrada')}</span>
                             </div>
                         </div>
 
-                        <!-- Lista de Pedidos (Ticket Virtual) -->
-                        <div id="pos-ticket-list" class="flex-1 overflow-y-auto p-4 bg-slate-50 border-x border-slate-200 space-y-3">
+                        <!-- Lista de Pedidos (Ticket Virtual Compacto) -->
+                        <div id="pos-ticket-list" class="flex-1 overflow-y-auto p-3 bg-slate-50 border-x border-slate-200">
                             ${renderPOSTicketItems(t)}
                         </div>
 
                         <!-- Footer de Totales y Botones -->
-                        <div id="pos-ticket-footer" class="bg-white p-5 border-t border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] shrink-0">
+                        <div id="pos-ticket-footer" class="bg-white p-4 border-t border-slate-200 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] shrink-0">
                             ${renderPOSFooter(t)}
                         </div>
                     </div>
@@ -407,65 +417,61 @@
             // Recordar scroll antes de re-renderizar
             const grid = document.getElementById('pos-menu-grid');
             if(grid) scrollPositions.menu = grid.scrollTop;
-            
+            window.renderSplitScreenPOS(currentTableId);
+        }
+
+        window.togglePOSCategory = function(cat) {
+            posCategory = cat;
+            const grid = document.getElementById('pos-menu-grid');
+            if(grid) scrollPositions.menu = grid.scrollTop; // Mantiene el scroll de la categoría, aunque cambiarla visualmente reiniciará la vista
             window.renderSplitScreenPOS(currentTableId);
         }
 
         // --- RENDERIZADORES INTERNOS DEL POS ---
         function renderPOSMenuGrid() {
-            let html = '';
-            const categories = [
-                { id: 'kitchen', name: 'Cocina', icon: 'fa-fire-burner', color: 'text-red-500' },
-                { id: 'bar', name: 'Barra', icon: 'fa-beer-mug-empty', color: 'text-amber-500' }
-            ];
-
-            categories.forEach(cat => {
-                const items = MENU.filter(i => i.category === cat.id);
-                if(items.length > 0) {
-                    html += `
-                        <h3 class="font-black text-xl text-slate-700 mb-4 mt-2 flex items-center gap-2 border-b-2 border-slate-200 pb-2">
-                            <i class="fa-solid ${cat.icon} ${cat.color}"></i> ${cat.name}
-                        </h3>
-                        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
-                    `;
-                    
-                    items.forEach(item => {
-                        // En modo rápido, mostrar diseño distinto
-                        if (isCobrarMode) {
-                            const localQty = localFastOrders[item.id] ? localFastOrders[item.id].quantity : 0;
-                            const badgeHtml = localQty > 0 ? `<div class="absolute -top-3 -right-3 bg-green-500 text-white font-black text-sm w-8 h-8 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20 pop-anim">${localQty}</div>` : '';
-                            const activeBorder = localQty > 0 ? 'border-green-500 bg-green-50' : 'border-slate-200 bg-white hover:border-green-300';
-                            
-                            html += `
-                                <div class="relative group">
-                                    ${badgeHtml}
-                                    <div class="flex flex-col h-full rounded-2xl shadow-sm border-2 ${activeBorder} transition-colors cursor-pointer active:scale-95 overflow-hidden">
-                                        <div onclick="window.fastAddOrder('${item.id}')" class="flex-1 p-4 flex flex-col items-center justify-center text-center">
-                                            <i class="fa-solid ${item.icon} text-3xl mb-3 ${localQty > 0 ? 'text-green-600' : 'text-slate-400 group-hover:text-green-500'} transition-colors"></i>
-                                            <span class="font-bold text-sm text-slate-800 leading-tight">${item.name}</span>
-                                        </div>
-                                        <div class="flex border-t border-slate-200 bg-slate-50">
-                                            <button onclick="window.fastRemoveOrder('${item.id}')" class="w-1/3 py-2 text-red-500 hover:bg-red-100 font-black text-lg border-r border-slate-200"><i class="fa-solid fa-minus"></i></button>
-                                            <button onclick="window.fastAddOrder('${item.id}')" class="w-2/3 py-2 text-blue-600 font-black text-base bg-blue-50 hover:bg-blue-100">+$${item.price}</button>
-                                        </div>
+            let html = '<div class="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 lg:gap-4 mb-8">';
+            const items = MENU.filter(i => i.category === posCategory);
+            
+            if(items.length > 0) {
+                items.forEach(item => {
+                    // En modo rápido, mostrar diseño distinto
+                    if (isCobrarMode) {
+                        const localQty = localFastOrders[item.id] ? localFastOrders[item.id].quantity : 0;
+                        const badgeHtml = localQty > 0 ? `<div class="absolute -top-2 -right-2 bg-green-500 text-white font-black text-xs w-7 h-7 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20 pop-anim">${localQty}</div>` : '';
+                        const activeBorder = localQty > 0 ? 'border-green-500 bg-green-50' : 'border-slate-200 bg-white hover:border-green-300';
+                        
+                        html += `
+                            <div class="relative group">
+                                ${badgeHtml}
+                                <div class="flex flex-col h-full rounded-xl shadow-sm border-2 ${activeBorder} transition-colors cursor-pointer active:scale-95 overflow-hidden">
+                                    <div onclick="window.fastAddOrder('${item.id}')" class="flex-1 p-3 flex flex-col items-center justify-center text-center">
+                                        <i class="fa-solid ${item.icon} text-2xl lg:text-3xl mb-2 ${localQty > 0 ? 'text-green-600' : 'text-slate-400 group-hover:text-green-500'} transition-colors"></i>
+                                        <span class="font-bold text-xs lg:text-sm text-slate-800 leading-tight">${item.name}</span>
+                                    </div>
+                                    <div class="flex border-t border-slate-200 bg-slate-50">
+                                        <button onclick="window.fastRemoveOrder('${item.id}')" class="w-1/3 py-2 text-red-500 hover:bg-red-100 font-black text-base border-r border-slate-200"><i class="fa-solid fa-minus"></i></button>
+                                        <button onclick="window.fastAddOrder('${item.id}')" class="w-2/3 py-2 text-blue-600 font-black text-sm bg-blue-50 hover:bg-blue-100">+$${item.price}</button>
                                     </div>
                                 </div>
-                            `;
-                        } else {
-                            // Modo Personalizar (Clásico)
-                            html += `
-                                <button onclick="window.openCustomizeModal('${item.id}')" class="bg-white p-4 rounded-2xl shadow-sm border-2 border-slate-200 hover:border-blue-400 active:bg-blue-50 active:scale-95 transition-all flex flex-col items-center justify-center text-center group h-32 relative overflow-hidden">
-                                    <i class="fa-solid ${item.icon} text-3xl mb-3 text-slate-400 group-hover:text-blue-500 transition-colors relative z-10"></i>
-                                    <span class="font-bold text-sm text-slate-800 leading-tight relative z-10">${item.name}</span>
-                                    <span class="text-xs font-black text-blue-600 mt-2 bg-blue-50 px-2 py-1 rounded-lg relative z-10">$${item.price}</span>
-                                    <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                </button>
-                            `;
-                        }
-                    });
-                    html += `</div>`;
-                }
-            });
+                            </div>
+                        `;
+                    } else {
+                        // Modo Personalizar (Clásico)
+                        html += `
+                            <button onclick="window.openCustomizeModal('${item.id}')" class="bg-white p-3 lg:p-4 rounded-xl shadow-sm border-2 border-slate-200 hover:border-blue-400 active:bg-blue-50 active:scale-95 transition-all flex flex-col items-center justify-center text-center group h-28 lg:h-32 relative overflow-hidden">
+                                <i class="fa-solid ${item.icon} text-2xl lg:text-3xl mb-2 text-slate-400 group-hover:text-blue-500 transition-colors relative z-10"></i>
+                                <span class="font-bold text-xs lg:text-sm text-slate-800 leading-tight relative z-10">${item.name}</span>
+                                <span class="text-[10px] lg:text-xs font-black text-blue-600 mt-1 lg:mt-2 bg-blue-50 px-2 py-0.5 lg:py-1 rounded-md relative z-10">$${item.price}</span>
+                                <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            </button>
+                        `;
+                    }
+                });
+            } else {
+                html += `<div class="col-span-full text-center text-slate-400 italic py-10 font-medium">No hay productos en esta categoría.</div>`;
+            }
+            
+            html += `</div>`;
             return html;
         }
 
@@ -475,36 +481,37 @@
             
             let html = '';
 
-            // 1. Mostrar Órdenes Locales Pendientes (Si hay)
+            // 1. Mostrar Órdenes Locales Pendientes (Si hay) de manera compacta
             const pendingOrders = Object.values(localFastOrders);
             if (pendingOrders.length > 0) {
-                html += `<div class="mb-4">
-                            <h4 class="text-[10px] font-black uppercase text-green-600 tracking-widest mb-2 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Pendientes de Enviar</h4>`;
+                html += `<div class="mb-3">
+                            <h4 class="text-[10px] font-black uppercase text-green-600 tracking-widest mb-1.5 flex items-center gap-1"><i class="fa-solid fa-bolt"></i> Pendientes de Enviar</h4>`;
                 pendingOrders.forEach(o => {
                     if(o.quantity > 0) {
                         html += `
-                            <div class="bg-green-50 border-2 border-green-400 p-3 rounded-xl shadow-sm mb-2 relative overflow-hidden slide-in">
+                            <div class="bg-green-50 border border-green-300 p-2 rounded-lg shadow-sm mb-1.5 relative overflow-hidden slide-in flex justify-between items-center">
                                 <div class="absolute left-0 top-0 bottom-0 w-1 bg-green-500"></div>
-                                <div class="flex justify-between items-center pl-2">
-                                    <div>
-                                        <div class="font-black text-slate-800 text-base"><span class="text-green-700 bg-white px-2 py-0.5 rounded-md border border-green-200 mr-1">${o.quantity}x</span> ${o.item.name}</div>
-                                        <div class="text-xs font-bold text-green-700 mt-1 italic">Mandar a preparación...</div>
+                                <div class="pl-2 flex-1">
+                                    <div class="font-bold text-slate-800 text-sm leading-tight flex items-start gap-1.5">
+                                        <span class="text-green-700 bg-white px-1.5 py-0.5 rounded text-xs border border-green-200 shrink-0">${o.quantity}x</span> 
+                                        <span class="leading-tight">${o.item.name}</span>
                                     </div>
-                                    <div class="font-black text-green-700 text-xl">$${o.finalPrice * o.quantity}</div>
+                                    <div class="text-[9px] font-bold text-green-600 mt-1 italic">Mandar a preparación...</div>
                                 </div>
+                                <div class="font-black text-green-700 text-base shrink-0">$${o.finalPrice * o.quantity}</div>
                             </div>
                         `;
                     }
                 });
-                html += `</div><div class="border-b-2 border-dashed border-slate-300 my-4"></div>`;
+                html += `</div><div class="border-b-2 border-dashed border-slate-300 my-3"></div>`;
             }
 
-            // 2. Mostrar Órdenes Guardadas
+            // 2. Mostrar Órdenes Guardadas (Diseño super compacto)
             if (ords.length === 0 && pendingOrders.length === 0) {
                 return `<div class="h-full flex flex-col items-center justify-center text-slate-400 opacity-60"><i class="fa-solid fa-receipt text-6xl mb-4"></i><p class="font-bold text-lg">Ticket Vacío</p></div>`;
             }
 
-            html += `<h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Ordenado</h4>`;
+            html += `<h4 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1.5">En Cuenta</h4>`;
             
             html += ords.map(o => {
                 let stClass = "bg-slate-200 text-slate-600", stIcon = "fa-clock";
@@ -515,24 +522,21 @@
                 const safeName = o.itemName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const timeDisplay = o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '...';
 
+                // Diseño compacto: el botón borrar siempre visible, ocupa menos espacio vertical
                 return `
-                    <div class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm mb-2 hover:border-blue-300 transition-colors group">
-                        <div class="flex justify-between items-start">
-                            <div class="pr-2">
-                                <div class="font-black text-slate-800 text-base leading-tight flex items-start gap-2">
-                                    <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">${o.quantity}x</span> 
-                                    <span>${o.itemName}</span>
-                                </div>
-                                ${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-amber-700 font-bold mt-1.5 bg-amber-50 px-2 py-1 rounded-md inline-block border border-amber-100"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}
-                                <div class="flex items-center gap-2 mt-2">
-                                    <div class="text-[10px] text-slate-400 font-mono font-bold"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div>
-                                    ${!isClosed ? `<button onclick="event.stopPropagation(); window.deleteOrder('${o.id}', ${o.quantity}, '${safeName}')" class="text-[10px] bg-red-50 text-red-500 px-2 py-0.5 rounded border border-red-100 hover:bg-red-500 hover:text-white transition opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="fa-solid fa-trash-can"></i> Borrar</button>` : ''}
-                                </div>
+                    <div class="bg-white border border-slate-200 p-2.5 rounded-lg shadow-sm mb-1.5 flex justify-between items-stretch">
+                        <div class="flex-1 pr-2 flex flex-col justify-center">
+                            <div class="font-bold text-slate-800 text-sm leading-tight flex items-start gap-1.5">
+                                <span class="text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded text-xs border border-blue-100 shrink-0">${o.quantity}x</span> 
+                                <span class="leading-tight">${o.itemName}</span>
                             </div>
-                            <div class="text-right flex flex-col items-end gap-1.5 shrink-0">
-                                <div class="font-black text-slate-800 text-xl">$${o.price*o.quantity}</div>
-                                <span class="text-[9px] font-bold px-2 py-1 rounded-full flex items-center gap-1 uppercase tracking-wider ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
-                            </div>
+                            ${o.modifiers&&o.modifiers.length?`<div class="text-[9px] text-amber-700 font-bold mt-1 leading-tight"><i class="fa-solid fa-pen-to-square"></i> ${o.modifiers.join(', ')}</div>`:''}
+                            <div class="text-[9px] text-slate-400 font-mono mt-1"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div>
+                        </div>
+                        <div class="flex flex-col items-end justify-between shrink-0 w-[70px] border-l border-slate-100 pl-2">
+                            <div class="font-black text-slate-800 text-base">$${o.price*o.quantity}</div>
+                            <span class="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider text-center w-full mt-1 ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
+                            ${!isClosed ? `<button onclick="window.deleteOrder('${o.id}', ${o.quantity}, '${safeName}')" class="text-[9px] font-bold bg-red-50 text-red-600 py-1 rounded border border-red-200 active:bg-red-500 active:text-white transition w-full mt-1"><i class="fa-solid fa-trash-can"></i> Borrar</button>` : ''}
                         </div>
                     </div>`;
             }).join('');
@@ -557,40 +561,40 @@
 
             if (isClosed) {
                 return `
-                    <div class="flex justify-between items-end mb-4">
-                        <span class="text-sm font-bold text-slate-500 uppercase tracking-widest">Total Cerrado</span>
-                        <span class="text-4xl font-black text-slate-800">$${total}</span>
+                    <div class="flex justify-between items-end mb-3">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Cerrado</span>
+                        <span class="text-3xl font-black text-slate-800">$${total}</span>
                     </div>
-                    <div class="flex gap-3">
-                        <button onclick="window.printR('${t.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-lg active:scale-95"><i class="fa-solid fa-print"></i> Ticket</button>
-                        <button onclick="window.downloadPDF('${t.id}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-4 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-lg active:scale-95"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    <div class="flex gap-2">
+                        <button onclick="window.printR('${t.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-base active:scale-95"><i class="fa-solid fa-print"></i> Ticket</button>
+                        <button onclick="window.downloadPDF('${t.id}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl shadow-md transition flex justify-center items-center gap-2 text-base active:scale-95"><i class="fa-solid fa-file-pdf"></i> PDF</button>
                     </div>
                 `;
             }
 
             let html = '';
             
-            // Desglose de totales
+            // Desglose de totales más compacto
             if (deposit > 0 || pendingTotal > 0) {
-                html += `<div class="space-y-1 mb-3 border-b border-slate-200 pb-3">`;
-                if (savedTotal > 0) html += `<div class="flex justify-between text-sm text-slate-500 font-bold"><span>Total Guardado</span><span>$${savedTotal}</span></div>`;
-                if (pendingTotal > 0) html += `<div class="flex justify-between text-sm text-green-600 font-black"><span>Total Pendiente</span><span>+$${pendingTotal}</span></div>`;
-                if (deposit > 0) html += `<div class="flex justify-between text-sm text-red-500 font-bold"><span>A Cuenta (Abono)</span><span>-$${deposit}</span></div>`;
+                html += `<div class="space-y-1 mb-2 border-b border-slate-200 pb-2">`;
+                if (savedTotal > 0) html += `<div class="flex justify-between text-xs text-slate-500 font-bold"><span>Total Guardado</span><span>$${savedTotal}</span></div>`;
+                if (pendingTotal > 0) html += `<div class="flex justify-between text-xs text-green-600 font-black"><span>Total Pendiente</span><span>+$${pendingTotal}</span></div>`;
+                if (deposit > 0) html += `<div class="flex justify-between text-xs text-red-500 font-bold"><span>A Cuenta (Abono)</span><span>-$${deposit}</span></div>`;
                 html += `</div>`;
             }
 
             html += `
-                <div class="flex justify-between items-end mb-4">
-                    <span class="text-sm font-black text-slate-800 uppercase tracking-widest">A Cobrar</span>
-                    <span class="text-5xl font-black text-blue-600 tracking-tighter">$${remaining}</span>
+                <div class="flex justify-between items-end mb-3">
+                    <span class="text-xs font-black text-slate-800 uppercase tracking-widest">A Cobrar</span>
+                    <span class="text-4xl font-black text-blue-600 tracking-tighter">$${remaining}</span>
                 </div>
             `;
 
             // Botones de acción contextuales
             if (pendingCount > 0) {
                 html += `
-                    <button onclick="window.submitLocalFastOrders()" class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-xl py-5 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-3">
-                        <i class="fa-solid fa-bell-concierge"></i> ENVIAR ${pendingCount} A PREPARACIÓN
+                    <button onclick="window.submitLocalFastOrders()" class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-lg py-4 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> ENVIAR ${pendingCount} A PREPARAR
                     </button>
                 `;
             } else {
@@ -598,62 +602,13 @@
                 let closeBtnColorClass = t.status === 'debt' ? "bg-blue-600 hover:bg-blue-700" : "bg-slate-800 hover:bg-slate-900";
                 
                 html += `
-                    <button onclick="window.openCloseAccountModal('${t.id}')" class="w-full ${closeBtnColorClass} text-white font-black text-xl py-5 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-3 uppercase tracking-wide">
+                    <button onclick="window.openCloseAccountModal('${t.id}')" class="w-full ${closeBtnColorClass} text-white font-black text-lg py-4 rounded-xl shadow-lg transition active:scale-95 flex items-center justify-center gap-2 uppercase tracking-wide">
                         <i class="fa-solid fa-cash-register"></i> ${closeBtnText}
                     </button>
                 `;
             }
 
             return html;
-        }
-
-        // ==========================================
-        // FUNCIONES DE COBRO RÁPIDO (Memoria Local)
-        // ==========================================
-        window.fastAddOrder = function(itemId) {
-            const item = MENU.find(i => i.id === itemId);
-            if (!localFastOrders[itemId]) {
-                localFastOrders[itemId] = { item: item, quantity: 0, finalPrice: item.price, finalName: item.name };
-            }
-            localFastOrders[itemId].quantity += 1;
-            window.renderSplitScreenPOS(currentTableId); // Re-renderiza el lado derecho
-        }
-
-        window.fastRemoveOrder = function(itemId) {
-            if (localFastOrders[itemId] && localFastOrders[itemId].quantity > 0) {
-                localFastOrders[itemId].quantity -= 1;
-                if (localFastOrders[itemId].quantity === 0) {
-                    delete localFastOrders[itemId];
-                }
-                window.renderSplitScreenPOS(currentTableId);
-            }
-        }
-
-        window.submitLocalFastOrders = async function() {
-            const orders = Object.values(localFastOrders);
-            if (orders.length === 0) return;
-
-            // Bloquear botón mientras guarda
-            const btn = document.querySelector('#pos-ticket-footer button');
-            if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
-
-            try {
-                const promises = orders.map(o => window.addOrderToDb(o.item, o.finalPrice, o.quantity, ['Cobro rápido'], o.finalName, o.item.category, true, 'ordered'));
-                
-                await Promise.all(promises);
-                localFastOrders = {}; 
-                
-                const statusTxt = document.getElementById('status-indicator');
-                statusTxt.innerHTML = `<i class="fa-solid fa-check"></i> Enviado a preparación`;
-                statusTxt.className = "fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 bg-green-600 text-white z-[100] font-black text-lg transition-opacity slide-in";
-                statusTxt.classList.remove('hidden');
-                setTimeout(() => { statusTxt.classList.add('hidden'); }, 2500);
-
-                window.renderSplitScreenPOS(currentTableId);
-            } catch (e) {
-                alert("Error al guardar orden: " + e.message);
-                window.renderSplitScreenPOS(currentTableId); // reset UI
-            }
         }
 
         // ==========================================
@@ -947,17 +902,6 @@
                     }
                 }
             } catch(e) { alert("Error agregando orden: " + e.message); }
-        }
-
-        window.deleteOrder = async function(orderId, currentQty, itemName) {
-            event.stopPropagation(); 
-            if (currentQty > 1) {
-                window.openDeleteQuantityModal(orderId, currentQty, itemName);
-            } else {
-                if(confirm(`¿Borrar "${itemName}" de la cuenta?`)) {
-                    await window.confirmDelete(orderId, currentQty, 1);
-                }
-            }
         }
 
         window.openDeleteQuantityModal = function(orderId, currentQty, itemName) {
