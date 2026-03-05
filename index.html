@@ -154,6 +154,33 @@
             package_options: ["Con Papas", "Con Aros de Cebolla", "Con Alitas", "Con Boneless", "Salsa BBQ", "Salsa Buffalo", "Salsa Mango", "Salsa Habanero"]
         };
 
+        const INITIAL_MENU = [
+            { id: 'b_md', name: 'Barril 1/2 Lt', price: 35, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty' },
+            { id: 'b_1l', name: 'Barril 1 Lt', price: 70, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty' },
+            { id: 'b_md_negra', name: 'Barril Negra 1/2 Lt', price: 45, category: 'bar', isBeer: true, type: 'dark', icon: 'fa-beer-mug-empty' },
+            { id: 'b_1l_negra', name: 'Barril Negra 1 Lt', price: 90, category: 'bar', isBeer: true, type: 'dark', icon: 'fa-beer-mug-empty' },
+            { id: 'b_emb', name: 'Cerveza Embotellada', price: 30, category: 'bar', isBeer: true, type: 'bottled', icon: 'fa-bottle-droplet' },
+            { id: 'b_cig', name: 'Cigarro', price: 8, category: 'bar', modGroup: 'general_bar', icon: 'fa-smoking' },
+            { id: 'b_ref', name: 'Refresco', price: 25, category: 'bar', modGroup: 'sodas', icon: 'fa-bottle-water' },
+            { id: 'b_coo', name: 'Caribe Cooler', price: 30, category: 'bar', modGroup: 'coolers', icon: 'fa-wine-bottle' },
+            { id: 'h1', name: 'Hamburguesa Sencilla', price: 55, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger' },
+            { id: 'h2', name: 'Hamburguesa Especial', price: 70, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger' },
+            { id: 'h3', name: 'Hamburguesa Arrachera', price: 90, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger' },
+            { id: 'h4', name: 'Hamburguesa Camarón', price: 80, category: 'kitchen', modGroup: 'burgers', icon: 'fa-shrimp' },
+            { id: 'h5', name: 'Hamburguesa Pollo', price: 65, category: 'kitchen', modGroup: 'burgers', icon: 'fa-drumstick-bite' },
+            { id: 'c1', name: 'Tenders de Pollo', price: 70, category: 'kitchen', modGroup: 'salsas', icon: 'fa-drumstick-bite' },
+            { id: 'c2', name: 'Boneless', price: 70, category: 'kitchen', modGroup: 'salsas', icon: 'fa-drumstick-bite' },
+            { id: 'c3', name: 'Alitas', price: 50, category: 'kitchen', modGroup: 'salsas', icon: 'fa-dove' },
+            { id: 's1', name: 'Papas a la francesa', price: 40, category: 'kitchen', modGroup: 'snacks', icon: 'fa-utensils' },
+            { id: 's2', name: 'Salchipapas', price: 50, category: 'kitchen', modGroup: 'snacks', icon: 'fa-bacon' },
+            { id: 's3', name: 'Aros de Cebolla', price: 45, category: 'kitchen', modGroup: 'snacks', icon: 'fa-ring' },
+            { id: 'hd1', name: 'Hot Dog Sencillo', price: 25, category: 'kitchen', modGroup: 'hotdogs', icon: 'fa-hotdog' },
+            { id: 'hd2', name: 'Hot Dog Especial', price: 40, category: 'kitchen', modGroup: 'hotdogs', icon: 'fa-hotdog' },
+            { id: 'p1', name: 'Paquete 1', price: 235, category: 'kitchen', isPackage: true, icon: 'fa-box-open' },
+            { id: 'p2', name: 'Paquete 2', price: 255, category: 'kitchen', isPackage: true, icon: 'fa-box-open' },
+            { id: 'p3', name: 'Paquete 3', price: 310, category: 'kitchen', isPackage: true, icon: 'fa-box-open' },
+        ];
+
         // ==========================================
         // 2. DEFINICIÓN DE TODAS LAS FUNCIONES
         // ==========================================
@@ -1078,16 +1105,29 @@
                 if (user) {
                     currentUser = user;
                     
+                    const handleDbError = (err) => {
+                        console.error(err);
+                        window.showError("Error de Base de Datos", "Revisa las 'Reglas' en Firebase.<br>Detalle: " + err.message);
+                    };
+
                     // ESCUCHAR INVENTARIO Y MENÚ EN TIEMPO REAL
                     db.collection('menu_items').onSnapshot(async (s) => {
                         if (s.empty) {
                             // Subir menú base inicial
-                            const batch = db.batch();
-                            MENU.forEach((item, index) => {
-                                const ref = db.collection('menu_items').doc(item.id);
-                                batch.set(ref, { ...item, inventory: 0, sold_since_update: 0, order: index });
-                            });
-                            await batch.commit().catch(e => console.error("Error sembrando menú", e));
+                            try {
+                                const batch = db.batch();
+                                INITIAL_MENU.forEach((item, index) => {
+                                    const ref = db.collection('menu_items').doc(item.id);
+                                    batch.set(ref, { ...item, inventory: 0, sold_since_update: 0, order: index });
+                                });
+                                await batch.commit();
+                                if (!appInitialized) {
+                                    appInitialized = true;
+                                    window.renderHome();
+                                }
+                            } catch (e) {
+                                handleDbError(e);
+                            }
                         } else {
                             // Leer y ordenar menú
                             MENU = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (a.order || 0) - (b.order || 0));
@@ -1097,7 +1137,7 @@
                             }
                             window.refreshCurrentView();
                         }
-                    });
+                    }, handleDbError);
 
                     const limitDate = new Date();
                     limitDate.setDate(limitDate.getDate() - 15);
@@ -1106,12 +1146,12 @@
                     db.collection('tables').where('openedAt', '>=', limitFb).onSnapshot(s => { 
                         tablesData = s.docs.map(d=>({id:d.id, ...d.data()})); 
                         if(appInitialized) window.refreshCurrentView(); 
-                    });
+                    }, handleDbError);
                     
                     db.collection('orders').where('timestamp', '>=', limitFb).onSnapshot(s => { 
                         ordersData = s.docs.map(d=>({id:d.id, ...d.data()})); 
                         if(appInitialized) window.refreshCurrentView(); 
-                    });
+                    }, handleDbError);
                 }
             });
 
