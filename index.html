@@ -111,31 +111,20 @@
 
     <script>
         // ==========================================
-        // FUNCION PANTALLA COMPLETA
+        // 0. FUNCIONES GLOBALES Y MANEJO DE ERRORES
         // ==========================================
         window.toggleFullScreen = function() {
             if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen();
-                } else if (document.documentElement.mozRequestFullScreen) {
-                    document.documentElement.mozRequestFullScreen();
-                } else if (document.documentElement.webkitRequestFullscreen) {
-                    document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-                }
+                if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) { document.documentElement.mozRequestFullScreen();
+                } else if (document.documentElement.webkitRequestFullscreen) { document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT); }
             } else {
-                if (document.cancelFullScreen) {
-                    document.cancelFullScreen();
-                } else if (document.mozCancelFullScreen) {
-                    document.mozCancelFullScreen();
-                } else if (document.webkitCancelFullScreen) {
-                    document.webkitCancelFullScreen();
-                }
+                if (document.cancelFullScreen) { document.cancelFullScreen();
+                } else if (document.mozCancelFullScreen) { document.mozCancelFullScreen();
+                } else if (document.webkitCancelFullScreen) { document.webkitCancelFullScreen(); }
             }
         }
 
-        // ==========================================
-        // 0. DETECTOR DE ERRORES VISUAL 
-        // ==========================================
         window.onerror = function(message, source, lineno, colno, error) {
             document.getElementById('content-area').innerHTML = `
                 <div class="flex flex-col justify-center items-center h-full p-6 text-center bg-red-50">
@@ -167,7 +156,6 @@
         let scrollPositions = { menu: 0, orders: 0 };
         let appInitialized = false;
 
-        // DATOS MAESTROS
         let MENU = [];
         let MASTER_INVENTORY = [];
         let currentAdminTab = 'inventory'; 
@@ -184,7 +172,6 @@
             package_options: ["Con Papas", "Con Aros de Cebolla", "Con Alitas", "Con Boneless", "Salsa BBQ", "Salsa Buffalo", "Salsa Mango", "Salsa Habanero"]
         };
 
-        // --- DICCIONARIO INICIAL CON VÍNCULOS DE INVENTARIO ---
         const INITIAL_MENU = [
             { id: 'b_md', name: 'Barril 1/2 Lt', price: 35, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty', invId: 'inv_barril_clara', invName: 'Cerveza Barril Clara (Litros)', invCost: 0.5 },
             { id: 'b_1l', name: 'Barril 1 Lt', price: 70, category: 'bar', isBeer: true, type: 'regular', icon: 'fa-beer-mug-empty', invId: 'inv_barril_clara', invName: 'Cerveza Barril Clara (Litros)', invCost: 1 },
@@ -194,31 +181,26 @@
             { id: 'b_cig', name: 'Cigarro', price: 8, category: 'bar', modGroup: 'general_bar', icon: 'fa-smoking', invId: 'inv_cigarros', invName: 'Cigarros Sueltos (Pzas)', invCost: 1 },
             { id: 'b_ref', name: 'Refresco', price: 25, category: 'bar', modGroup: 'sodas', icon: 'fa-bottle-water', invId: 'inv_refrescos', invName: 'Refrescos Familia (Pzas)', invCost: 1 },
             { id: 'b_coo', name: 'Caribe Cooler', price: 30, category: 'bar', modGroup: 'coolers', icon: 'fa-wine-bottle', invId: 'inv_caribes', invName: 'Caribe Coolers (Pzas)', invCost: 1 },
-            
             { id: 'h1', name: 'Hamburguesa Sencilla', price: 55, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger', invId: 'inv_hamb_res', invName: 'Carne Hamburguesa Res (Pzas)', invCost: 1 },
             { id: 'h2', name: 'Hamburguesa Especial', price: 70, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger', invId: 'inv_hamb_res', invName: 'Carne Hamburguesa Res (Pzas)', invCost: 1 },
             { id: 'h3', name: 'Hamburguesa Arrachera', price: 90, category: 'kitchen', modGroup: 'burgers', icon: 'fa-burger', invId: 'inv_hamb_arrachera', invName: 'Carne Arrachera (Pzas)', invCost: 1 },
             { id: 'h4', name: 'Hamburguesa Camarón', price: 80, category: 'kitchen', modGroup: 'burgers', icon: 'fa-shrimp', invId: 'inv_hamb_camaron', invName: 'Camarón Hamburguesa (Porción)', invCost: 1 },
             { id: 'h5', name: 'Hamburguesa Pollo', price: 65, category: 'kitchen', modGroup: 'burgers', icon: 'fa-drumstick-bite', invId: 'inv_hamb_pollo', invName: 'Pollo Hamburguesa (Pzas)', invCost: 1 },
-            
             { id: 'c1', name: 'Tenders de Pollo', price: 70, category: 'kitchen', modGroup: 'salsas', icon: 'fa-drumstick-bite', invId: 'inv_tenders', invName: 'Tenders de Pollo (Pzas)', invCost: 4 },
             { id: 'c2', name: 'Boneless', price: 70, category: 'kitchen', modGroup: 'salsas', icon: 'fa-drumstick-bite', invId: 'inv_boneless', invName: 'Boneless (Porción)', invCost: 1 },
             { id: 'c3', name: 'Alitas', price: 50, category: 'kitchen', modGroup: 'salsas', icon: 'fa-dove', invId: 'inv_alitas', invName: 'Alitas de Pollo (Pzas)', invCost: 8 },
-            
             { id: 's1', name: 'Papas a la francesa', price: 40, category: 'kitchen', modGroup: 'snacks', icon: 'fa-utensils', invId: 'inv_papas', invName: 'Papas Francesa (Porción)', invCost: 1 },
             { id: 's2', name: 'Salchipapas', price: 50, category: 'kitchen', modGroup: 'snacks', icon: 'fa-bacon', invId: 'inv_salchichas', invName: 'Salchichas (Pzas)', invCost: 2 },
             { id: 's3', name: 'Aros de Cebolla', price: 45, category: 'kitchen', modGroup: 'snacks', icon: 'fa-ring', invId: 'inv_aros', invName: 'Aros de Cebolla (Porción)', invCost: 1 },
-            
             { id: 'hd1', name: 'Hot Dog Sencillo', price: 25, category: 'kitchen', modGroup: 'hotdogs', icon: 'fa-hotdog', invId: 'inv_salchichas_hd', invName: 'Salchicha Hot Dog (Pzas)', invCost: 1 },
             { id: 'hd2', name: 'Hot Dog Especial', price: 40, category: 'kitchen', modGroup: 'hotdogs', icon: 'fa-hotdog', invId: 'inv_salchichas_hd', invName: 'Salchicha Hot Dog (Pzas)', invCost: 1 },
-            
             { id: 'p1', name: 'Paquete 1', price: 235, category: 'kitchen', isPackage: true, icon: 'fa-box-open', invId: 'inv_paquetes', invName: 'Ventas de Paquetes (Genérico)', invCost: 1 },
             { id: 'p2', name: 'Paquete 2', price: 255, category: 'kitchen', isPackage: true, icon: 'fa-box-open', invId: 'inv_paquetes', invName: 'Ventas de Paquetes (Genérico)', invCost: 1 },
             { id: 'p3', name: 'Paquete 3', price: 310, category: 'kitchen', isPackage: true, icon: 'fa-box-open', invId: 'inv_paquetes', invName: 'Ventas de Paquetes (Genérico)', invCost: 1 },
         ];
 
         // ==========================================
-        // 2. DEFINICIÓN DE TODAS LAS FUNCIONES
+        // 2. UTILIDADES BÁSICAS
         // ==========================================
         window.updateStatusDisplay = function() {
             const ind = document.getElementById('status-indicator');
@@ -231,6 +213,11 @@
         window.showError = function(title, details) { 
             document.getElementById('content-area').innerHTML = `<div class="flex flex-col justify-center items-center h-full p-6 text-center"><h2 class="font-bold text-2xl text-red-600">${title}</h2><p class="text-slate-600 mt-2">${details}</p><button onclick="location.reload()" class="mt-6 bg-slate-800 text-white rounded-lg px-6 py-2 shadow">Reintentar</button></div>`; 
         }
+
+        window.adjQty = function(d) { const el=document.getElementById('modal-qty'); let v=parseInt(el.innerText)+d; if(v<1)v=1; el.innerText=v; }
+        window.toggleMod = function(b) { b.classList.toggle('selected'); }
+        window.closeModal = function() { document.getElementById('modal-overlay').classList.add('hidden'); }
+        window.logoutToHome = function() { window.renderHome(); }
 
         window.refreshCurrentView = function() {
             if(!currentRole) return;
@@ -251,15 +238,13 @@
                     <button onclick="window.setRole('bar')" class="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-2xl p-5 text-xl font-bold flex gap-4 items-center shadow-lg transition transform active:scale-95"><div class="bg-amber-700/30 p-3 rounded-xl"><i class="fa-solid fa-beer-mug-empty"></i></div><span>Barra</span></button>
                     <button onclick="window.setRole('kitchen')" class="w-full bg-red-500 hover:bg-red-600 text-white rounded-2xl p-5 text-xl font-bold flex gap-4 items-center shadow-lg transition transform active:scale-95"><div class="bg-red-700/30 p-3 rounded-xl"><i class="fa-solid fa-fire-burner"></i></div><span>Cocina</span></button>
                     
-                    <!-- Botón Admin Oculto pero accesible -->
                     <button onclick="window.promptAdminPin()" class="mt-8 text-slate-400 font-bold hover:text-slate-600 transition flex items-center gap-2 text-sm"><i class="fa-solid fa-lock"></i> Panel de Administración</button>
                 </div>`;
         }
-        
         window.setRole = function(r) { currentRole = r; window.refreshCurrentView(); }
 
         // ==========================================
-        // FUNCIONES DE ADMINISTRADOR Y PIN
+        // 3. PANEL DE ADMINISTRADOR
         // ==========================================
         window.promptAdminPin = function() {
             document.getElementById('modal-content').innerHTML = `
@@ -279,19 +264,11 @@
             try {
                 const docRef = await db.collection('config').doc('admin').get();
                 let validPin = '123456';
-                if (docRef.exists && docRef.data().pin) {
-                    validPin = docRef.data().pin;
-                } else {
-                    await db.collection('config').doc('admin').set({ pin: '123456' });
-                }
+                if (docRef.exists && docRef.data().pin) validPin = docRef.data().pin;
+                else await db.collection('config').doc('admin').set({ pin: '123456' });
 
-                if (input === validPin) {
-                    window.closeModal();
-                    window.setRole('admin');
-                } else {
-                    alert("PIN Incorrecto");
-                    document.getElementById('admin-pin-input').value = '';
-                }
+                if (input === validPin) { window.closeModal(); window.setRole('admin'); } 
+                else { alert("PIN Incorrecto"); document.getElementById('admin-pin-input').value = ''; }
             } catch (e) { alert("Error verificando PIN: " + e.message); }
         }
 
@@ -319,26 +296,18 @@
             if (newPin.length < 4) return alert("El PIN debe tener al menos 4 dígitos.");
             try {
                 await db.collection('config').doc('admin').set({ pin: newPin }, { merge: true });
-                alert("PIN actualizado con éxito.");
-                window.closeModal();
+                alert("PIN actualizado con éxito."); window.closeModal();
             } catch(e) { alert("Error: " + e.message); }
         }
 
-        // ==========================================
-        // VISTAS SEPARADAS DE ADMIN (INVENTARIO VS MENÚ)
-        // ==========================================
-        window.switchAdminMainTab = function(tab) {
-            currentAdminTab = tab;
-            window.renderAdminDashboard();
-        }
+        window.switchAdminMainTab = function(tab) { currentAdminTab = tab; window.renderAdminDashboard(); }
 
         window.renderAdminDashboard = function() {
             currentTableId = null;
-            document.getElementById('header-title').innerText = 'Panel de Administración';
+            document.getElementById('header-title').innerText = 'Administración';
 
             const activeClass = "bg-blue-600 text-white shadow-md border border-blue-700";
             const inactiveClass = "bg-white text-slate-600 border border-slate-300 hover:bg-slate-50 transition";
-
             let contentHtml = '';
 
             if (currentAdminTab === 'inventory') {
@@ -346,123 +315,72 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden overflow-x-auto mb-4">
                         <table class="w-full text-left border-collapse min-w-[600px]">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-4">Insumo Maestro</th>
-                                    <th class="p-4 text-center">Stock Real Disponible</th>
-                                    <th class="p-4 text-center w-48">Acción</th>
-                                </tr>
+                                <tr><th class="p-4">Insumo Maestro</th><th class="p-4 text-center">Stock Disponible</th><th class="p-4 text-center w-48">Acción</th></tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-sm">
                                 ${MASTER_INVENTORY.map(inv => `
                                     <tr class="hover:bg-slate-50 transition">
-                                        <td class="p-4">
-                                            <div class="font-bold text-slate-800 text-base">${inv.name}</div>
-                                            <div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${inv.id}</div>
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <span class="font-black text-2xl ${inv.stock > 10 ? 'text-green-600' : (inv.stock > 0 ? 'text-amber-500' : 'text-red-500')}">
-                                                ${inv.stock}
-                                            </span>
-                                        </td>
-                                        <td class="p-4 text-center">
-                                            <button onclick="window.openEditMasterInvModal('${inv.id}')" class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-xl font-bold hover:bg-amber-500 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-boxes-stacked"></i> Ajustar</button>
-                                        </td>
+                                        <td class="p-4"><div class="font-bold text-slate-800 text-base">${inv.name}</div><div class="text-[10px] text-slate-400 font-mono mt-1">ID: ${inv.id}</div></td>
+                                        <td class="p-4 text-center"><span class="font-black text-2xl ${inv.stock > 10 ? 'text-green-600' : (inv.stock > 0 ? 'text-amber-500' : 'text-red-500')}">${inv.stock}</span></td>
+                                        <td class="p-4 text-center"><button onclick="window.openEditMasterInvModal('${inv.id}')" class="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-2.5 rounded-xl font-bold hover:bg-amber-500 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-boxes-stacked"></i> Ajustar</button></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
                     </div>
-                    <button onclick="window.openAddMasterInvModal()" class="w-full bg-green-50 text-green-600 border border-green-200 border-dashed rounded-xl py-4 font-bold hover:bg-green-500 hover:text-white transition flex items-center justify-center gap-2 shadow-sm"><i class="fa-solid fa-plus"></i> Agregar Nuevo Insumo Maestro</button>
+                    <button onclick="window.openAddMasterInvModal()" class="w-full bg-green-50 text-green-600 border border-green-200 border-dashed rounded-xl py-4 font-bold hover:bg-green-500 hover:text-white transition flex items-center justify-center gap-2 shadow-sm"><i class="fa-solid fa-plus"></i> Agregar Insumo Maestro</button>
                 `;
             } else {
                 contentHtml = `
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden overflow-x-auto mb-4">
                         <table class="w-full text-left border-collapse min-w-[900px]">
                             <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold border-b border-slate-200">
-                                <tr>
-                                    <th class="p-4">Producto del Menú</th>
-                                    <th class="p-4">Precio Público</th>
-                                    <th class="p-4 text-center">Receta (Consume)</th>
-                                    <th class="p-4 text-center">Órdenes Vendidas</th>
-                                    <th class="p-4 text-center w-48">Acción</th>
-                                </tr>
+                                <tr><th class="p-4">Producto del Menú</th><th class="p-4">Precio Público</th><th class="p-4 text-center">Receta (Consume)</th><th class="p-4 text-center">Vendidos</th><th class="p-4 text-center w-48">Acción</th></tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100 text-sm">
                                 ${MENU.map(item => {
-                                    const masterInv = MASTER_INVENTORY.find(inv => inv.id === item.invId) || { name: 'Sin Insumo vinculado', stock: 0 };
+                                    const masterInv = MASTER_INVENTORY.find(inv => inv.id === item.invId) || { name: 'Sin Insumo', stock: 0 };
                                     return `
                                     <tr class="hover:bg-slate-50 transition">
-                                        <td class="p-4">
-                                            <div class="font-bold text-slate-700 text-base">${item.name}</div>
-                                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">${item.category}</span>
-                                        </td>
+                                        <td class="p-4"><div class="font-bold text-slate-700 text-base">${item.name}</div><span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">${item.category}</span></td>
                                         <td class="p-4 text-blue-600 font-black text-lg">$${item.price}</td>
-                                        <td class="p-4 text-center">
-                                            <div class="font-bold text-slate-600">${item.invCost || 0} de:</div>
-                                            <div class="text-xs text-slate-400 mt-1 truncate max-w-[200px] mx-auto">${masterInv.name}</div>
-                                        </td>
+                                        <td class="p-4 text-center"><div class="font-bold text-slate-600">${item.invCost || 0} de:</div><div class="text-xs text-slate-400 mt-1 truncate max-w-[200px] mx-auto">${masterInv.name}</div></td>
                                         <td class="p-4 text-slate-500 font-bold text-center text-base">${item.sold_since_update || 0}</td>
-                                        <td class="p-4 text-center">
-                                            <button onclick="window.openEditMenuItemModal('${item.id}')" class="bg-blue-50 border border-blue-100 text-blue-600 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-pen-to-square"></i> Modificar</button>
-                                        </td>
+                                        <td class="p-4 text-center"><button onclick="window.openEditMenuItemModal('${item.id}')" class="bg-blue-50 border border-blue-100 text-blue-600 px-4 py-2.5 rounded-xl font-bold hover:bg-blue-600 hover:text-white transition shadow-sm active:scale-95 flex items-center justify-center w-full gap-2"><i class="fa-solid fa-pen-to-square"></i> Modificar</button></td>
                                     </tr>
                                 `}).join('')}
                             </tbody>
                         </table>
                     </div>
-                    <button onclick="window.openAddMenuItemModal()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 border-dashed rounded-xl py-4 font-bold hover:bg-blue-600 hover:text-white transition flex items-center justify-center gap-2 shadow-sm"><i class="fa-solid fa-plus"></i> Agregar Nuevo Producto al Menú</button>
+                    <button onclick="window.openAddMenuItemModal()" class="w-full bg-blue-50 text-blue-600 border border-blue-200 border-dashed rounded-xl py-4 font-bold hover:bg-blue-600 hover:text-white transition flex items-center justify-center gap-2 shadow-sm"><i class="fa-solid fa-plus"></i> Agregar Producto al Menú</button>
                 `;
             }
 
-            let html = `
+            document.getElementById('content-area').innerHTML = `
                 <div class="p-4 md:p-8 max-w-6xl mx-auto pb-24">
                     <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h2 class="text-2xl font-black text-slate-800">Panel de Administración</h2>
-                            <p class="text-sm text-slate-500 font-medium">Gestiona el almacén y el punto de venta por separado.</p>
-                        </div>
+                        <div><h2 class="text-2xl font-black text-slate-800">Panel de Administración</h2><p class="text-sm text-slate-500 font-medium">Gestiona el almacén y el punto de venta.</p></div>
                         <button onclick="window.openChangePinModal()" class="bg-white border border-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-bold hover:bg-slate-50 hover:text-blue-600 transition text-sm shadow-sm flex items-center gap-2"><i class="fa-solid fa-key"></i> Cambiar PIN</button>
                     </div>
-
-                    <!-- Botones de Navegación Admin -->
                     <div class="flex gap-4 mb-6">
-                        <button onclick="window.switchAdminMainTab('inventory')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'inventory' ? activeClass : inactiveClass}">
-                            <i class="fa-solid fa-warehouse mr-2"></i> Lista de Almacén (Insumos)
-                        </button>
-                        <button onclick="window.switchAdminMainTab('menu')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'menu' ? activeClass : inactiveClass}">
-                            <i class="fa-solid fa-book-open mr-2"></i> Lista de Menú (Punto de Venta)
-                        </button>
+                        <button onclick="window.switchAdminMainTab('inventory')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'inventory' ? activeClass : inactiveClass}"><i class="fa-solid fa-warehouse mr-2"></i> Almacén (Insumos)</button>
+                        <button onclick="window.switchAdminMainTab('menu')" class="flex-1 py-4 rounded-xl font-bold text-lg transition-all ${currentAdminTab === 'menu' ? activeClass : inactiveClass}"><i class="fa-solid fa-book-open mr-2"></i> Menú (POS)</button>
                     </div>
-                    
                     ${contentHtml}
                 </div>
             `;
-            document.getElementById('content-area').innerHTML = html;
         }
 
-        // --- CREACIÓN Y EDICIÓN DE INVENTARIO MAESTRO ---
         window.openAddMasterInvModal = function() {
             document.getElementById('modal-content').innerHTML = `
                 <div class="p-6 bg-white relative border-t-8 border-green-500 rounded-t-xl">
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-plus text-green-500 mr-2"></i> Nuevo Insumo Maestro</h3>
-                    <p class="text-sm text-slate-500 font-bold mb-6">Agrega un insumo general para descontar inventario.</p>
-                    
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 space-y-4">
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Nombre del Insumo</label>
-                            <input type="text" id="new-master-name" placeholder="Ej. Carne de Res (Kilos)" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 focus:border-green-500 outline-none text-slate-800 rounded-xl shadow-sm">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Stock Inicial Disponible</label>
-                            <input type="number" step="0.5" id="new-master-stock" value="0" class="w-full text-2xl text-center font-black p-3 bg-white border border-slate-300 focus:border-green-500 outline-none text-green-600 rounded-xl shadow-sm">
-                        </div>
+                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-plus text-green-500 mr-2"></i> Nuevo Insumo</h3>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 space-y-4 mt-4">
+                        <div><label class="text-xs font-bold text-slate-500 uppercase mb-2">Nombre del Insumo</label><input type="text" id="new-master-name" placeholder="Ej. Carne de Res (Kilos)" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 focus:border-green-500 outline-none text-slate-800 rounded-xl shadow-sm"></div>
+                        <div><label class="text-xs font-bold text-slate-500 uppercase mb-2">Stock Inicial Disponible</label><input type="number" step="0.5" id="new-master-stock" value="0" class="w-full text-2xl text-center font-black p-3 bg-white border border-slate-300 focus:border-green-500 outline-none text-green-600 rounded-xl shadow-sm"></div>
                     </div>
-
-                    <div class="flex gap-3">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.saveNewMasterInv()" class="flex-[2] bg-green-500 text-white font-bold rounded-xl py-4 shadow-md hover:bg-green-600 transition active:scale-95 text-lg">Crear Insumo</button>
-                    </div>
+                    <div class="flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.saveNewMasterInv()" class="flex-[2] bg-green-500 text-white font-bold rounded-xl py-4 shadow-md hover:bg-green-600 transition active:scale-95 text-lg">Crear</button></div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
@@ -470,16 +388,10 @@
         window.saveNewMasterInv = async function() {
             const name = document.getElementById('new-master-name').value.trim();
             const stock = parseFloat(document.getElementById('new-master-stock').value) || 0;
-            
             if (!name) return alert("Por favor ingresa un nombre para el insumo.");
-
             try {
                 const newId = 'inv_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
-                await db.collection('inventory').doc(newId).set({
-                    id: newId,
-                    name: name,
-                    stock: stock
-                });
+                await db.collection('inventory').doc(newId).set({ id: newId, name: name, stock: stock });
                 window.closeModal();
             } catch(e) { alert("Error al crear insumo: " + e.message); }
         }
@@ -491,93 +403,57 @@
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
                     <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-boxes-stacked text-amber-500 mr-2"></i> Ajustar Almacén</h3>
                     <p class="text-sm text-slate-500 font-bold mb-6">${inv.name}</p>
-                    
                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6">
-                        <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Stock Físico Real</label>
+                        <label class="text-xs font-bold text-slate-500 uppercase mb-2">Stock Físico Real</label>
                         <input type="number" step="0.5" id="edit-master-stock-val" value="${inv.stock}" class="w-full text-4xl text-center font-black p-4 bg-white border border-slate-300 focus:border-amber-500 outline-none text-amber-600 rounded-xl shadow-sm">
-                        <p class="text-[11px] font-medium text-amber-700 mt-3 bg-amber-100/50 p-2 rounded border border-amber-200"><i class="fa-solid fa-circle-info mr-1"></i> Al guardar, los contadores de "Vendidos" de los productos del menú vinculados a este insumo volverán a 0.</p>
                     </div>
-
-                    <div class="flex gap-3">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.saveMasterInvUpdate('${inv.id}', ${inv.stock})" class="flex-[2] bg-amber-500 text-white font-bold rounded-xl py-4 shadow-md hover:bg-amber-600 transition active:scale-95 text-lg">Guardar Stock</button>
-                    </div>
+                    <div class="flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.saveMasterInvUpdate('${inv.id}', ${inv.stock})" class="flex-[2] bg-amber-500 text-white font-bold rounded-xl py-4 shadow-md hover:bg-amber-600 transition active:scale-95 text-lg">Guardar Stock</button></div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
 
         window.saveMasterInvUpdate = async function(invId, oldStock) {
             const newStock = parseFloat(document.getElementById('edit-master-stock-val').value) || 0;
-            if (newStock === oldStock) {
-                window.closeModal();
-                return;
-            }
-
+            if (newStock === oldStock) return window.closeModal();
             try {
                 await db.collection('inventory').doc(invId).update({ stock: newStock });
-
                 const itemsToReset = MENU.filter(m => m.invId === invId);
                 if (itemsToReset.length > 0) {
                     const batch = db.batch();
-                    itemsToReset.forEach(item => {
-                        const ref = db.collection('menu_items').doc(item.id);
-                        batch.update(ref, { sold_since_update: 0 });
-                    });
+                    itemsToReset.forEach(item => { batch.update(db.collection('menu_items').doc(item.id), { sold_since_update: 0 }); });
                     await batch.commit();
                 }
-
                 window.closeModal();
             } catch(e) { alert("Error al actualizar inventario: " + e.message); }
         }
 
-        // --- CREACIÓN Y EDICIÓN DE MENÚ Y RECETA ---
         window.openAddMenuItemModal = function() {
-            const invOptions = MASTER_INVENTORY.map(inv => 
-                `<option value="${inv.id}">${inv.name}</option>`
-            ).join('');
-
+            const invOptions = MASTER_INVENTORY.map(inv => `<option value="${inv.id}">${inv.name}</option>`).join('');
             document.getElementById('modal-content').innerHTML = `
                 <div class="p-6 bg-white relative border-t-8 border-blue-500 rounded-t-xl flex flex-col h-full max-h-[90vh]">
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-plus text-blue-500 mr-2"></i> Nuevo Producto</h3>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-4 pb-3 border-b border-slate-100">Agregar al Punto de Venta</p>
-                    
-                    <div class="space-y-4 mb-6 overflow-y-auto pr-2 flex-1">
+                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight">Nuevo Producto</h3>
+                    <div class="space-y-4 mb-6 overflow-y-auto pr-2 flex-1 mt-4">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
                             <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Nombre del Producto</label>
-                            <input type="text" id="new-menu-name" placeholder="Ej. Michelada" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl shadow-sm mb-4">
-                            
+                            <input type="text" id="new-menu-name" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl mb-4">
                             <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Categoría</label>
-                            <select id="new-menu-cat" class="w-full text-base font-bold p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 shadow-sm mb-4">
-                                <option value="bar">Barra (Bebidas)</option>
-                                <option value="kitchen">Cocina (Alimentos)</option>
-                            </select>
-
-                            <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Opciones Personalizables (separadas por coma)</label>
-                            <input type="text" id="new-menu-mods" placeholder="Ej. Sin cebolla, Extra queso, Con tajín" class="w-full text-base font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl shadow-sm">
+                            <select id="new-menu-cat" class="w-full text-base font-bold p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 mb-4"><option value="bar">Barra (Bebidas)</option><option value="kitchen">Cocina (Alimentos)</option></select>
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Modificadores (separados por coma)</label>
+                            <input type="text" id="new-menu-mods" class="w-full text-base font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl">
                         </div>
-
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                            <label class="text-xs font-bold text-blue-700 uppercase flex items-center gap-2 mb-2">Precio de Venta Público ($)</label>
-                            <input type="number" id="new-menu-price" value="0" class="w-full text-2xl font-black p-3 bg-white border border-blue-200 focus:border-blue-500 outline-none text-blue-700 rounded-xl shadow-sm">
+                            <label class="text-xs font-bold text-blue-700 uppercase mb-2 block">Precio de Venta ($)</label>
+                            <input type="number" id="new-menu-price" value="0" class="w-full text-2xl font-black p-3 bg-white border border-blue-200 focus:border-blue-500 outline-none text-blue-700 rounded-xl">
                         </div>
-
                         <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-link"></i> Insumo del almacén asociado</label>
-                            <select id="new-menu-invid" class="w-full text-sm font-bold p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 mb-4 shadow-sm">
-                                <option value="none">-- No descontar de almacén --</option>
-                                ${invOptions}
-                            </select>
-
-                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-scale-balanced"></i> Porción a descontar por orden</label>
-                            <input type="number" step="0.1" id="new-menu-cost" value="1" class="w-full text-xl font-black p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 shadow-sm">
+                            <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Insumo Asociado</label>
+                            <select id="new-menu-invid" class="w-full text-sm font-bold p-3 bg-white border border-slate-300 rounded-xl mb-4"><option value="none">-- Ninguno --</option>${invOptions}</select>
+                            <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Porción a descontar</label>
+                            <input type="number" step="0.1" id="new-menu-cost" value="1" class="w-full text-xl font-black p-3 bg-white border border-slate-300 rounded-xl">
                         </div>
                     </div>
-
-                    <div class="flex gap-3 shrink-0 pt-2">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.saveNewMenuItem()" class="flex-[2] bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition active:scale-95 text-lg">Agregar Producto</button>
-                    </div>
+                    <div class="flex gap-3 shrink-0 pt-2"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200">Cancelar</button><button onclick="window.saveNewMenuItem()" class="flex-[2] bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700">Guardar</button></div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
@@ -588,26 +464,12 @@
             const price = parseFloat(document.getElementById('new-menu-price').value) || 0;
             const invCost = parseFloat(document.getElementById('new-menu-cost').value) || 0;
             const invId = document.getElementById('new-menu-invid').value;
-            
-            const modsInput = document.getElementById('new-menu-mods').value;
-            const customMods = modsInput.split(',').map(m => m.trim()).filter(m => m !== '');
+            const customMods = document.getElementById('new-menu-mods').value.split(',').map(m => m.trim()).filter(m => m !== '');
 
             if (!name) return alert("Ingresa un nombre para el producto.");
-
             try {
                 const newId = 'item_' + Date.now();
-                await db.collection('menu_items').doc(newId).set({
-                    id: newId,
-                    name: name,
-                    category: cat,
-                    price: price,
-                    invCost: invCost,
-                    invId: invId === 'none' ? null : invId,
-                    customMods: customMods,
-                    sold_since_update: 0,
-                    order: MENU.length,
-                    icon: cat === 'bar' ? 'fa-martini-glass' : 'fa-utensils'
-                });
+                await db.collection('menu_items').doc(newId).set({ id: newId, name: name, category: cat, price: price, invCost: invCost, invId: invId === 'none' ? null : invId, customMods: customMods, sold_since_update: 0, order: MENU.length, icon: cat === 'bar' ? 'fa-martini-glass' : 'fa-utensils' });
                 window.closeModal();
             } catch(e) { alert("Error al crear producto: " + e.message); }
         }
@@ -615,48 +477,32 @@
         window.openEditMenuItemModal = function(menuId) {
             const item = MENU.find(i => i.id === menuId);
             const currentInvId = item.invId || 'none';
-            const currentMods = (item.customMods || []).join(', ');
-
-            const invOptions = MASTER_INVENTORY.map(inv => 
-                `<option value="${inv.id}" ${inv.id === currentInvId ? 'selected' : ''}>${inv.name}</option>`
-            ).join('');
+            const invOptions = MASTER_INVENTORY.map(inv => `<option value="${inv.id}" ${inv.id === currentInvId ? 'selected' : ''}>${inv.name}</option>`).join('');
 
             document.getElementById('modal-content').innerHTML = `
                 <div class="p-6 bg-white relative border-t-8 border-blue-600 rounded-t-xl flex flex-col h-full max-h-[90vh]">
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center z-10"><i class="fa-solid fa-times"></i></button>
-                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight"><i class="fa-solid fa-book-open text-blue-500 mr-2"></i> Ajustar Menú</h3>
-                    <p class="text-sm text-slate-500 font-bold mb-4 pb-3 border-b border-slate-100">${item.name}</p>
-                    
+                    <h3 class="font-black text-2xl mb-1 text-slate-800 pr-8 leading-tight">Ajustar Menú</h3>
+                    <p class="text-sm text-slate-500 font-bold mb-4 border-b border-slate-100 pb-2">${item.name}</p>
                     <div class="space-y-4 mb-6 overflow-y-auto pr-2 flex-1">
                         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                            <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Nombre del Producto</label>
-                            <input type="text" id="edit-menu-name" value="${item.name}" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl shadow-sm mb-4">
-                            
-                            <label class="text-xs font-bold text-slate-500 uppercase flex items-center gap-2 mb-2">Opciones Personalizables (separadas por coma)</label>
-                            <input type="text" id="edit-menu-mods" value="${currentMods}" placeholder="Ej. Sin cebolla, Extra queso, Sin sal" class="w-full text-base font-bold p-3 bg-white border border-slate-300 focus:border-blue-500 outline-none text-slate-800 rounded-xl shadow-sm">
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Nombre del Producto</label>
+                            <input type="text" id="edit-menu-name" value="${item.name}" class="w-full text-lg font-bold p-3 bg-white border border-slate-300 rounded-xl mb-4">
+                            <label class="text-xs font-bold text-slate-500 uppercase mb-2 block">Opciones Personalizables</label>
+                            <input type="text" id="edit-menu-mods" value="${(item.customMods || []).join(', ')}" class="w-full text-base font-bold p-3 bg-white border border-slate-300 rounded-xl">
                         </div>
-
                         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-                            <label class="text-xs font-bold text-blue-700 uppercase flex items-center gap-2 mb-2">Precio de Venta ($)</label>
-                            <input type="number" id="edit-menu-price" value="${item.price}" class="w-full text-2xl font-black p-3 bg-white border border-blue-200 focus:border-blue-500 outline-none text-blue-700 rounded-xl shadow-sm">
+                            <label class="text-xs font-bold text-blue-700 uppercase mb-2 block">Precio de Venta ($)</label>
+                            <input type="number" id="edit-menu-price" value="${item.price}" class="w-full text-2xl font-black p-3 bg-white border border-blue-200 rounded-xl">
                         </div>
-
                         <div class="bg-amber-50 p-4 rounded-xl border border-amber-200">
-                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-link"></i> Insumo del almacén asociado</label>
-                            <select id="edit-menu-invid" class="w-full text-sm font-bold p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 mb-4 shadow-sm">
-                                <option value="none">-- No descontar de almacén --</option>
-                                ${invOptions}
-                            </select>
-
-                            <label class="text-xs font-bold text-slate-600 uppercase flex items-center gap-2 mb-2"><i class="fa-solid fa-scale-balanced"></i> Porción a descontar por orden</label>
-                            <input type="number" step="0.1" id="edit-menu-cost" value="${item.invCost || 1}" class="w-full text-xl font-black p-3 bg-white border border-slate-300 rounded-xl focus:border-blue-500 outline-none text-slate-700 shadow-sm">
+                            <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Insumo Asociado</label>
+                            <select id="edit-menu-invid" class="w-full text-sm font-bold p-3 bg-white border border-slate-300 rounded-xl mb-4"><option value="none">-- Ninguno --</option>${invOptions}</select>
+                            <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Porción a descontar</label>
+                            <input type="number" step="0.1" id="edit-menu-cost" value="${item.invCost || 1}" class="w-full text-xl font-black p-3 bg-white border border-slate-300 rounded-xl">
                         </div>
                     </div>
-
-                    <div class="flex gap-3 shrink-0 pt-2">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.saveMenuItemUpdate('${item.id}')" class="flex-[2] bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition active:scale-95 text-lg">Guardar Receta</button>
-                    </div>
+                    <div class="flex gap-3 shrink-0 pt-2"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200">Cancelar</button><button onclick="window.saveMenuItemUpdate('${item.id}')" class="flex-[2] bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700">Guardar</button></div>
                 </div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
@@ -666,108 +512,74 @@
             const newPrice = parseFloat(document.getElementById('edit-menu-price').value) || 0;
             const newCost = parseFloat(document.getElementById('edit-menu-cost').value) || 0;
             const invId = document.getElementById('edit-menu-invid').value;
-            
-            const modsInput = document.getElementById('edit-menu-mods').value;
-            const customMods = modsInput.split(',').map(m => m.trim()).filter(m => m !== '');
+            const customMods = document.getElementById('edit-menu-mods').value.split(',').map(m => m.trim()).filter(m => m !== '');
 
             if (!newName) return alert("El nombre no puede estar vacío.");
-
             try {
-                await db.collection('menu_items').doc(menuId).update({
-                    name: newName,
-                    price: newPrice,
-                    invCost: newCost,
-                    invId: invId === 'none' ? null : invId,
-                    customMods: customMods,
-                    last_updated: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                await db.collection('menu_items').doc(menuId).update({ name: newName, price: newPrice, invCost: newCost, invId: invId === 'none' ? null : invId, customMods: customMods, last_updated: firebase.firestore.FieldValue.serverTimestamp() });
                 window.closeModal();
             } catch(e) { alert("Error al actualizar menú: " + e.message); }
         }
 
         // ==========================================
-        // CÓDIGO MESERO ORIGINAL
+        // 4. CONTROL DE MESAS (MESEROS)
         // ==========================================
-
         window.renderWaiterDashboard = function() {
-            if (Object.keys(localFastOrders).length > 0) {
-                if (!confirm("Tienes artículos en Cobro Rápido sin guardar. ¿Deseas salir y descartarlos?")) return;
-            }
-            localFastOrders = {}; 
-            currentTableId = null;
-            isCobrarMode = false; 
-            currentTab = 'menu';
-            scrollPositions = { menu: 0, orders: 0 };
-
+            if (Object.keys(localFastOrders).length > 0 && !confirm("Tienes artículos en Cobro Rápido sin guardar. ¿Deseas salir y descartarlos?")) return;
+            
+            localFastOrders = {}; currentTableId = null; isCobrarMode = false; currentTab = 'menu'; scrollPositions = { menu: 0, orders: 0 };
             document.getElementById('header-title').innerText = 'Control de Mesas';
             const now = Date.now();
-            const eightDaysMs = 8 * 24 * 60 * 60 * 1000;
             const openTables = tablesData.filter(t => t.status === 'open').sort((a,b) => (b.openedAt?.seconds||0) - (a.openedAt?.seconds||0));
             const debtTables = tablesData.filter(t => t.status === 'debt').sort((a,b) => (b.debtDate?.seconds||0) - (a.debtDate?.seconds||0));
-            const closedTables = tablesData.filter(t => {
-                if (t.status !== 'closed') return false;
-                const closedDate = t.closedAt?.seconds * 1000 || 0;
-                return (now - closedDate) < eightDaysMs;
-            }).sort((a,b) => (b.closedAt?.seconds||0) - (a.closedAt?.seconds||0));
-            
+            const closedTables = tablesData.filter(t => { if (t.status !== 'closed') return false; return (now - (t.closedAt?.seconds * 1000 || 0)) < (8*24*60*60*1000); }).sort((a,b) => (b.closedAt?.seconds||0) - (a.closedAt?.seconds||0));
             const btnClass = showingDebts ? 'bg-red-500 hover:bg-red-600 text-white' : 'bg-slate-700 hover:bg-slate-800 text-white';
-            const sectionTitle = showingDebts ? 'Deudas Pendientes' : 'Mesas Abiertas';
-
-            let html = `
+            
+            document.getElementById('content-area').innerHTML = `
                 <div class="p-4 flex flex-col gap-6 pb-24">
                     <div class="flex gap-2 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
                         <input type="number" id="search-ticket-id" placeholder="Buscar Ticket #" class="flex-1 border-0 p-2 bg-transparent outline-none text-slate-700 placeholder-slate-400 font-mono font-bold">
-                        <button onclick="window.searchTicket()" class="bg-slate-800 text-white px-5 rounded-lg hover:bg-slate-700 transition shadow-sm"><i class="fa-solid fa-search"></i></button>
+                        <button onclick="window.searchTicket()" class="bg-slate-800 text-white px-5 rounded-lg hover:bg-slate-700"><i class="fa-solid fa-search"></i></button>
                     </div>
                     <div class="flex gap-3"><button onclick="window.toggleDebtView()" class="flex-1 ${btnClass} font-bold rounded-xl py-4 shadow-sm transition active:scale-95 text-sm">${showingDebts ? '⬅ Ver Mesas Activas' : '📂 Ver Deudas / Fiado'}</button></div>
                     <div>
                         <div class="flex justify-between items-end mb-4 border-b-2 border-slate-200 pb-2">
-                            <h3 class="font-black text-slate-800 text-lg uppercase tracking-wide">${sectionTitle}</h3>
+                            <h3 class="font-black text-slate-800 text-lg uppercase tracking-wide">${showingDebts ? 'Deudas Pendientes' : 'Mesas Abiertas'}</h3>
                             ${!showingDebts ? `<button onclick="window.openNewTableModal()" class="bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-sm font-bold text-xs px-4 py-2 flex items-center gap-1 transition active:scale-95"><i class="fa-solid fa-plus"></i> NUEVA</button>` : ''}
                         </div>
                         <div class="grid grid-cols-2 gap-4">
-                            ${!showingDebts && openTables.length === 0 ? '<p class="col-span-2 text-slate-400 text-sm text-center italic py-6 bg-white rounded-xl border border-dashed border-slate-300">No hay mesas abiertas</p>' : ''}
-                            ${showingDebts && debtTables.length === 0 ? '<p class="col-span-2 text-slate-400 text-sm text-center italic py-6 bg-white rounded-xl border border-dashed border-slate-300">No hay deudas</p>' : ''}
                             ${!showingDebts ? openTables.map(t => window.createTableCard(t)).join('') : debtTables.map(t => window.createTableCard(t)).join('')}
                         </div>
                     </div>
                     ${!showingDebts ? `<div class="mt-6 opacity-80"><h3 class="font-bold text-slate-500 text-sm uppercase mb-3 border-b border-slate-200 pb-1">Cerradas (8 días)</h3><div class="grid grid-cols-2 gap-4">${closedTables.length ? closedTables.map(t => window.createTableCard(t)).join('') : '<p class="col-span-2 text-slate-400 text-xs text-center">Historial vacío</p>'}</div></div>` : ''}
                 </div>`;
-            document.getElementById('content-area').innerHTML = html;
         }
 
         window.createTableCard = function(t) {
             const ords = ordersData.filter(o => o.tableId === t.id && o.status !== 'cancelled');
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
-            const deposit = t.deposit || 0;
-            const remaining = total - deposit;
-            let cardBgClass = 'bg-white', borderColor = 'border-slate-200', badge = '', statusIconColor = 'text-slate-500';
+            const remaining = total - (t.deposit || 0);
+            let cardBg = t.isVip ? 'bg-pink-50' : 'bg-white';
+            let borderColor = t.isVip ? 'border-pink-200' : 'border-slate-200';
+            let badge = '', statusIconColor = 'text-slate-500';
             
-            if (t.isVip) { cardBgClass = 'bg-pink-50'; borderColor = 'border-pink-200'; }
             if (t.status === 'open') {
                 const pending = ords.some(o => o.status !== 'delivered');
                 borderColor = pending ? 'border-amber-400' : 'border-green-500';
                 statusIconColor = pending ? 'text-amber-500' : 'text-green-500';
                 badge = pending ? `<i class="fa-solid fa-clock animate-pulse ${statusIconColor}"></i>` : `<i class="fa-solid fa-check ${statusIconColor}"></i>`;
-            } else if (t.status === 'debt') { borderColor = 'border-red-400'; cardBgClass = 'bg-red-50'; statusIconColor = 'text-red-500'; badge = `<i class="fa-solid fa-file-invoice-dollar ${statusIconColor}"></i>`;
-            } else { cardBgClass = 'bg-slate-100'; statusIconColor = 'text-slate-400'; badge = `<i class="fa-solid fa-lock ${statusIconColor}"></i>`; }
+            } else if (t.status === 'debt') { borderColor = 'border-red-400'; cardBg = 'bg-red-50'; badge = `<i class="fa-solid fa-file-invoice-dollar text-red-500"></i>`;
+            } else { cardBg = 'bg-slate-100'; badge = `<i class="fa-solid fa-lock text-slate-400"></i>`; }
             
-            let vipBadge = t.isVip ? `<span class="absolute -top-3 -left-3 bg-pink-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-md border-2 border-white"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
-            let priceDisplay = `$${total}`; if (deposit > 0) priceDisplay = `<span class="text-xs text-red-500 line-through mr-1 font-mono">$${total}</span> $${remaining}`;
-            const dateStr = t.openedAt ? new Date(t.openedAt.seconds * 1000).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') : '';
+            let pDisp = `$${total}`; if ((t.deposit || 0) > 0) pDisp = `<span class="text-xs text-red-500 line-through mr-1 font-mono">$${total}</span> $${remaining}`;
+            const dtStr = t.openedAt ? new Date(t.openedAt.seconds*1000).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }).replace(',', '') : '';
 
-            return `<div onclick="window.renderTableDetail('${t.id}')" class="rounded-xl shadow-sm p-4 border-2 ${cardBgClass} ${borderColor} relative cursor-pointer hover:shadow-md active:scale-95 transition-all">
-                    ${vipBadge}
-                    <div class="flex justify-between items-start mb-2">
-                        <span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/50 px-2 py-1 rounded-md">#${t.uniqueId || '---'}</span>
-                        <div class="flex flex-col items-end">
-                             <span class="text-[10px] text-slate-400 font-mono mb-1 font-bold">${dateStr}</span>
-                             <div class="bg-white rounded-full p-1.5 shadow-sm">${badge}</div>
-                        </div>
-                    </div>
+            return `<div onclick="window.renderTableDetail('${t.id}')" class="rounded-xl shadow-sm p-4 border-2 ${cardBg} ${borderColor} relative cursor-pointer active:scale-95 transition-all">
+                    ${t.isVip ? `<span class="absolute -top-3 -left-3 bg-pink-500 text-white text-[10px] px-3 py-1 rounded-full font-bold shadow-md border-2 border-white"><i class="fa-solid fa-crown"></i> VIP</span>` : ''}
+                    <div class="flex justify-between items-start mb-2"><span class="text-[10px] font-mono font-bold text-slate-500 bg-slate-200/50 px-2 py-1 rounded-md">#${t.uniqueId || '---'}</span><div class="flex flex-col items-end"><span class="text-[10px] text-slate-400 font-mono mb-1 font-bold">${dtStr}</span><div class="bg-white rounded-full p-1.5 shadow-sm">${badge}</div></div></div>
                     <div class="text-2xl font-black text-slate-800 leading-tight mb-1 text-center truncate">${t.nickname}</div>
                     <div class="text-xs text-slate-500 font-bold mb-3 uppercase tracking-wider text-center border-b border-dashed border-slate-200 pb-2">Mesa ${t.number}</div>
-                    <div class="text-xl font-bold text-blue-600 text-right">${priceDisplay}</div>
+                    <div class="text-xl font-bold text-blue-600 text-right">${pDisp}</div>
                 </div>`;
         }
 
@@ -779,27 +591,12 @@
                 <div class="p-6 bg-white relative">
                     <button onclick="window.closeModal()" class="absolute top-5 right-5 text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
                     <h3 class="font-black text-2xl mb-6 text-slate-800 tracking-tight">Nueva Mesa</h3>
-                    
                     <div class="space-y-4 mb-6">
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Número de Mesa</label>
-                            <input type="number" id="ntn" placeholder="Ej. 5" class="w-full text-center text-xl p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase ml-1">Referencia / Apodo</label>
-                            <input type="text" id="ntnm" placeholder="Ej. Los de la esquina" class="w-full text-center text-lg p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none">
-                        </div>
+                        <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Número de Mesa</label><input type="number" id="ntn" placeholder="Ej. 5" class="w-full text-center text-xl p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"></div>
+                        <div><label class="text-xs font-bold text-slate-500 uppercase ml-1">Referencia / Apodo</label><input type="text" id="ntnm" placeholder="Ej. Los de la esquina" class="w-full text-center text-lg p-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none"></div>
                     </div>
-
-                    <label class="flex items-center justify-center gap-3 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-xl cursor-pointer hover:bg-pink-100 transition">
-                        <input type="checkbox" id="ntvip" class="w-5 h-5 accent-pink-500">
-                        <span class="font-bold text-pink-700 uppercase tracking-wide text-sm"><i class="fa-solid fa-crown text-pink-500 mr-1"></i> Cliente VIP</span>
-                    </label>
-
-                    <div class="flex gap-3">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.subNT()" class="flex-1 bg-green-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-green-700 transition">Abrir Mesa</button>
-                    </div>
+                    <label class="flex items-center justify-center gap-3 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-xl cursor-pointer hover:bg-pink-100 transition"><input type="checkbox" id="ntvip" class="w-5 h-5 accent-pink-500"><span class="font-bold text-pink-700 uppercase tracking-wide text-sm"><i class="fa-solid fa-crown text-pink-500 mr-1"></i> Cliente VIP</span></label>
+                    <div class="flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.subNT()" class="flex-1 bg-green-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-green-700 transition">Abrir Mesa</button></div>
                 </div>`; 
             document.getElementById('modal-overlay').classList.remove('hidden'); 
             setTimeout(() => document.getElementById('ntn').focus(), 100);
@@ -817,269 +614,26 @@
                     let newId = 1000;
                     if (counterDoc.exists) newId = counterDoc.data().current + 1;
                     transaction.set(counterRef, { current: newId });
-                    
                     const newTableRef = db.collection('tables').doc();
                     transaction.set(newTableRef, { number: num, nickname: nick, status: 'open', openedAt: firebase.firestore.FieldValue.serverTimestamp(), uniqueId: newId, isVip: isVip });
                 });
-                window.closeModal();
-                window.renderWaiterDashboard();
-            } catch (e) { alert("Error al crear mesa: " + e.message); console.error(e); }
+                window.closeModal(); window.renderWaiterDashboard();
+            } catch (e) { alert("Error al crear mesa: " + e.message); }
         }
 
-        window.deleteOrder = async function(orderId, currentQty, itemName) {
-            event.stopPropagation(); 
-            if (currentQty > 1) {
-                window.openDeleteQuantityModal(orderId, currentQty, itemName);
-            } else {
-                if(confirm(`¿Borrar "${itemName}" de la cuenta?`)) {
-                    await window.confirmDelete(orderId, currentQty, 1);
-                }
-            }
-        }
-
-        window.openDeleteQuantityModal = function(orderId, currentQty, itemName) {
-             document.getElementById('modal-content').innerHTML = `
-                <div class="p-6 text-center bg-white relative">
-                    <h3 class="font-black text-xl mb-4 text-slate-800 border-b border-slate-100 pb-3">Borrar Artículo</h3>
-                    <p class="mb-2 text-slate-600 text-sm">Hay <strong>${currentQty}</strong> ordenados de:<br><span class="text-slate-800 font-bold text-lg">${itemName}</span></p>
-                    <p class="mb-4 text-slate-400 text-xs font-bold uppercase tracking-wider">¿Cuántos eliminar?</p>
-                    
-                    <div class="flex justify-center items-center gap-6 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                         <button onclick="window.adjDelQty(-1)" class="w-14 h-14 rounded-full bg-white text-slate-600 font-bold text-2xl border border-slate-200 shadow-sm active:scale-95 transition">-</button>
-                         <span id="del-qty-val" class="text-4xl font-black text-red-500 w-12 text-center">1</span>
-                         <button onclick="window.adjDelQty(1, ${currentQty})" class="w-14 h-14 rounded-full bg-red-500 text-white font-bold text-2xl shadow-md hover:bg-red-600 active:scale-95 transition">+</button>
-                    </div>
-
-                    <div class="flex gap-3">
-                        <button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition">Cancelar</button>
-                        <button onclick="window.confirmDeleteFromModal('${orderId}', ${currentQty})" class="flex-1 bg-red-500 text-white font-bold py-4 rounded-xl shadow-md hover:bg-red-600 transition">Confirmar</button>
-                    </div>
-                </div>`;
-            document.getElementById('modal-overlay').classList.remove('hidden');
-        }
-
-        window.adjDelQty = function(delta, max) {
-            const el = document.getElementById('del-qty-val');
-            let val = parseInt(el.innerText) + delta;
-            if (val < 1) val = 1;
-            if (max && val > max) val = max;
-            el.innerText = val;
-        }
-
-        window.confirmDeleteFromModal = async function(orderId, currentQty) {
-            const qtyToDelete = parseInt(document.getElementById('del-qty-val').innerText);
-            await window.confirmDelete(orderId, currentQty, qtyToDelete);
-            window.closeModal();
-        }
-
-        window.confirmDelete = async function(orderId, currentQty, qtyToDelete) {
-            try {
-                const docSnap = await db.collection('orders').doc(orderId).get();
-                if(docSnap.exists) {
-                    const orderData = docSnap.data();
-                    const itemId = orderData.itemId;
-                    
-                    if (qtyToDelete >= currentQty) {
-                        await db.collection('orders').doc(orderId).delete();
-                    } else {
-                        await db.collection('orders').doc(orderId).update({ quantity: currentQty - qtyToDelete });
-                    }
-
-                    if(itemId) {
-                        const menuItem = MENU.find(m => m.id === itemId);
-                        if (menuItem) {
-                            const totalToReturn = qtyToDelete * (menuItem.invCost || 1);
-                            db.collection('menu_items').doc(itemId).update({
-                                sold_since_update: firebase.firestore.FieldValue.increment(-qtyToDelete)
-                            }).catch(e=>console.warn(e));
-
-                            if (menuItem.invId) {
-                                db.collection('inventory').doc(menuItem.invId).update({
-                                    stock: firebase.firestore.FieldValue.increment(totalToReturn)
-                                }).catch(e=>console.warn(e));
-                            }
-                        }
-                    }
-                }
-            } catch(e) { alert("Error al borrar: " + e.message); }
-        }
-
-        window.setCobrarMode = function(isCobrar) {
-            if (Object.keys(localFastOrders).length > 0 && !isCobrar) {
-                if (!confirm("Tienes artículos sin agregar. ¿Deseas descartarlos al salir del modo Rápido?")) return;
-            }
-            localFastOrders = {};
-            isCobrarMode = isCobrar;
-            scrollPositions.menu = 0;
-            window.renderTableDetail(currentTableId);
-        }
-
-        window.getFastMenuGroups = function() {
-            let items = [];
-            MENU.forEach(item => {
-                items.push({ ...item, displayName: item.name, finalPrice: item.price, extraName: '', extraPrice: 0 });
-                if (item.isBeer) {
-                    items.push({ 
-                        ...item, 
-                        displayName: `${item.name} + Clamato`, 
-                        finalPrice: item.price + 5, 
-                        extraName: '+ Clamato', 
-                        extraPrice: 5 
-                    });
-                }
-            });
-
-            let groups = {};
-            items.forEach(i => {
-                if (!groups[i.finalPrice]) groups[i.finalPrice] = [];
-                groups[i.finalPrice].push(i);
-            });
-            return groups;
-        }
-
-        window.renderFastMenu = function() {
-            const groups = window.getFastMenuGroups();
-            const sortedPrices = Object.keys(groups).map(Number).sort((a,b) => a - b);
-            
-            return sortedPrices.map(price => {
-                const items = groups[price];
-                const buttons = items.map(i => {
-                    const safeKey = (i.id + (i.extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
-                    const localQty = localFastOrders[safeKey] ? localFastOrders[safeKey].quantity : 0;
-                    const hiddenClass = localQty > 0 ? '' : 'hidden';
-
-                    return `
-                    <div class="flex h-16 rounded-xl shadow-sm border border-slate-200 bg-white hover:border-blue-300 transition-colors relative">
-                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-red-50 hover:bg-red-100 text-red-500 border-r border-slate-100 flex items-center justify-center active:bg-red-200 transition-colors rounded-l-xl">
-                            <i class="fa-solid fa-minus"></i>
-                        </button>
-                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-green-50 transition-colors p-2 rounded-r-xl">
-                            <div id="badge-${safeKey}" class="absolute -top-2 -right-2 bg-blue-500 text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md ${hiddenClass} z-20 transform transition-transform border-2 border-white">${localQty}</div>
-                            <span class="text-[11px] font-bold text-slate-700 leading-tight text-center relative z-10">${i.displayName}</span>
-                        </button>
-                    </div>
-                    `;
-                }).join('');
-                
-                return `
-                    <div class="mb-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                        <h4 class="font-black text-slate-800 border-b border-slate-100 mb-3 pb-2 flex justify-between items-center text-lg">
-                            <span>$${price}</span>
-                            <span class="text-xs text-slate-400 font-normal bg-slate-100 px-2 py-1 rounded-md">${items.length} items</span>
-                        </h4>
-                        <div class="grid grid-cols-2 gap-3">
-                            ${buttons}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        window.fastAddOrder = function(itemId, extraName, extraPrice) {
-            const item = MENU.find(i => i.id === itemId);
-            const finalName = extraName ? `${item.name} ${extraName}` : item.name;
-            const finalPrice = item.price + extraPrice;
-            const safeKey = (itemId + (extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
-
-            if (!localFastOrders[safeKey]) {
-                localFastOrders[safeKey] = {
-                    item: item, finalName: finalName, finalPrice: finalPrice,
-                    quantity: 0, category: item.category
-                };
-            }
-            
-            localFastOrders[safeKey].quantity += 1;
-            
-            const badge = document.getElementById(`badge-${safeKey}`);
-            if (badge) {
-                badge.innerText = localFastOrders[safeKey].quantity;
-                badge.classList.remove('hidden', 'pop-anim');
-                void badge.offsetWidth;
-                badge.classList.add('pop-anim');
-            }
-            window.updateFloatingFastAddButton();
-        }
-
-        window.fastRemoveOrder = function(itemId, extraName) {
-            const safeKey = (itemId + (extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
-            if (localFastOrders[safeKey] && localFastOrders[safeKey].quantity > 0) {
-                localFastOrders[safeKey].quantity -= 1;
-                const badge = document.getElementById(`badge-${safeKey}`);
-                if (badge) {
-                    if (localFastOrders[safeKey].quantity > 0) {
-                        badge.innerText = localFastOrders[safeKey].quantity;
-                        badge.classList.remove('pop-anim');
-                        void badge.offsetWidth; 
-                        badge.classList.add('pop-anim');
-                    } else {
-                        badge.classList.add('hidden');
-                        delete localFastOrders[safeKey];
-                    }
-                }
-                window.updateFloatingFastAddButton();
-            }
-        }
-
-        window.updateFloatingFastAddButton = function() {
-            let total = 0; let count = 0;
-            Object.values(localFastOrders).forEach(o => { total += o.finalPrice * o.quantity; count += o.quantity; });
-            const btn = document.getElementById('floating-fast-add');
-            if (btn) {
-                if (count > 0) {
-                    btn.innerHTML = `AGREGAR $${total} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full font-bold shadow-sm">${count}</span>`;
-                    btn.classList.remove('hidden');
-                } else { btn.classList.add('hidden'); }
-            }
-        }
-
-        window.submitLocalFastOrders = async function() {
-            const orders = Object.values(localFastOrders);
-            if (orders.length === 0) return;
-
-            const btn = document.getElementById('floating-fast-add');
-            if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO...';
-
-            try {
-                const promises = orders.map(o => window.addOrderToDb(o.item, o.finalPrice, o.quantity, ['Cobro rápido'], o.finalName, o.category, true, 'delivered'));
-                
-                await Promise.all(promises);
-                localFastOrders = {}; 
-                
-                const statusTxt = document.getElementById('status-indicator');
-                statusTxt.innerHTML = `<i class="fa-solid fa-check"></i> Guardado`;
-                statusTxt.className = "absolute left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 top-16 md:top-auto bg-green-500 text-white z-[60] font-bold text-sm transition-opacity";
-                statusTxt.classList.remove('hidden');
-                setTimeout(() => { statusTxt.classList.add('hidden'); }, 2000);
-
-                window.renderTableDetail(currentTableId);
-            } catch (e) {
-                alert("Error al guardar: " + e.message);
-                window.updateFloatingFastAddButton();
-            }
-        }
-
+        // ==========================================
+        // 5. INTERFAZ DE ORDENES Y MENÚ (MESA ACTIVA)
+        // ==========================================
         window.switchTab = function(t) {
-            if (t === 'orders' && Object.keys(localFastOrders).length > 0) {
-                currentTab = 'orders';
-                window.submitLocalFastOrders(); 
-                return;
-            }
+            if (t === 'orders' && Object.keys(localFastOrders).length > 0) return window.submitLocalFastOrders(); 
             currentTab = t;
-            const activeClass = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm";
-            const inactiveClass = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
-            
+            const act = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm", inact = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
             if(t==='menu'){ 
-                document.getElementById('tab-menu')?.classList.remove('hidden'); 
-                document.getElementById('tab-orders')?.classList.add('hidden'); 
-                document.getElementById('order-footer')?.classList.add('hidden'); 
-                document.getElementById('tab-btn-menu').className = activeClass;
-                document.getElementById('tab-btn-orders').className = inactiveClass;
+                document.getElementById('tab-menu')?.classList.remove('hidden'); document.getElementById('tab-orders')?.classList.add('hidden'); document.getElementById('order-footer')?.classList.add('hidden'); 
+                document.getElementById('tab-btn-menu').className = act; document.getElementById('tab-btn-orders').className = inact;
             } else { 
-                document.getElementById('tab-menu')?.classList.add('hidden'); 
-                document.getElementById('tab-orders')?.classList.remove('hidden'); 
-                document.getElementById('order-footer')?.classList.remove('hidden');
-                document.getElementById('tab-btn-orders').className = activeClass;
-                document.getElementById('tab-btn-menu').className = inactiveClass;
+                document.getElementById('tab-menu')?.classList.add('hidden'); document.getElementById('tab-orders')?.classList.remove('hidden'); document.getElementById('order-footer')?.classList.remove('hidden');
+                document.getElementById('tab-btn-orders').className = act; document.getElementById('tab-btn-menu').className = inact;
             }
         }
 
@@ -1088,122 +642,72 @@
             const t = tablesData.find(x => x.id === tid);
             if(!t) return window.renderWaiterDashboard();
 
-            const prevMenu = document.getElementById('tab-menu');
-            const prevOrders = document.getElementById('tab-orders');
-            if (prevMenu) scrollPositions.menu = prevMenu.scrollTop;
-            if (prevOrders) scrollPositions.orders = prevOrders.scrollTop;
+            if (document.getElementById('tab-menu')) scrollPositions.menu = document.getElementById('tab-menu').scrollTop;
+            if (document.getElementById('tab-orders')) scrollPositions.orders = document.getElementById('tab-orders').scrollTop;
 
-            const uniqueDisplay = t.uniqueId ? `#${t.uniqueId}` : '';
             const ords = ordersData.filter(o => o.tableId === tid && o.status !== 'cancelled').sort((a,b) => (b.timestamp?.seconds||0) - (a.timestamp?.seconds||0));
             const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
-            const deposit = t.deposit || 0;
-            const remaining = total - deposit;
+            const remaining = total - (t.deposit || 0);
 
             const isClosed = t.status === 'closed';
             const showMenu = !isClosed && currentTab === 'menu';
             const showOrders = isClosed || currentTab === 'orders';
 
-            const activeClass = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm";
-            const inactiveClass = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
-            const menuBtnClass = showMenu ? activeClass : inactiveClass;
-            const ordersBtnClass = showOrders ? activeClass : inactiveClass;
+            const act = "flex-1 py-4 text-blue-600 border-b-2 border-blue-600 bg-blue-50/50 font-bold text-sm", inact = "flex-1 py-4 text-slate-500 font-bold hover:bg-slate-50 transition text-sm";
+            const mClass = showMenu ? act : inact, oClass = showOrders ? act : inact;
+            const pBg = t.isVip ? 'bg-pink-50' : 'bg-slate-50';
 
-            let closeBtnText = t.status === 'debt' ? "Liquidar Deuda" : "Cerrar Cuenta";
-            let closeBtnColorClass = t.status === 'debt' ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700";
+            let tDisp = `<div class="flex justify-between mb-3 font-black text-2xl text-slate-800 px-2"><span>Total</span><span>$${total}</span></div>`;
+            if ((t.deposit || 0) > 0) tDisp = `<div class="flex justify-between text-sm text-slate-500 font-mono"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-sm text-red-500 font-mono"><span>A cuenta</span><span>-$${t.deposit}</span></div><div class="flex justify-between font-black text-2xl text-slate-800 border-t border-slate-200 pt-2 mt-2"><span>Restante</span><span>$${remaining}</span></div>`;
             
-            let totalDisplay = `<div class="flex justify-between mb-3 font-black text-2xl text-slate-800 px-2"><span>Total</span><span>$${total}</span></div>`;
-            if (deposit > 0) totalDisplay = `<div class="flex justify-between text-sm text-slate-500 font-mono"><span>Subtotal</span><span>$${total}</span></div><div class="flex justify-between text-sm text-red-500 font-mono"><span>A cuenta</span><span>-$${deposit}</span></div><div class="flex justify-between font-black text-2xl text-slate-800 border-t border-slate-200 pt-2 mt-2"><span>Restante</span><span>$${remaining}</span></div>`;
+            let footerHtml = isClosed ? 
+            `<div id="order-footer" class="fixed bottom-0 w-full bg-slate-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-30 border-t border-slate-300"><div class="flex justify-between mb-3 font-bold text-2xl text-slate-800 px-2"><span>Total Final</span><span>$${total}</span></div><div class="flex gap-3"><button onclick="window.printR('${tid}')" class="flex-1 bg-slate-800 text-white font-bold rounded-xl py-3 shadow hover:bg-slate-700 transition"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="window.downloadPDF('${tid}')" class="flex-1 bg-red-500 text-white font-bold rounded-xl py-3 shadow hover:bg-red-600 transition"><i class="fa-solid fa-file-pdf"></i> PDF</button></div><div class="text-center text-xs text-slate-400 mt-3 font-bold uppercase tracking-widest pt-2">MESA CERRADA</div></div>` : 
+            `<div id="order-footer" class="fixed bottom-0 w-full bg-white p-4 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-30 border-t border-slate-200 ${showOrders?'':'hidden'}">${tDisp}<button onclick="window.openCloseAccountModal('${tid}')" class="w-full ${t.status === 'debt' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white font-bold rounded-xl py-4 text-lg mt-2 shadow-md transition active:scale-95 uppercase tracking-wide">${t.status === 'debt' ? "Liquidar Deuda" : "Cerrar Cuenta"}</button></div>`;
             
-            let footerHtml = isClosed ? `<div id="order-footer" class="fixed bottom-0 w-full bg-slate-100 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-30 border-t border-slate-300"><div class="flex justify-between mb-3 font-bold text-2xl text-slate-800 px-2"><span>Total Final</span><span>$${total}</span></div><div class="flex gap-3"><button onclick="window.printR('${tid}')" class="flex-1 bg-slate-800 text-white font-bold rounded-xl py-3 shadow hover:bg-slate-700 transition"><i class="fa-solid fa-print"></i> Ticket</button><button onclick="window.downloadPDF('${tid}')" class="flex-1 bg-red-500 text-white font-bold rounded-xl py-3 shadow hover:bg-red-600 transition"><i class="fa-solid fa-file-pdf"></i> PDF</button></div><div class="text-center text-xs text-slate-400 mt-3 font-bold uppercase tracking-widest pt-2">MESA CERRADA</div></div>` : 
-            `<div id="order-footer" class="fixed bottom-0 w-full bg-white p-4 shadow-[0_-4px_15px_rgba(0,0,0,0.05)] z-30 border-t border-slate-200 ${showOrders ? '' : 'hidden'}">${totalDisplay}<button onclick="window.openCloseAccountModal('${tid}')" class="w-full ${closeBtnColorClass} text-white font-bold rounded-xl py-4 text-lg mt-2 shadow-md transition active:scale-95 uppercase tracking-wide">${closeBtnText}</button></div>`;
-            
-            const pageBgClass = t.isVip ? 'bg-pink-50' : 'bg-slate-50';
-            const vipHeader = t.isVip ? `<span class="ml-3 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>` : '';
-
-            let menuContentHtml = ''; let floatingBtnHtml = '';
-
+            let menuContentHtml = '', floatingBtnHtml = '';
             if (isCobrarMode) {
                 menuContentHtml = window.renderFastMenu();
-                let localTotal = 0; let localCount = 0;
-                Object.values(localFastOrders).forEach(o => { localTotal += o.finalPrice * o.quantity; localCount += o.quantity; });
-                const floatHidden = localCount > 0 ? '' : 'hidden';
-                
-                floatingBtnHtml = `<button id="floating-fast-add" onclick="window.submitLocalFastOrders()" class="${floatHidden} fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white font-black text-lg py-4 px-6 rounded-full shadow-lg z-[60] flex items-center justify-center gap-2 transition active:scale-95 border border-green-400">AGREGAR $${localTotal} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full shadow-sm">${localCount}</span></button>`;
+                let lTot = 0, lCnt = 0; Object.values(localFastOrders).forEach(o => { lTot += o.finalPrice * o.quantity; lCnt += o.quantity; });
+                floatingBtnHtml = `<button id="floating-fast-add" onclick="window.submitLocalFastOrders()" class="${lCnt > 0 ? '' : 'hidden'} fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white font-black text-lg py-4 px-6 rounded-full shadow-lg z-[60] flex items-center justify-center gap-2 transition active:scale-95 border border-green-400">AGREGAR $${lTot} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full shadow-sm">${lCnt}</span></button>`;
             } else {
                 menuContentHtml = `<h3 class="cat-header">Cocina</h3><div class="grid gap-3 mb-8">${window.renderMenuSection('kitchen')}</div><h3 class="cat-header">Barra</h3><div class="grid gap-3">${window.renderMenuSection('bar')}</div>`;
             }
 
-            const switchHtml = isClosed ? '' : `
-                <div class="flex justify-center mb-6">
-                    <div class="bg-slate-200 rounded-xl p-1 flex w-full max-w-[320px] relative h-12 items-center">
-                        <button onclick="window.setCobrarMode(false)" class="flex-1 text-xs font-bold z-10 transition-colors ${!isCobrarMode ? 'text-blue-700' : 'text-slate-500'}">📝 ORDENAR</button>
-                        <button onclick="window.setCobrarMode(true)" class="flex-1 text-xs font-bold z-10 transition-colors ${isCobrarMode ? 'text-green-700' : 'text-slate-500'}">💲 RÁPIDO</button>
-                        <div class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-transform duration-300 ${isCobrarMode ? 'translate-x-[calc(100%+4px)]' : ''}"></div>
-                    </div>
-                </div>
-            `;
-
-            let html = `<div class="flex flex-col h-full ${pageBgClass}">
+            let html = `<div class="flex flex-col h-full ${pBg}">
                 <div class="bg-slate-800 text-white p-4 flex items-center justify-between shadow-md shrink-0">
                     <button onclick="window.renderWaiterDashboard()" class="text-slate-300 font-bold text-sm flex items-center gap-2 hover:text-white transition"><i class="fa-solid fa-chevron-left"></i> Volver</button>
-                    <div class="text-center"><div class="font-black text-xl leading-none flex items-center justify-center tracking-tight">MESA ${t.number} ${vipHeader}</div><div class="text-[10px] font-mono text-slate-400 mt-1 font-bold">Ticket ${uniqueDisplay}</div></div><div class="w-14"></div>
+                    <div class="text-center"><div class="font-black text-xl leading-none flex items-center justify-center tracking-tight">MESA ${t.number} ${t.isVip ? `<span class="ml-3 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>` : ''}</div><div class="text-[10px] font-mono text-slate-400 mt-1 font-bold">Ticket ${t.uniqueId ? `#${t.uniqueId}` : ''}</div></div><div class="w-14"></div>
                 </div>
                 <div class="bg-white shadow-sm flex border-b border-slate-200 shrink-0">
-                    <button onclick="window.switchTab('menu')" id="tab-btn-menu" class="${menuBtnClass}">MENÚ</button>
-                    <button onclick="window.switchTab('orders')" id="tab-btn-orders" class="${ordersBtnClass}">CUENTA</button>
+                    <button onclick="window.switchTab('menu')" id="tab-btn-menu" class="${mClass}">MENÚ</button><button onclick="window.switchTab('orders')" id="tab-btn-orders" class="${oClass}">CUENTA</button>
                 </div>
-                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-32 ${showMenu ? '' : 'hidden'} ${pageBgClass} relative">
-                    ${switchHtml}
-                    ${menuContentHtml}
-                    ${floatingBtnHtml}
+                <div id="tab-menu" class="flex-1 overflow-y-auto p-4 pb-32 ${showMenu ? '' : 'hidden'} ${pBg} relative">
+                    ${!isClosed ? `<div class="flex justify-center mb-6"><div class="bg-slate-200 rounded-xl p-1 flex w-full max-w-[320px] relative h-12 items-center"><button onclick="window.setCobrarMode(false)" class="flex-1 text-xs font-bold z-10 transition-colors ${!isCobrarMode ? 'text-blue-700' : 'text-slate-500'}">📝 ORDENAR</button><button onclick="window.setCobrarMode(true)" class="flex-1 text-xs font-bold z-10 transition-colors ${isCobrarMode ? 'text-green-700' : 'text-slate-500'}">💲 RÁPIDO</button><div class="absolute top-1 bottom-1 w-[calc(50%-4px)] bg-white rounded-lg shadow-sm transition-transform duration-300 ${isCobrarMode ? 'translate-x-[calc(100%+4px)]' : ''}"></div></div></div>` : ''}
+                    ${menuContentHtml}${floatingBtnHtml}
                 </div>
-                <div id="tab-orders" class="${showOrders ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-52 ${pageBgClass}">
-                    ${ords.length === 0 ? '<div class="text-center py-12 text-slate-400 italic font-medium bg-white rounded-2xl border border-dashed border-slate-300">Mesa vacía - Sin pedidos</div>' : ''}
+                <div id="tab-orders" class="${showOrders ? '' : 'hidden'} flex-1 overflow-y-auto p-4 pb-52 ${pBg}">
+                    ${ords.length === 0 ? '<div class="text-center py-12 text-slate-400 italic font-medium bg-white rounded-2xl border border-dashed border-slate-300">Mesa vacía</div>' : ''}
                     ${ords.map(o => {
                         let stClass = "bg-slate-100 text-slate-500", stIcon = "fa-clock";
                         if(o.status === 'preparing') { stClass = "bg-amber-100 text-amber-700"; stIcon = "fa-fire"; }
                         if(o.status === 'ready') { stClass = "bg-green-100 text-green-700"; stIcon = "fa-bell"; }
                         if(o.status === 'delivered') { stClass = "bg-blue-100 text-blue-700"; stIcon = "fa-thumbs-up"; }
-                        const itemBgClass = t.isVip ? 'bg-white border-pink-200' : 'bg-white border-slate-200';
-                        const safeName = o.itemName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                        const timeDisplay = o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '...';
-
-                        return `<div class="${itemBgClass} p-4 rounded-2xl shadow-sm mb-3 border relative overflow-hidden">
-                        ${t.isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-transparent border-r-pink-100"></div>' : ''}
-                        <div class="flex justify-between items-start relative z-10">
-                            <div><div class="font-bold text-slate-800 text-lg leading-tight flex items-center gap-2">
-                                <span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md text-sm">${o.quantity}x</span> 
-                                <span>${o.itemName}</span>
-                                ${!isClosed ? `<button onclick="event.stopPropagation(); window.deleteOrder('${o.id}', ${o.quantity}, '${safeName}')" class="text-slate-400 hover:text-red-500 ml-1 bg-transparent border-none cursor-pointer transition-colors"><i class="fa-solid fa-trash-can"></i></button>` : ''}
-                            </div>
-                                ${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-amber-700 font-bold mt-2 bg-amber-50 px-2 py-1 rounded-md inline-block border border-amber-100"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}
-                                <div class="text-[10px] text-slate-400 mt-2 font-mono font-medium flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeDisplay}</div></div>
-                            <div class="text-right flex flex-col items-end gap-2">
-                                <div class="font-black text-slate-700 text-xl">$${o.price*o.quantity}</div>
-                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 justify-end uppercase tracking-wider ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span>
-                            </div>
-                        </div></div>`;
+                        return `<div class="${t.isVip ? 'bg-white border-pink-200' : 'bg-white border-slate-200'} p-4 rounded-2xl shadow-sm mb-3 border relative overflow-hidden">${t.isVip ? '<div class="absolute top-0 right-0 w-0 h-0 border-t-[30px] border-r-[30px] border-t-transparent border-r-pink-100"></div>' : ''}
+                        <div class="flex justify-between items-start relative z-10"><div><div class="font-bold text-slate-800 text-lg leading-tight flex items-center gap-2"><span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md text-sm">${o.quantity}x</span><span>${o.itemName}</span>${!isClosed ? `<button onclick="event.stopPropagation(); window.deleteOrder('${o.id}', ${o.quantity}, '${o.itemName.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')" class="text-slate-400 hover:text-red-500 ml-1 bg-transparent border-none cursor-pointer transition-colors"><i class="fa-solid fa-trash-can"></i></button>` : ''}</div>${o.modifiers&&o.modifiers.length?`<div class="text-[11px] text-amber-700 font-bold mt-2 bg-amber-50 px-2 py-1 rounded-md inline-block border border-amber-100"><i class="fa-solid fa-pen-to-square mr-1"></i> ${o.modifiers.join(', ')}</div>`:''}<div class="text-[10px] text-slate-400 mt-2 font-mono font-medium flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${o.timestamp ? new Date(o.timestamp.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : '...'}</div></div><div class="text-right flex flex-col items-end gap-2"><div class="font-black text-slate-700 text-xl">$${o.price*o.quantity}</div><span class="text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 justify-end uppercase tracking-wider ${stClass}"><i class="fa-solid ${stIcon}"></i> ${o.status}</span></div></div></div>`;
                     }).join('')}
-                </div>
-                ${footerHtml}</div>`;
+                </div>${footerHtml}</div>`;
             document.getElementById('content-area').innerHTML = html;
 
             setTimeout(() => {
-                const newMenu = document.getElementById('tab-menu');
-                const newOrders = document.getElementById('tab-orders');
-                if (newMenu) newMenu.scrollTop = scrollPositions.menu;
-                if (newOrders) newOrders.scrollTop = scrollPositions.orders;
+                if (document.getElementById('tab-menu')) document.getElementById('tab-menu').scrollTop = scrollPositions.menu;
+                if (document.getElementById('tab-orders')) document.getElementById('tab-orders').scrollTop = scrollPositions.orders;
             }, 0);
         }
 
         window.renderMenuSection = function(cat) {
             return MENU.filter(i => i.category === cat).map(i => `
                 <button onclick="window.openCustomizeModal('${i.id}')" class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center text-left hover:bg-slate-50 border border-slate-200 active:border-blue-400 transition-all group w-full active:scale-[0.98]">
-                    <div class="flex items-center gap-4 relative z-10">
-                        <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-blue-500 group-active:bg-blue-100 transition-colors text-xl"><i class="fa-solid ${i.icon}"></i></div>
-                        <div><div class="font-bold text-slate-800 text-base group-active:text-blue-700">${i.name}</div><div class="text-sm text-slate-500 font-semibold mt-0.5">$${i.price}</div></div>
-                    </div>
-                    <div class="bg-slate-100 text-slate-400 w-8 h-8 rounded-full flex items-center justify-center font-bold group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors text-sm relative z-10"><i class="fa-solid fa-plus"></i></div>
+                    <div class="flex items-center gap-4 relative z-10"><div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-slate-500 group-hover:text-blue-500 group-active:bg-blue-100 transition-colors text-xl"><i class="fa-solid ${i.icon}"></i></div><div><div class="font-bold text-slate-800 text-base group-active:text-blue-700">${i.name}</div><div class="text-sm text-slate-500 font-semibold mt-0.5">$${i.price}</div></div></div><div class="bg-slate-100 text-slate-400 w-8 h-8 rounded-full flex items-center justify-center font-bold group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors text-sm relative z-10"><i class="fa-solid fa-plus"></i></div>
                 </button>`).join('');
         }
 
@@ -1228,13 +732,7 @@
                     </div>`;
                 window.checkChamoy();
             } else {
-                let mods = [];
-                if (item.customMods && item.customMods.length > 0) {
-                    mods = item.customMods;
-                } else {
-                    mods = item.modGroup ? MODIFIERS[item.modGroup] : (MODIFIERS['general_' + item.category] || []);
-                }
-
+                let mods = item.customMods && item.customMods.length > 0 ? item.customMods : (item.modGroup ? MODIFIERS[item.modGroup] : (MODIFIERS['general_' + item.category] || []));
                 modal.innerHTML = `
                     <div class="flex-1 flex flex-col h-full max-h-[85vh] bg-white relative">
                         <div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div>
@@ -1254,96 +752,38 @@
 
         window.openPackageModal = function(item) {
             const modal = document.getElementById('modal-content');
-            let content = '';
+            const salsaSection = (title, name) => `<div class="pkg-section"><h4 class="pkg-title">${title}</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-2 text-xs border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-50 font-bold text-slate-600 transition-colors bg-white"><input type="radio" name="${name}" value="${s}" class="accent-amber-500 w-4 h-4"> ${s}</label>`).join('')}</div></div>`;
+            const beerSection = (num) => `<div class="pkg-section"><h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> Tarro ${num} (½ Lt)</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p_beer_type_${num}" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select><select id="p_beer_prep_${num}" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p_beer_nolimon_${num}" class="w-4 h-4 accent-red-500"> Sin Limón</label></div>`;
             
-            const salsaSection = (title, name) => `
-                <div class="pkg-section">
-                    <h4 class="pkg-title">${title}</h4>
-                    <div class="grid grid-cols-2 gap-2">
-                        ${MODIFIERS.salsas.map(s => `<label class="flex items-center gap-2 text-xs border border-slate-200 p-3 rounded-lg cursor-pointer hover:bg-slate-50 font-bold text-slate-600 transition-colors bg-white"><input type="radio" name="${name}" value="${s}" class="accent-amber-500 w-4 h-4"> ${s}</label>`).join('')}
-                    </div>
-                </div>`;
+            let content = '';
+            if(item.id === 'p1') { content = `${salsaSection('Salsa Alitas', 'p1_salsa_alitas')}${salsaSection('Salsa Boneless', 'p1_salsa_boneless')}<div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div></div>${beerSection(1)} ${beerSection(2)}`; }
+            else if(item.id === 'p2') { content = `<div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Alitas" checked class="w-5 h-5 accent-blue-500"> Alitas</label><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Boneless" class="w-5 h-5 accent-blue-500"> Boneless</label></div>${salsaSection('Salsa Principal', 'p2_salsa_main').replace('<div class="pkg-section">','<div>').replace('pkg-title', 'text-xs font-bold text-slate-400 uppercase mb-2 block')}</div><div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h1_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div><div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h2_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div><div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_side_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>${beerSection(1)} ${beerSection(2)}`; }
+            else if(item.id === 'p3') { content = `${salsaSection('Salsa Alitas', 'p3_salsa_alitas')}${salsaSection('Salsa Boneless', 'p3_salsa_boneless')}<div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_aros_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div><div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.hotdogs.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_hd_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div><div class="pkg-section"><h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> 3 Tarros Chicos</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p3_beer_type" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select><select id="p3_beer_prep" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p3_beer_nolimon" class="w-4 h-4 accent-red-500"> Sin Limón</label></div>`; }
 
-            const beerSection = (num) => `
-                <div class="pkg-section">
-                    <h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> Tarro ${num} (½ Lt)</h4>
-                    <div class="grid grid-cols-2 gap-3 mb-3">
-                        <select id="p_beer_type_${num}" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select>
-                        <select id="p_beer_prep_${num}" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select>
-                    </div>
-                    <label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p_beer_nolimon_${num}" class="w-4 h-4 accent-red-500"> Sin Limón</label>
-                </div>`;
-
-            if(item.id === 'p1') {
-                content = `
-                    ${salsaSection('Salsa Alitas', 'p1_salsa_alitas')}
-                    ${salsaSection('Salsa Boneless', 'p1_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p1_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div></div>
-                    ${beerSection(1)} ${beerSection(2)}
-                `;
-            } else if(item.id === 'p2') {
-                content = `
-                    <div class="pkg-section"><h4 class="pkg-title">Elección Principal</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Alitas" checked class="w-5 h-5 accent-blue-500"> Alitas</label><label class="flex items-center gap-2 font-bold text-slate-800 text-base"><input type="radio" name="p2_main" value="Boneless" class="w-5 h-5 accent-blue-500"> Boneless</label></div>${salsaSection('Salsa Principal', 'p2_salsa_main').replace('<div class="pkg-section">','<div>').replace('pkg-title', 'text-xs font-bold text-slate-400 uppercase mb-2 block')}</div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 1</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h1_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Hamburguesa 2</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.burgers.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_h2_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">Guarnición</h4><div class="flex gap-4 mb-4 bg-slate-50 p-3 rounded-lg"><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Papas" checked class="w-5 h-5 accent-blue-500"> ½ Papas</label><label class="flex items-center gap-2 font-bold text-slate-700"><input type="radio" name="p2_side" value="Media Aros" class="w-5 h-5 accent-blue-500"> ½ Aros</label></div><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p2_side_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    ${beerSection(1)} ${beerSection(2)}
-                `;
-            } else if(item.id === 'p3') {
-                content = `
-                    ${salsaSection('Salsa Alitas', 'p3_salsa_alitas')}
-                    ${salsaSection('Salsa Boneless', 'p3_salsa_boneless')}
-                    <div class="pkg-section"><h4 class="pkg-title">Aros de Cebolla</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.snacks.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_aros_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title">3 Hot Dogs (Iguales)</h4><div class="grid grid-cols-2 gap-2">${MODIFIERS.hotdogs.map(m=>`<label class="text-xs flex items-center gap-2 bg-white border border-slate-200 p-2 font-bold text-slate-600 rounded-lg hover:bg-slate-50"><input type="checkbox" class="p3_hd_mod w-4 h-4 accent-red-500" value="${m}"> ${m}</label>`).join('')}</div></div>
-                    <div class="pkg-section"><h4 class="pkg-title flex items-center gap-2"><div class="bg-amber-100 text-amber-600 w-6 h-6 flex items-center justify-center rounded-full"><i class="fa-solid fa-beer-mug-empty text-xs"></i></div> 3 Tarros Chicos</h4><div class="grid grid-cols-2 gap-3 mb-3"><select id="p3_beer_type" class="w-full text-sm p-2"><option value="Clara">Clara</option><option value="Oscura">Oscura</option></select><select id="p3_beer_prep" class="w-full text-sm p-2"><option value="Escarchado Chamoy">Chamoy</option><option value="Escarchado Sal">Sal</option><option value="Sin Escarchar">Sin Escarchar</option></select></div><label class="flex items-center gap-2 text-sm font-bold text-red-500 bg-red-50 p-2 rounded-lg border border-red-200 cursor-pointer w-fit"><input type="checkbox" id="p3_beer_nolimon" class="w-4 h-4 accent-red-500"> Sin Limón</label></div>
-                `;
-            }
-
-            modal.innerHTML = `
-                <div class="flex-1 flex flex-col h-full max-h-[90vh] bg-white relative">
-                    <div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div>
-                    <div class="p-4 overflow-y-auto flex-1 bg-slate-50">${content}</div>
-                    <div class="p-4 border-t border-slate-100 bg-white flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.submitPackageOrder('${item.id}')" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition">Agregar Paquete</button></div>
-                </div>`;
+            modal.innerHTML = `<div class="flex-1 flex flex-col h-full max-h-[90vh] bg-white relative"><div class="p-5 border-b border-slate-100 flex justify-between items-center relative"><div><h3 class="font-black text-xl text-slate-800 tracking-tight">${item.name}</h3><p class="text-blue-600 font-bold">$${item.price}</p></div><button onclick="window.closeModal()" class="text-slate-400 text-xl hover:text-red-500 transition bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center absolute top-5 right-5"><i class="fa-solid fa-times"></i></button></div><div class="p-4 overflow-y-auto flex-1 bg-slate-50">${content}</div><div class="p-4 border-t border-slate-100 bg-white flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold rounded-xl py-4 hover:bg-slate-200 transition">Cancelar</button><button onclick="window.submitPackageOrder('${item.id}')" class="flex-1 bg-blue-600 text-white font-bold rounded-xl py-4 shadow-md hover:bg-blue-700 transition">Agregar Paquete</button></div></div>`;
             document.getElementById('modal-overlay').classList.remove('hidden');
         }
 
         window.submitPackageOrder = async function(itemId) {
             const item = MENU.find(i => i.id === itemId);
-            let kitchenMods = [];
-            let barMods = [];
-
+            let kitchenMods = [], barMods = [];
             const getRadio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || 'Sin elección';
             const getChecks = (cls) => Array.from(document.querySelectorAll(`.${cls}:checked`)).map(c => c.value).join(', ');
             const getBeer = (n) => `T${n}: ${document.getElementById(`p_beer_type_${n}`).value}, ${document.getElementById(`p_beer_prep_${n}`).value}` + (document.getElementById(`p_beer_nolimon_${n}`).checked ? ' (Sin Limón)' : '');
 
             if(itemId === 'p1') {
-                kitchenMods.push(`Alitas: ${getRadio('p1_salsa_alitas')}`);
-                kitchenMods.push(`Boneless: ${getRadio('p1_salsa_boneless')}`);
-                kitchenMods.push(`Guarnición: ${getRadio('p1_side')}`);
-                barMods.push(getBeer(1));
-                barMods.push(getBeer(2));
+                kitchenMods.push(`Alitas: ${getRadio('p1_salsa_alitas')}`, `Boneless: ${getRadio('p1_salsa_boneless')}`, `Guarnición: ${getRadio('p1_side')}`);
+                barMods.push(getBeer(1), getBeer(2));
             } else if(itemId === 'p2') {
-                kitchenMods.push(`Principal: ${getRadio('p2_main')} (${getRadio('p2_salsa_main')})`);
-                kitchenMods.push(`Burg 1: ${getChecks('p2_h1_mod') || 'Sencilla'}`);
-                kitchenMods.push(`Burg 2: ${getChecks('p2_h2_mod') || 'Sencilla'}`);
-                kitchenMods.push(`Guarnición: ${getRadio('p2_side')} (${getChecks('p2_side_mod')})`);
-                barMods.push(getBeer(1));
-                barMods.push(getBeer(2));
+                kitchenMods.push(`Principal: ${getRadio('p2_main')} (${getRadio('p2_salsa_main')})`, `Burg 1: ${getChecks('p2_h1_mod') || 'Sencilla'}`, `Burg 2: ${getChecks('p2_h2_mod') || 'Sencilla'}`, `Guarnición: ${getRadio('p2_side')} (${getChecks('p2_side_mod')})`);
+                barMods.push(getBeer(1), getBeer(2));
             } else if(itemId === 'p3') {
-                kitchenMods.push(`Alitas: ${getRadio('p3_salsa_alitas')}`);
-                kitchenMods.push(`Boneless: ${getRadio('p3_salsa_boneless')}`);
-                kitchenMods.push(`Aros: ${getChecks('p3_aros_mod')}`);
-                kitchenMods.push(`3 HotDogs: ${getChecks('p3_hd_mod')}`);
+                kitchenMods.push(`Alitas: ${getRadio('p3_salsa_alitas')}`, `Boneless: ${getRadio('p3_salsa_boneless')}`, `Aros: ${getChecks('p3_aros_mod')}`, `3 HotDogs: ${getChecks('p3_hd_mod')}`);
                 barMods.push(`3 Tarros: ${document.getElementById('p3_beer_type').value}, ${document.getElementById('p3_beer_prep').value}` + (document.getElementById('p3_beer_nolimon').checked ? ' (Sin Limón)' : ''));
             }
-
-            // Para los paquetes, registramos y solo bajamos inventario con el primero
             await window.addOrderToDb(item, item.price, 1, kitchenMods, `${item.name} (Cocina)`, 'kitchen', true);
             await window.addOrderToDb(item, 0, 1, barMods, `${item.name} (Barra)`, 'bar', false); 
-            
-            window.closeModal();
-            window.switchTab('orders');
+            window.closeModal(); window.switchTab('orders');
         }
 
         window.selectRadio = function(el, groupId) { const group = document.getElementById(groupId); if(group) { group.querySelectorAll('.beer-radio, .prep-radio').forEach(d => d.classList.remove('selected')); el.classList.add('selected'); } }
@@ -1364,8 +804,7 @@
             const note = document.getElementById('manual-note').value.trim(); if(note) mods.push(note);
             
             await window.addOrderToDb(item, finalPrice, qty, mods);
-            window.closeModal();
-            window.switchTab('orders');
+            window.closeModal(); window.switchTab('orders');
         }
 
         window.submitGeneralOrder = async function(itemId) {
@@ -1376,49 +815,337 @@
             if(note) mods.push(note);
             
             await window.addOrderToDb(item, item.price, qty, mods);
-            window.closeModal();
-            window.switchTab('orders');
+            window.closeModal(); window.switchTab('orders');
         }
 
         window.addOrderToDb = async function(item, price, qty, mods, forceName = null, forceCat = null, updateInv = true, customStatus = 'ordered') {
             try {
-                await db.collection('orders').add({
-                    tableId: currentTableId, 
-                    itemId: item.id, 
-                    itemName: forceName || item.name, 
-                    category: forceCat || item.category,
-                    price: price, 
-                    quantity: qty, 
-                    modifiers: mods, 
-                    status: customStatus, 
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
+                await db.collection('orders').add({ tableId: currentTableId, itemId: item.id, itemName: forceName || item.name, category: forceCat || item.category, price: price, quantity: qty, modifiers: mods, status: customStatus, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                 if (updateInv && item.id) {
-                    const totalDeduction = qty * (item.invCost || 1);
-
-                    db.collection('menu_items').doc(item.id).update({
-                        sold_since_update: firebase.firestore.FieldValue.increment(qty)
-                    }).catch(e => console.warn("Error sold count:", e));
-
-                    if (item.invId) {
-                        db.collection('inventory').doc(item.invId).update({
-                            stock: firebase.firestore.FieldValue.increment(-totalDeduction)
-                        }).catch(e => console.warn("Error inv update:", e));
-                    }
+                    db.collection('menu_items').doc(item.id).update({ sold_since_update: firebase.firestore.FieldValue.increment(qty) }).catch(e => console.warn(e));
+                    if (item.invId) db.collection('inventory').doc(item.invId).update({ stock: firebase.firestore.FieldValue.increment(-(qty * (item.invCost || 1))) }).catch(e => console.warn(e));
                 }
             } catch(e) { alert("Error agregando orden: " + e.message); }
         }
 
-        // --- SISTEMA DE COCINA / BARRA ---
+        // ==========================================
+        // 6. ELIMINAR ÓRDENES
+        // ==========================================
+        window.deleteOrder = async function(orderId, currentQty, itemName) {
+            event.stopPropagation(); 
+            if (currentQty > 1) window.openDeleteQuantityModal(orderId, currentQty, itemName);
+            else if(confirm(`¿Borrar "${itemName}" de la cuenta?`)) await window.confirmDelete(orderId, currentQty, 1);
+        }
+
+        window.openDeleteQuantityModal = function(orderId, currentQty, itemName) {
+             document.getElementById('modal-content').innerHTML = `
+                <div class="p-6 text-center bg-white relative">
+                    <h3 class="font-black text-xl mb-4 text-slate-800 border-b border-slate-100 pb-3">Borrar Artículo</h3>
+                    <p class="mb-2 text-slate-600 text-sm">Hay <strong>${currentQty}</strong> ordenados de:<br><span class="text-slate-800 font-bold text-lg">${itemName}</span></p>
+                    <p class="mb-4 text-slate-400 text-xs font-bold uppercase tracking-wider">¿Cuántos eliminar?</p>
+                    <div class="flex justify-center items-center gap-6 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-200"><button onclick="window.adjDelQty(-1)" class="w-14 h-14 rounded-full bg-white text-slate-600 font-bold text-2xl border border-slate-200 shadow-sm active:scale-95 transition">-</button><span id="del-qty-val" class="text-4xl font-black text-red-500 w-12 text-center">1</span><button onclick="window.adjDelQty(1, ${currentQty})" class="w-14 h-14 rounded-full bg-red-500 text-white font-bold text-2xl shadow-md hover:bg-red-600 active:scale-95 transition">+</button></div>
+                    <div class="flex gap-3"><button onclick="window.closeModal()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-4 rounded-xl hover:bg-slate-200 transition">Cancelar</button><button onclick="window.confirmDeleteFromModal('${orderId}', ${currentQty})" class="flex-1 bg-red-500 text-white font-bold py-4 rounded-xl shadow-md hover:bg-red-600 transition">Confirmar</button></div>
+                </div>`;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        window.adjDelQty = function(delta, max) {
+            const el = document.getElementById('del-qty-val');
+            let val = parseInt(el.innerText) + delta;
+            if (val < 1) val = 1; if (max && val > max) val = max;
+            el.innerText = val;
+        }
+
+        window.confirmDeleteFromModal = async function(orderId, currentQty) {
+            await window.confirmDelete(orderId, currentQty, parseInt(document.getElementById('del-qty-val').innerText));
+            window.closeModal();
+        }
+
+        window.confirmDelete = async function(orderId, currentQty, qtyToDelete) {
+            try {
+                const docSnap = await db.collection('orders').doc(orderId).get();
+                if(docSnap.exists) {
+                    const orderData = docSnap.data();
+                    const itemId = orderData.itemId;
+                    if (qtyToDelete >= currentQty) await db.collection('orders').doc(orderId).delete();
+                    else await db.collection('orders').doc(orderId).update({ quantity: currentQty - qtyToDelete });
+                    
+                    if(itemId) {
+                        const menuItem = MENU.find(m => m.id === itemId);
+                        if (menuItem) {
+                            db.collection('menu_items').doc(itemId).update({ sold_since_update: firebase.firestore.FieldValue.increment(-qtyToDelete) }).catch(e=>console.warn(e));
+                            if (menuItem.invId) db.collection('inventory').doc(menuItem.invId).update({ stock: firebase.firestore.FieldValue.increment(qtyToDelete * (menuItem.invCost || 1)) }).catch(e=>console.warn(e));
+                        }
+                    }
+                }
+            } catch(e) { alert("Error al borrar: " + e.message); }
+        }
+
+        // ==========================================
+        // 7. MODO DE COBRO RÁPIDO
+        // ==========================================
+        window.setCobrarMode = function(isCobrar) {
+            if (Object.keys(localFastOrders).length > 0 && !isCobrar && !confirm("Tienes artículos sin agregar. ¿Deseas descartarlos al salir del modo Rápido?")) return;
+            localFastOrders = {}; isCobrarMode = isCobrar; scrollPositions.menu = 0; window.renderTableDetail(currentTableId);
+        }
+
+        window.getFastMenuGroups = function() {
+            let items = [];
+            MENU.forEach(item => {
+                items.push({ ...item, displayName: item.name, finalPrice: item.price, extraName: '', extraPrice: 0 });
+                if (item.isBeer) items.push({ ...item, displayName: `${item.name} + Clamato`, finalPrice: item.price + 5, extraName: '+ Clamato', extraPrice: 5 });
+            });
+            let groups = {};
+            items.forEach(i => { if (!groups[i.finalPrice]) groups[i.finalPrice] = []; groups[i.finalPrice].push(i); });
+            return groups;
+        }
+
+        window.renderFastMenu = function() {
+            const groups = window.getFastMenuGroups();
+            const sortedPrices = Object.keys(groups).map(Number).sort((a,b) => a - b);
+            return sortedPrices.map(price => {
+                const items = groups[price];
+                const buttons = items.map(i => {
+                    const safeKey = (i.id + (i.extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
+                    const localQty = localFastOrders[safeKey] ? localFastOrders[safeKey].quantity : 0;
+                    return `
+                    <div class="flex h-16 rounded-xl shadow-sm border border-slate-200 bg-white hover:border-blue-300 transition-colors relative">
+                        <button onclick="window.fastRemoveOrder('${i.id}', '${i.extraName}')" class="w-1/4 bg-red-50 hover:bg-red-100 text-red-500 border-r border-slate-100 flex items-center justify-center active:bg-red-200 transition-colors rounded-l-xl"><i class="fa-solid fa-minus"></i></button>
+                        <button onclick="window.fastAddOrder('${i.id}', '${i.extraName}', ${i.extraPrice})" class="w-3/4 flex flex-col items-center justify-center relative active:bg-green-50 transition-colors p-2 rounded-r-xl">
+                            <div id="badge-${safeKey}" class="absolute -top-2 -right-2 bg-blue-500 text-white text-[11px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md ${localQty > 0 ? '' : 'hidden'} z-20 transform transition-transform border-2 border-white">${localQty}</div>
+                            <span class="text-[11px] font-bold text-slate-700 leading-tight text-center relative z-10">${i.displayName}</span>
+                        </button>
+                    </div>`;
+                }).join('');
+                return `
+                    <div class="mb-5 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                        <h4 class="font-black text-slate-800 border-b border-slate-100 mb-3 pb-2 flex justify-between items-center text-lg"><span>$${price}</span><span class="text-xs text-slate-400 font-normal bg-slate-100 px-2 py-1 rounded-md">${items.length} items</span></h4>
+                        <div class="grid grid-cols-2 gap-3">${buttons}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        window.fastAddOrder = function(itemId, extraName, extraPrice) {
+            const item = MENU.find(i => i.id === itemId);
+            const safeKey = (itemId + (extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
+            if (!localFastOrders[safeKey]) localFastOrders[safeKey] = { item: item, finalName: extraName ? `${item.name} ${extraName}` : item.name, finalPrice: item.price + extraPrice, quantity: 0, category: item.category };
+            localFastOrders[safeKey].quantity += 1;
+            const badge = document.getElementById(`badge-${safeKey}`);
+            if (badge) { badge.innerText = localFastOrders[safeKey].quantity; badge.classList.remove('hidden', 'pop-anim'); void badge.offsetWidth; badge.classList.add('pop-anim'); }
+            window.updateFloatingFastAddButton();
+        }
+
+        window.fastRemoveOrder = function(itemId, extraName) {
+            const safeKey = (itemId + (extraName || '')).replace(/[^a-zA-Z0-9]/g, '');
+            if (localFastOrders[safeKey] && localFastOrders[safeKey].quantity > 0) {
+                localFastOrders[safeKey].quantity -= 1;
+                const badge = document.getElementById(`badge-${safeKey}`);
+                if (badge) {
+                    if (localFastOrders[safeKey].quantity > 0) { badge.innerText = localFastOrders[safeKey].quantity; badge.classList.remove('pop-anim'); void badge.offsetWidth; badge.classList.add('pop-anim'); }
+                    else { badge.classList.add('hidden'); delete localFastOrders[safeKey]; }
+                }
+                window.updateFloatingFastAddButton();
+            }
+        }
+
+        window.updateFloatingFastAddButton = function() {
+            let total = 0, count = 0;
+            Object.values(localFastOrders).forEach(o => { total += o.finalPrice * o.quantity; count += o.quantity; });
+            const btn = document.getElementById('floating-fast-add');
+            if (btn) {
+                if (count > 0) { btn.innerHTML = `AGREGAR $${total} <span class="text-xs ml-2 bg-white text-green-600 px-2 py-0.5 rounded-full font-bold shadow-sm">${count}</span>`; btn.classList.remove('hidden'); } 
+                else { btn.classList.add('hidden'); }
+            }
+        }
+
+        window.submitLocalFastOrders = async function() {
+            const orders = Object.values(localFastOrders);
+            if (orders.length === 0) return;
+            const btn = document.getElementById('floating-fast-add');
+            if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GUARDANDO...';
+
+            try {
+                const promises = orders.map(o => window.addOrderToDb(o.item, o.finalPrice, o.quantity, ['Cobro rápido'], o.finalName, o.category, true, 'ordered'));
+                await Promise.all(promises);
+                localFastOrders = {}; 
+                const statusTxt = document.getElementById('status-indicator');
+                statusTxt.innerHTML = `<i class="fa-solid fa-check"></i> Guardado`; statusTxt.className = "absolute left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 top-16 md:top-auto bg-green-500 text-white z-[60] font-bold text-sm transition-opacity"; statusTxt.classList.remove('hidden');
+                setTimeout(() => { statusTxt.classList.add('hidden'); }, 2000);
+                window.renderTableDetail(currentTableId);
+            } catch (e) { alert("Error al guardar: " + e.message); window.updateFloatingFastAddButton(); }
+        }
+
+        // ==========================================
+        // 8. CERRAR CUENTAS, DEUDAS Y TICKETS
+        // ==========================================
+        window.openCloseAccountModal = function(tid) {
+            const t = tablesData.find(x => x.id === tid);
+            const ords = ordersData.filter(o => o.tableId === tid && o.status !== 'cancelled');
+            const total = ords.reduce((a,c) => a + (c.price * c.quantity), 0);
+            const amountToPay = total - (t.deposit || 0);
+
+            document.getElementById('modal-content').innerHTML = `
+                <div class="p-8 text-center bg-white relative">
+                    <button onclick="window.closeModal()" class="absolute top-6 right-6 text-slate-400 text-2xl hover:text-red-500 transition bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+                    <h3 class="font-black text-4xl text-slate-800 mb-2 uppercase tracking-tight mt-4">MESA ${t.number}</h3>
+                    <p class="text-slate-400 font-mono text-base mb-8 font-medium">Ticket #${t.uniqueId || '---'}</p>
+                    
+                    <label class="flex items-center justify-center gap-4 mb-8 cursor-pointer bg-slate-50 p-5 rounded-xl border-2 border-slate-200 hover:bg-slate-100 transition w-fit mx-auto shadow-sm active:scale-95">
+                        <input type="checkbox" id="close-card-check" onchange="window.calcCloseTotal(${amountToPay})" class="w-6 h-6 accent-blue-600">
+                        <span class="font-bold text-slate-700 flex items-center gap-2 text-lg"><i class="fa-solid fa-credit-card text-blue-500 text-xl"></i> Pago con Tarjeta (+4%)</span>
+                    </label>
+
+                    <div class="bg-slate-50 p-8 rounded-3xl border-2 border-slate-200 mb-8 relative overflow-hidden shadow-inner">
+                         <div id="close-breakdown" class="hidden text-base mb-4 space-y-3 text-slate-500 border-b-2 border-dashed border-slate-300 pb-5">
+                            <div class="flex justify-between"><span>Subtotal:</span><span class="font-bold text-lg">$${amountToPay}</span></div>
+                            <div class="flex justify-between text-red-500 font-bold text-lg"><span>Comisión (4%):</span><span id="close-comm-val">$0</span></div>
+                        </div>
+                        <span class="block text-slate-400 text-sm uppercase font-black tracking-[0.3em] mb-2">Total a Pagar</span>
+                        <span class="block text-7xl font-black text-slate-800 tracking-tighter" id="close-total-val">$${amountToPay}</span>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+                        <button onclick="window.openDebtModal('${tid}')" class="bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold py-4 rounded-xl transition text-base border border-blue-200">Dejar en Deuda / Fiado</button>
+                        <div class="flex gap-4">
+                            <button onclick="window.printR('${tid}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white font-bold py-5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-lg active:scale-95"><i class="fa-solid fa-print"></i> Ticket</button>
+                            <button onclick="window.downloadPDF('${tid}')" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-lg active:scale-95"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        </div>
+                        <button onclick="window.closeFinal('${tid}')" class="bg-green-500 hover:bg-green-600 text-white font-black py-6 text-2xl rounded-xl shadow-lg transition active:scale-95 mt-2 flex justify-center items-center gap-3"><i class="fa-solid fa-check-double"></i> COBRAR Y CERRAR</button>
+                    </div>
+                </div>`;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        window.calcCloseTotal = function(baseAmount) {
+            const isChecked = document.getElementById('close-card-check').checked;
+            if (isChecked) {
+                const comm = baseAmount * 0.04;
+                document.getElementById('close-comm-val').innerText = `$${comm.toFixed(2)}`;
+                document.getElementById('close-total-val').innerText = `$${(baseAmount + comm).toFixed(2)}`;
+                document.getElementById('close-breakdown').classList.remove('hidden');
+            } else {
+                document.getElementById('close-total-val').innerText = `$${baseAmount}`;
+                document.getElementById('close-breakdown').classList.add('hidden');
+            }
+        }
+
+        window.openDebtModal = function(tid) {
+            document.getElementById('modal-content').innerHTML = `
+                <div class="p-8 text-center bg-white relative">
+                    <button onclick="window.openCloseAccountModal('${tid}')" class="absolute top-6 right-6 text-slate-400 text-2xl hover:text-slate-600 transition bg-slate-100 rounded-full w-10 h-10 flex items-center justify-center"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h3 class="font-black text-3xl mb-3 text-slate-800 tracking-tight mt-4">DEJAR EN DEUDA</h3>
+                    <p class="mb-8 text-slate-500 text-lg">¿Cuánto dinero dejaron a cuenta hoy?</p>
+                    <div class="relative max-w-[250px] mx-auto mb-8"><span class="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 text-3xl font-bold">$</span><input type="number" id="debt-deposit" value="0" oninput="window.calcDebtTotal()" class="w-full py-5 pl-12 pr-5 text-center text-5xl border-2 border-slate-200 rounded-2xl font-black outline-none focus:border-blue-500 transition text-slate-800 bg-slate-50 shadow-inner"></div>
+                    <label class="flex items-center justify-center gap-3 mb-8 cursor-pointer bg-slate-50 p-4 rounded-xl border border-slate-200 hover:bg-slate-100 transition w-fit mx-auto shadow-sm"><input type="checkbox" id="debt-card-check" onchange="window.calcDebtTotal()" class="w-6 h-6 accent-blue-600"><span class="font-bold text-slate-700 text-base">Pago con Tarjeta (+4%)</span></label>
+                    <div id="debt-breakdown" class="hidden bg-slate-50 p-5 rounded-2xl mb-8 text-base border border-slate-200 shadow-inner"><div class="flex justify-between text-slate-500 mb-2"><span>Monto a Cuenta:</span><span class="font-bold" id="debt-base-val">$0</span></div><div class="flex justify-between text-red-500 font-bold mb-3"><span>Comisión (4%):</span><span id="debt-comm-val">$0</span></div><div class="border-t-2 border-dashed border-slate-300 my-4"></div><div class="flex justify-between font-black text-2xl text-slate-800"><span>Total a Cobrar:</span><span id="debt-total-val">$0</span></div></div>
+                    <div class="flex gap-4"><button onclick="window.openCloseAccountModal('${tid}')" class="flex-1 bg-slate-100 text-slate-600 font-bold py-5 rounded-xl hover:bg-slate-200 transition text-lg">Cancelar</button><button onclick="window.confirmDebt('${tid}')" class="flex-[2] bg-blue-600 text-white font-black py-5 rounded-xl shadow-lg hover:bg-blue-700 transition active:scale-95 text-xl flex justify-center items-center gap-2"><i class="fa-solid fa-file-signature"></i> Confirmar Deuda</button></div>
+                </div>`;
+        }
+
+        window.calcDebtTotal = function() {
+            const val = parseFloat(document.getElementById('debt-deposit').value) || 0;
+            const checked = document.getElementById('debt-card-check').checked;
+            const bd = document.getElementById('debt-breakdown');
+            if (val > 0 && checked) {
+                const comm = val * 0.04;
+                document.getElementById('debt-base-val').innerText = `$${val}`; document.getElementById('debt-comm-val').innerText = `$${comm.toFixed(2)}`; document.getElementById('debt-total-val').innerText = `$${(val + comm).toFixed(2)}`;
+                bd.classList.remove('hidden');
+            } else { bd.classList.add('hidden'); }
+        }
+
+        window.confirmDebt = async function(id) {
+            const depositInput = parseFloat(document.getElementById('debt-deposit').value) || 0;
+            const currentDeposit = tablesData.find(x => x.id === id).deposit || 0;
+            try {
+                await db.collection('tables').doc(id).update({ status:'debt', debtDate: firebase.firestore.FieldValue.serverTimestamp(), deposit: currentDeposit + depositInput });
+                window.closeModal(); window.renderWaiterDashboard();
+            } catch(e) { alert("Error al guardar la deuda: " + e.message); }
+        }
+
+        window.closeFinal = async function(id) { 
+            if(confirm("¿Estás seguro de COBRAR Y CERRAR esta mesa? Ya no podrás agregar artículos.")) { 
+                try {
+                    await db.collection('tables').doc(id).update({ status: 'closed', closedAt: firebase.firestore.FieldValue.serverTimestamp() }); 
+                    window.closeModal(); window.renderWaiterDashboard(); 
+                } catch(e) { alert("Error al cerrar la mesa: " + e.message); }
+            } 
+        }
+
+        window.printR = function(tid) {
+            const t = tablesData.find(x=>x.id===tid);
+            const ords = ordersData.filter(x=>x.tableId===tid && x.status!=='cancelled');
+            const total = ords.reduce((acc,c)=>acc+(c.price*c.quantity),0);
+            const deposit = t.deposit || 0;
+            const remaining = total - deposit;
+            const date = new Date().toLocaleString();
+            const grouped = {};
+            ords.forEach(o => { const key = o.itemName + (o.modifiers ? o.modifiers.join('') : ''); if(!grouped[key]) grouped[key] = { ...o, qty: 0, total: 0 }; grouped[key].qty += o.quantity; grouped[key].total += (o.price * o.quantity); });
+            const itemsHtml = Object.values(grouped).map(o => `<div style="margin-bottom:6px; font-size:12px;"><div style="display:flex; justify-content:space-between; font-weight:bold;"><span>${o.qty} x ${o.itemName}</span><span>$${o.total}</span></div>${o.modifiers&&o.modifiers.length?`<div style="font-size:10px; font-style:italic; margin-left:10px;">- ${o.modifiers.join(', ')}</div>`:''}</div>`).join('');
+            
+            let totalHtml = `<div style="border-top:1px dashed #000; margin-top:15px; padding-top:10px; display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>TOTAL</span><span>$${total}</span></div>`;
+            if (deposit > 0) {
+                totalHtml = `
+                    <div style="border-top:1px dashed #000; margin-top:10px; padding-top:5px; display:flex; justify-content:space-between; font-size:12px;"><span>Subtotal</span><span>$${total}</span></div>
+                    <div style="display:flex; justify-content:space-between; font-size:12px;"><span>A Cuenta</span><span>-$${deposit}</span></div>
+                    <div style="margin-top:5px; padding-top:5px; border-top:1px solid #000; display:flex; justify-content:space-between; font-weight:bold; font-size:16px;"><span>RESTANTE</span><span>$${remaining}</span></div>
+                `;
+            }
+
+            document.getElementById('receipt-area').innerHTML = `<div style="text-align:center; margin-bottom:15px; font-family: monospace;"><img src="https://www.dropbox.com/scl/fi/htapbd4yf4m239y9zv2n1/Picture1.png?rlkey=o8je5uxe95avc9i9od6dmpbqh&raw=1" style="width: 60%; max-width: 150px; display: block; margin: 0 auto 10px auto;" onerror="this.style.display='none'"><h2 style="font-weight:bold; font-size:18px; margin:0;">A-LAS DE BARRIL</h2><p style="margin:0; font-size:10px;">--- COPIA CLIENTE ---</p><br><p style="margin:0; font-size:12px;">Ticket #${t.uniqueId||'---'}</p><p style="margin:0; font-size:12px;">${date}</p></div><div style="border-bottom:1px dashed #000; margin-bottom:10px;"></div><div style="font-weight:bold; margin-bottom:10px; font-size:14px;">Mesa: ${t.number}</div>${itemsHtml}${totalHtml}<div style="text-align:center; margin-top:30px; font-size:10px;"><p>¡Gracias por su visita!</p><p>Wifi: AlasInvitado</p></div>`;
+            window.print();
+        }
+
+        window.downloadPDF = function(tid) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [80, 200] }); 
+            const t = tablesData.find(x=>x.id===tid);
+            const ords = ordersData.filter(x=>x.tableId===tid && x.status!=='cancelled');
+            const total = ords.reduce((acc,c)=>acc+(c.price*c.quantity),0);
+            const deposit = t.deposit || 0;
+            const remaining = total - deposit;
+            
+            const cardCheckbox = document.getElementById('close-card-check');
+            const cardFee = (cardCheckbox && cardCheckbox.checked) ? remaining * 0.04 : 0; 
+            const finalRemaining = remaining + cardFee;
+
+            doc.setFontSize(14); doc.text("A-LAS DE BARRIL", 40, 10, { align: "center" });
+            doc.setFontSize(10); doc.text("Ticket #" + (t.uniqueId || '---'), 40, 18, { align: "center" });
+            doc.text(new Date().toLocaleString(), 40, 23, { align: "center" });
+            doc.line(5, 26, 75, 26); doc.text(`Mesa: ${t.number}`, 5, 32);
+            let y = 38; doc.setFontSize(9);
+            ords.forEach(o => {
+                doc.text(`${o.quantity}x ${o.itemName}`, 5, y);
+                doc.text(`$${o.price * o.quantity}`, 75, y, { align: "right" });
+                y += 5;
+                if(o.modifiers && o.modifiers.length) { doc.setFontSize(7); doc.text(`(${o.modifiers.join(', ')})`, 10, y); doc.setFontSize(9); y += 4; }
+            });
+            doc.line(5, y, 75, y); y += 5;
+            
+            if (deposit > 0) {
+                doc.text("Subtotal:", 5, y); doc.text(`$${total}`, 75, y, { align: "right" }); y += 5;
+                doc.text("A Cuenta:", 5, y); doc.text(`-$${deposit}`, 75, y, { align: "right" }); y += 5;
+            }
+
+            if (cardFee > 0) {
+                doc.text("Restante Base:", 5, y); doc.text(`$${remaining}`, 75, y, { align: "right" }); y += 5;
+                doc.text("Comisión (4%):", 5, y); doc.text(`$${cardFee.toFixed(2)}`, 75, y, { align: "right" }); y += 5;
+                doc.setFontSize(12); doc.text("TOTAL A PAGAR:", 5, y); doc.text(`$${finalRemaining.toFixed(2)}`, 75, y, { align: "right" }); y += 5; doc.setFontSize(9);
+            } else {
+                doc.setFontSize(12); doc.text("TOTAL A PAGAR:", 5, y); doc.text(`$${remaining}`, 75, y, { align: "right" }); y += 5; doc.setFontSize(9);
+            }
+            
+            y += 10; doc.setFontSize(8); doc.text("¡Gracias por su visita!", 40, y, { align: "center" });
+            doc.save(`Ticket_Mesa_${t.number}.pdf`);
+        }
+
+        // ==========================================
+        // 9. PANTALLAS DE PRODUCCIÓN (COCINA / BARRA)
+        // ==========================================
         window.renderBoard = function(cat) {
             document.getElementById('header-title').innerText = cat === 'kitchen' ? 'COCINA' : 'BARRA';
-            const active = ordersData.filter(o => o.category === cat && ['ordered','preparing'].includes(o.status)).sort((a,b) => {
-                const ta = a.timestamp?.seconds || Date.now()/1000;
-                const tb = b.timestamp?.seconds || Date.now()/1000;
-                return ta - tb; 
-            });
+            const active = ordersData.filter(o => o.category === cat && ['ordered','preparing'].includes(o.status)).sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
             const ready = ordersData.filter(o => o.category === cat && o.status === 'ready');
+            
             let html = `<div class="flex h-full p-3 gap-4 overflow-x-auto bg-slate-100">`;
             html += `<div class="flex-1 min-w-[300px] bg-white rounded-2xl shadow-sm p-4 flex flex-col border-t-4 border-red-500"><h3 class="font-black text-slate-800 mb-4 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div> Pendientes (${active.filter(o=>o.status==='ordered').length})</h3><div class="flex-1 overflow-y-auto space-y-3 pr-1">${active.filter(o=>o.status==='ordered').map(o=>window.card(o,'ordered')).join('')}</div></div>`;
             if(cat==='kitchen') html += `<div class="flex-1 min-w-[300px] bg-white rounded-2xl shadow-sm p-4 flex flex-col border-t-4 border-amber-400"><h3 class="font-black text-slate-800 mb-4 text-lg flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-400"></div> Cocinando (${active.filter(o=>o.status==='preparing').length})</h3><div class="flex-1 overflow-y-auto space-y-3 pr-1">${active.filter(o=>o.status==='preparing').map(o=>window.card(o,'preparing')).join('')}</div></div>`;
@@ -1428,62 +1155,37 @@
         
         window.card = function(o,s) {
             const t = tablesData.find(x=>x.id===o.tableId);
-            const timeAgo = Math.floor((new Date()-new Date(o.timestamp?.seconds*1000))/60000);
+            const timeAgo = Math.floor((new Date() - new Date(o.timestamp?.seconds*1000))/60000);
             let btnClass = "bg-slate-500", btnText = "Acción";
             if(s==='ordered') { if(o.category==='bar') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } else { btnText="Cocinar"; btnClass="bg-amber-500 hover:bg-amber-600"; } }
             else if(s==='preparing') { btnText="Terminar"; btnClass="bg-green-600 hover:bg-green-700"; } 
             else { btnText="Entregar"; btnClass="bg-blue-600 hover:bg-blue-700"; }
             let nextSt = s==='ordered' ? (o.category==='bar'?'ready':'preparing') : (s==='preparing'?'ready':'delivered');
             
-            const isVip = t?.isVip;
-            const cardBg = isVip ? "bg-pink-50 border-pink-200" : "bg-white border-slate-200";
-            const vipBadge = isVip ? '<span class="bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full ml-2 shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>' : '';
-            
-            return `<div class="${cardBg} p-4 rounded-xl shadow-sm border"><div class="flex justify-between font-bold text-sm mb-3"><span class="bg-slate-800 text-white px-2 py-1 rounded-md flex items-center shadow-sm">MESA ${t?t.number:'?'}${vipBadge}</span><span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-md flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div><div class="text-lg font-bold text-slate-800 leading-tight mb-2"><span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md mr-1">${o.quantity}x</span> ${o.itemName}</div>${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-600 font-bold bg-red-50 p-2 rounded-lg border border-red-100 mb-3 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}<button onclick="window.upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition uppercase tracking-wide">${btnText}</button></div>`;
+            return `<div class="${t?.isVip ? "bg-pink-50 border-pink-200" : "bg-white border-slate-200"} p-4 rounded-xl shadow-sm border"><div class="flex justify-between font-bold text-sm mb-3"><span class="bg-slate-800 text-white px-2 py-1 rounded-md flex items-center shadow-sm">MESA ${t?t.number:'?'}${t?.isVip ? '<span class="bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full ml-2 shadow-sm"><i class="fa-solid fa-crown"></i> VIP</span>' : ''}</span><span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-2 py-1 rounded-md flex items-center gap-1"><i class="fa-regular fa-clock"></i> ${timeAgo} min</span></div><div class="text-lg font-bold text-slate-800 leading-tight mb-2"><span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md mr-1">${o.quantity}x</span> ${o.itemName}</div>${o.modifiers&&o.modifiers.length?`<div class="text-xs text-red-600 font-bold bg-red-50 p-2 rounded-lg border border-red-100 mb-3 flex flex-col gap-1 items-start"><span>${o.modifiers.join(', ')}</span></div>`:''}<button onclick="window.upd('${o.id}','${nextSt}')" class="w-full ${btnClass} text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition uppercase tracking-wide">${btnText}</button></div>`;
         }
         
         window.upd = async function(id,s) { await db.collection('orders').doc(id).update({status:s}); }
 
-        // --- FUNCIONES COMPARTIDAS FALTANTES ---
-        window.adjQty = function(d) { const el=document.getElementById('modal-qty'); let v=parseInt(el.innerText)+d; if(v<1)v=1; el.innerText=v; }
-        window.toggleMod = function(b) { b.classList.toggle('selected'); }
-        window.closeModal = function() { document.getElementById('modal-overlay').classList.add('hidden'); }
-        window.logoutToHome = function() { window.renderHome(); }
-
         // ==========================================
-        // ARRANQUE FIREBASE Y SINCRONIZACIÓN
+        // 10. ARRANQUE FIREBASE Y SINCRONIZACIÓN
         // ==========================================
         try {
             firebase.initializeApp(firebaseConfig); 
             auth = firebase.auth(); 
             db = firebase.firestore();
-            
             db.enablePersistence({synchronizeTabs:true}).catch(err => console.warn("Offline persistence warn:", err.code));
             
             auth.onAuthStateChanged((user) => {
                 if (user) {
                     currentUser = user;
-                    
-                    const handleDbError = (err) => {
-                        console.error(err);
-                        window.showError("Error de Base de Datos", "Revisa las 'Reglas' en Firebase.<br>Detalle: " + err.message);
-                    };
+                    const handleDbError = (err) => { console.error(err); window.showError("Error de Base de Datos", "Revisa las 'Reglas' en Firebase.<br>Detalle: " + err.message); };
 
-                    // ESCUCHAR INVENTARIO MAESTRO
                     db.collection('inventory').onSnapshot(s => {
                         if (s.empty && MENU.length === 0) {
-                            // Siembra inicial de inventario maestro
-                            const batch = db.batch();
-                            const uniqueInventories = {};
-                            INITIAL_MENU.forEach(item => {
-                                if(item.invId && !uniqueInventories[item.invId]) {
-                                    uniqueInventories[item.invId] = { id: item.invId, name: item.invName, stock: 0 };
-                                }
-                            });
-                            Object.values(uniqueInventories).forEach(inv => {
-                                const ref = db.collection('inventory').doc(inv.id);
-                                batch.set(ref, inv);
-                            });
+                            const batch = db.batch(); const uniqueInventories = {};
+                            INITIAL_MENU.forEach(item => { if(item.invId && !uniqueInventories[item.invId]) uniqueInventories[item.invId] = { id: item.invId, name: item.invName, stock: 0 }; });
+                            Object.values(uniqueInventories).forEach(inv => batch.set(db.collection('inventory').doc(inv.id), inv));
                             batch.commit().catch(e => console.error("Error sembrando inventario", e));
                         } else {
                             MASTER_INVENTORY = s.docs.map(d => ({id: d.id, ...d.data()}));
@@ -1491,35 +1193,21 @@
                         }
                     }, handleDbError);
 
-                    // ESCUCHAR MENÚ EN TIEMPO REAL
                     db.collection('menu_items').onSnapshot(async (s) => {
                         if (s.empty) {
-                            // Subir menú base inicial
                             try {
                                 const batch = db.batch();
-                                INITIAL_MENU.forEach((item, index) => {
-                                    const ref = db.collection('menu_items').doc(item.id);
-                                    // Guardamos el costo de inventario para futuras deducciones
-                                    batch.set(ref, { ...item, sold_since_update: 0, order: index });
-                                });
+                                INITIAL_MENU.forEach((item, index) => batch.set(db.collection('menu_items').doc(item.id), { ...item, sold_since_update: 0, order: index }));
                                 await batch.commit();
-                            } catch (e) {
-                                handleDbError(e);
-                            }
+                            } catch (e) { handleDbError(e); }
                         } else {
-                            // Leer y ordenar menú
                             MENU = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => (a.order || 0) - (b.order || 0));
-                            if (!appInitialized) {
-                                appInitialized = true;
-                                window.renderHome();
-                            } else {
-                                window.refreshCurrentView();
-                            }
+                            if (!appInitialized) { appInitialized = true; window.renderHome(); } 
+                            else { window.refreshCurrentView(); }
                         }
                     }, handleDbError);
 
-                    const limitDate = new Date();
-                    limitDate.setDate(limitDate.getDate() - 15);
+                    const limitDate = new Date(); limitDate.setDate(limitDate.getDate() - 15);
                     const limitFb = firebase.firestore.Timestamp.fromDate(limitDate);
 
                     db.collection('tables').where('openedAt', '>=', limitFb).onSnapshot(s => { 
@@ -1534,18 +1222,8 @@
                 }
             });
 
-            async function initApp() { 
-                try { 
-                    await auth.signInAnonymously(); 
-                } catch (e) { 
-                    window.showError("Error de Conexión", "Asegúrate de activar el inicio de sesión anónimo en Firebase.<br><br>" + e.message); 
-                } 
-            }
-            initApp();
-
-        } catch (e) { 
-            window.showError("Error Crítico de Firebase", e.message); 
-        }
+            auth.signInAnonymously().catch(e => window.showError("Error de Conexión", "Asegúrate de activar el inicio de sesión anónimo en Firebase.<br><br>" + e.message)); 
+        } catch (e) { window.showError("Error Crítico de Firebase", e.message); }
 
     </script>
 </body>
